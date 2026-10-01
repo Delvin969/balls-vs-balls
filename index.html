@@ -3,11 +3,8 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
-<title>Ball vs Ball — Neon Arena</title>
+<title>Ball vs Ball — Neon Battle Royale</title>
 <style>
-/* ============================================================
-   RESET & DASAR
-   ============================================================ */
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{
   height:100%;overflow:hidden;background:#04020e;
@@ -17,99 +14,66 @@ html,body{
 }
 canvas{position:fixed;inset:0;display:block;}
 
-/* ============================================================
-   HUD
-   ============================================================ */
+/* ============ HUD ============ */
 #hud{position:fixed;inset:0;pointer-events:none;z-index:10;transition:opacity .35s;}
 #hud.hidden{opacity:0;}
 
 .hud-top{
   position:absolute;top:0;left:0;right:0;
   display:flex;justify-content:space-between;align-items:flex-start;
-  padding:14px 18px;gap:10px;
+  padding:14px 22px;
 }
-.hp-wrap{flex:1;max-width:34%;}
-.hp-wrap.right{text-align:right;}
-.hp-name{
-  font-size:11px;letter-spacing:2.5px;font-weight:700;
-  margin-bottom:5px;opacity:.85;text-shadow:0 0 10px currentColor;
+.hud-stat{text-align:center;min-width:70px;}
+.hud-stat.right{text-align:right;}
+.hud-stat-label{
+  font-size:10px;letter-spacing:2.5px;font-weight:700;opacity:.65;
 }
-.hp-wrap.left .hp-name{color:#5fe6ff;}
-.hp-wrap.right .hp-name{color:#ff5f9e;}
-.hp-bar{
-  height:16px;border-radius:9px;overflow:hidden;
-  background:rgba(255,255,255,.07);
-  border:1px solid rgba(255,255,255,.18);
-  box-shadow:inset 0 0 12px rgba(0,0,0,.6);
-  position:relative;
+.hud-stat-value{
+  font-size:28px;font-weight:900;line-height:1.1;
+  color:#5fe6ff;text-shadow:0 0 16px #5fe6ff;
+  font-variant-numeric:tabular-nums;
 }
-.hp-fill{
-  height:100%;width:100%;border-radius:8px;
-  background:linear-gradient(90deg,#0aa6d6,#5fe6ff,#b6f7ff);
-  box-shadow:0 0 16px #5fe6ff;
-  transition:width .18s ease-out;
+.hud-stat.right .hud-stat-value{
+  color:#ff5f9e;text-shadow:0 0 16px #ff5f9e;
 }
-.hp-fill.enemy{
-  background:linear-gradient(90deg,#ffb6d5,#ff5f9e,#c81e63);
-  box-shadow:0 0 16px #ff5f9e;
-  margin-left:auto;
-}
-.hp-wrap.right .hp-bar{display:flex;justify-content:flex-end;}
-
-.hud-center{text-align:center;min-width:120px;}
+.hud-center{text-align:center;flex:1;}
 .timer{
   font-size:26px;font-weight:800;letter-spacing:2px;
   text-shadow:0 0 18px #a25bff,0 0 34px #a25bff;
   font-variant-numeric:tabular-nums;
 }
-.score{
-  font-size:12px;letter-spacing:2px;font-weight:700;
-  color:#ffd93d;text-shadow:0 0 12px #ffd93d;margin-top:2px;
-}
 
 .hud-bottom{
-  position:absolute;left:0;right:0;bottom:20px;
-  display:flex;flex-direction:column;align-items:center;gap:10px;
+  position:absolute;left:0;right:0;bottom:16px;
+  display:flex;justify-content:center;
 }
-.dash-wrap{width:min(280px,60vw);text-align:center;}
-.dash-label{
-  font-size:10px;letter-spacing:2.5px;font-weight:700;
-  opacity:.75;margin-bottom:5px;
+.ball-list{
+  display:flex;gap:6px;flex-wrap:wrap;justify-content:center;
+  max-width:92vw;padding:8px 12px;border-radius:14px;
+  background:rgba(0,0,0,0.28);
+  border:1px solid rgba(255,255,255,0.08);
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
 }
-.dash-bar{
-  height:9px;border-radius:5px;overflow:hidden;
-  background:rgba(255,255,255,.09);
-  border:1px solid rgba(255,255,255,.16);
+.ball-chip{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:4px 5px;border-radius:8px;
+  transition:opacity .4s, filter .4s;
 }
-.dash-fill{
-  height:100%;width:100%;border-radius:5px;
-  background:linear-gradient(90deg,#a25bff,#ff5fd2,#ffd93d);
-  box-shadow:0 0 14px #ff5fd2;
-  transition:width .06s linear;
+.ball-chip.dead{opacity:.12;filter:grayscale(1);}
+.ball-chip .dot{
+  width:13px;height:13px;border-radius:50%;
 }
-.combo{
-  font-size:16px;font-weight:900;letter-spacing:2px;
-  color:#ffd93d;text-shadow:0 0 16px #ff9d00;
-  opacity:0;transform:scale(.7);transition:all .18s;
+.ball-chip .hp-mini{
+  width:24px;height:4px;border-radius:2px;
+  background:rgba(255,255,255,0.13);
+  overflow:hidden;
 }
-.combo.show{opacity:1;transform:scale(1);}
+.ball-chip .hp-mini-fill{
+  height:100%;width:100%;
+  transition:width .15s ease-out;
+}
 
-#dashBtn{
-  position:absolute;right:22px;bottom:26px;
-  width:92px;height:92px;border-radius:50%;
-  border:2px solid rgba(255,255,255,.35);
-  background:radial-gradient(circle at 35% 30%,rgba(162,91,255,.65),rgba(70,20,140,.5));
-  color:#fff;font-weight:900;font-size:14px;letter-spacing:2px;
-  box-shadow:0 0 28px rgba(162,91,255,.7),inset 0 0 20px rgba(255,255,255,.18);
-  pointer-events:auto;display:none;
-  -webkit-appearance:none;appearance:none;
-}
-#dashBtn:active{transform:scale(.92);background:radial-gradient(circle at 35% 30%,rgba(255,120,220,.8),rgba(120,30,180,.6));}
-body.touch #dashBtn{display:block;}
-
-/* ============================================================
-   OVERLAY / MENU
-   ============================================================ */
+/* ============ OVERLAY ============ */
 #overlay{
   position:fixed;inset:0;z-index:20;
   display:flex;align-items:center;justify-content:center;
@@ -123,7 +87,7 @@ body.touch #dashBtn{display:block;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
 
 h1.logo{
-  font-size:clamp(34px,9vw,58px);font-weight:900;letter-spacing:4px;
+  font-size:clamp(32px,8.5vw,54px);font-weight:900;letter-spacing:4px;
   line-height:1;text-align:center;margin-bottom:6px;
   background:linear-gradient(90deg,#5fe6ff,#a25bff,#ff5f9e,#ffd93d);
   -webkit-background-clip:text;background-clip:text;color:transparent;
@@ -151,6 +115,7 @@ h2.title{
   border:1.5px solid rgba(120,200,255,.35);
   transition:all .16s;-webkit-appearance:none;appearance:none;
   text-transform:uppercase;
+  font-family:inherit;
 }
 .btn:hover,.btn:active{
   background:rgba(95,230,255,.16);
@@ -176,6 +141,7 @@ h2.title{
   background:rgba(255,255,255,.05);color:#b9c7dd;
   border:1.5px solid rgba(255,255,255,.14);
   transition:all .16s;-webkit-appearance:none;appearance:none;
+  font-family:inherit;
 }
 .chip.active{
   background:linear-gradient(120deg,rgba(95,230,255,.28),rgba(162,91,255,.28));
@@ -186,7 +152,6 @@ h2.title{
 }
 .best span{color:#ffd93d;font-weight:800;text-shadow:0 0 12px #ffd93d;}
 
-/* Kartu petunjuk */
 .card{
   background:rgba(255,255,255,.045);
   border:1px solid rgba(255,255,255,.12);
@@ -194,36 +159,42 @@ h2.title{
   margin-bottom:14px;font-size:13.5px;line-height:1.85;
 }
 .card b{color:#5fe6ff;text-shadow:0 0 10px rgba(95,230,255,.7);}
+.card ul{list-style:none;}
+.card li{margin-bottom:6px;}
 .card .k{
   display:inline-block;padding:1px 8px;border-radius:6px;
   background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);
   font-weight:700;font-size:12px;margin:0 2px;
 }
-.card ul{list-style:none;}
-.card li{margin-bottom:5px;}
 
-/* Skin grid */
-.skin-grid{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));
-  gap:11px;width:100%;margin-bottom:16px;
+/* Winner display */
+.winner-display{
+  display:flex;flex-direction:column;align-items:center;
+  gap:10px;margin-bottom:18px;
 }
-.skin{
-  border-radius:14px;padding:12px 6px 9px;text-align:center;cursor:pointer;
-  background:rgba(255,255,255,.05);
-  border:1.5px solid rgba(255,255,255,.13);
-  transition:all .16s;position:relative;overflow:hidden;
+.winner-orb{
+  width:80px;height:80px;border-radius:50%;
+  box-shadow:0 0 50px currentColor, inset 0 0 30px rgba(255,255,255,0.3);
+  animation:pop 0.6s cubic-bezier(.2,1.6,.4,1);
 }
-.skin .orb{
-  width:38px;height:38px;border-radius:50%;margin:0 auto 7px;
-  box-shadow:0 0 20px currentColor;
+@keyframes pop{
+  0%{transform:scale(0);}
+  100%{transform:scale(1);}
 }
-.skin .nm{font-size:10px;letter-spacing:1px;font-weight:700;opacity:.9;}
-.skin .rq{font-size:9px;opacity:.55;margin-top:2px;letter-spacing:.5px;}
-.skin.locked{opacity:.4;cursor:not-allowed;}
-.skin.locked .orb{filter:grayscale(1);}
-.skin.sel{border-color:#ffd93d;box-shadow:0 0 26px rgba(255,217,61,.55);background:rgba(255,217,61,.1);}
+.winner-name{
+  font-size:22px;font-weight:900;letter-spacing:4px;
+  text-shadow:0 0 24px currentColor;
+}
 
-/* Leaderboard */
+.result-sub{font-size:12px;letter-spacing:2px;opacity:.7;margin-bottom:16px;text-align:center;}
+.result-stats{display:flex;gap:10px;width:100%;margin-bottom:16px;}
+.stat{
+  flex:1;text-align:center;padding:12px 6px;border-radius:13px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);
+}
+.stat .v{font-size:20px;font-weight:900;color:#5fe6ff;text-shadow:0 0 14px rgba(95,230,255,.8);}
+.stat .l{font-size:9px;letter-spacing:2px;opacity:.6;margin-top:3px;}
+
 .board{width:100%;margin-bottom:14px;}
 .board .row{
   display:flex;justify-content:space-between;align-items:center;
@@ -235,91 +206,63 @@ h2.title{
 .board .rk{font-weight:900;opacity:.55;width:24px;}
 .board .sc{margin-left:auto;font-weight:800;color:#ffd93d;letter-spacing:1px;}
 .board .dt{font-size:10px;opacity:.4;margin-left:10px;}
-.result-sub{font-size:12px;letter-spacing:2px;opacity:.65;margin-bottom:18px;text-align:center;}
-.result-stats{
-  display:flex;gap:10px;width:100%;margin-bottom:16px;
-}
-.stat{
-  flex:1;text-align:center;padding:12px 6px;border-radius:13px;
-  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);
-}
-.stat .v{font-size:20px;font-weight:900;color:#5fe6ff;text-shadow:0 0 14px rgba(95,230,255,.8);}
-.stat .l{font-size:9px;letter-spacing:2px;opacity:.6;margin-top:3px;}
-.win{color:#4dff9e !important;text-shadow:0 0 26px #4dff9e !important;}
-.lose{color:#ff5f7e !important;text-shadow:0 0 26px #ff5f7e !important;}
 </style>
 </head>
 <body>
 <canvas id="game"></canvas>
 
-<!-- ================= HUD ================= -->
 <div id="hud" class="hidden">
   <div class="hud-top">
-    <div class="hp-wrap left">
-      <div class="hp-name">YOU</div>
-      <div class="hp-bar"><div class="hp-fill" id="pHP"></div></div>
+    <div class="hud-stat">
+      <div class="hud-stat-label">ALIVE</div>
+      <div class="hud-stat-value" id="aliveCount">0</div>
     </div>
     <div class="hud-center">
       <div class="timer" id="hudTimer">00:00</div>
-      <div class="score" id="hudScore">SCORE 0</div>
     </div>
-    <div class="hp-wrap right">
-      <div class="hp-name">ENEMY</div>
-      <div class="hp-bar"><div class="hp-fill enemy" id="eHP"></div></div>
+    <div class="hud-stat right">
+      <div class="hud-stat-label">TOTAL</div>
+      <div class="hud-stat-value" id="totalBalls">0</div>
     </div>
   </div>
   <div class="hud-bottom">
-    <div class="combo" id="comboEl">COMBO x2</div>
-    <div class="dash-wrap">
-      <div class="dash-label">DASH COOLDOWN</div>
-      <div class="dash-bar"><div class="dash-fill" id="dashFill"></div></div>
-    </div>
+    <div class="ball-list" id="ballList"></div>
   </div>
-  <button id="dashBtn">DASH</button>
 </div>
 
-<!-- ================= OVERLAY ================= -->
 <div id="overlay">
 
-  <!-- MENU UTAMA -->
+  <!-- MENU -->
   <div class="screen active" id="scr-menu">
     <h1 class="logo">BALL <span>VS</span> BALL</h1>
-    <p class="sub">Neon Arena Battle</p>
-    <button class="btn primary" data-act="play">▶ PLAY</button>
-    <button class="btn" data-act="howto">? HOW TO PLAY</button>
-    <button class="btn" data-act="skins">🎨 SKIN BOLA</button>
+    <p class="sub">Neon Battle Royale</p>
+    <button class="btn primary" data-act="play">▶ MULAI PERTARUNGAN</button>
+    <button class="btn" data-act="howto">? CARA MAIN</button>
     <div class="diff-row">
-      <span>DIFFICULTY</span>
+      <span>CHAOS LEVEL</span>
       <div class="diff-btns">
-        <button class="chip" data-diff="easy">EASY</button>
+        <button class="chip" data-diff="easy">SANTAI</button>
         <button class="chip active" data-diff="normal">NORMAL</button>
-        <button class="chip" data-diff="hard">HARD</button>
+        <button class="chip" data-diff="hard">CHAOS</button>
       </div>
     </div>
-    <div class="best">BEST SCORE: <span id="bestScore">0</span></div>
+    <div class="best">GAME TERAKHIR: <span id="bestScore">—</span></div>
   </div>
 
   <!-- HOW TO PLAY -->
   <div class="screen" id="scr-howto">
-    <h2 class="title">HOW TO PLAY</h2>
+    <h2 class="title">CARA MAIN</h2>
     <div class="card">
       <ul>
-        <li><b>Gerak:</b> arahkan kursor mouse / sentuh layar, atau pakai <span class="k">W</span><span class="k">A</span><span class="k">S</span><span class="k">D</span> / <span class="k">↑</span><span class="k">←</span><span class="k">↓</span><span class="k">→</span></li>
-        <li><b>Dash:</b> tekan <span class="k">SPASI</span> (atau tombol DASH di mobile) untuk menerjang. Damage dash 2x lipat!</li>
-        <li><b>Damage:</b> makin cepat bola menabrak, makin besar damage-nya.</li>
-        <li><b>Ring Out:</b> bola yang terlempar keluar arena akan kena damage besar. Terlalu jauh = langsung kalah!</li>
-        <li><b>Power-Up:</b> ⚡ Speed · ✚ Heal · ◈ Shield · ⬤ Big Ball</li>
-        <li><b>Combo:</b> tabrak musuh berturut-turut untuk multiplier skor.</li>
-        <li><b>Pause:</b> tekan <span class="k">ESC</span></li>
+        <li><b>Tonton saja!</b> Kamu tidak mengendalikan bola. Setiap bola punya AI-nya sendiri.</li>
+        <li>Setiap game, <b>bola dibuat acak</b>: warna, ukuran, HP, kecepatan, dan agresivitas berbeda-beda.</li>
+        <li>Bola akan <b>saling serang</b> — damage dihitung dari kecepatan tabrakan.</li>
+        <li>Bola yang <b>terdorong keluar arena</b> kena damage besar. Terlalu jauh = langsung hancur!</li>
+        <li><b>Power-up</b> muncul acak: ⚡ Speed · ✚ Heal · ◈ Shield · ⬤ Big Ball</li>
+        <li>Bola yang <b>terakhir bertahan</b> adalah pemenangnya! 🏆</li>
+        <li>Tekan <span class="k">ESC</span> untuk pause.</li>
       </ul>
     </div>
-    <button class="btn" data-act="back">← KEMBALI</button>
-  </div>
-
-  <!-- SKIN -->
-  <div class="screen" id="scr-skins">
-    <h2 class="title">PILIH SKIN</h2>
-    <div class="skin-grid" id="skinGrid"></div>
     <button class="btn" data-act="back">← KEMBALI</button>
   </div>
 
@@ -327,21 +270,25 @@ h2.title{
   <div class="screen" id="scr-pause">
     <h2 class="title">PAUSED</h2>
     <button class="btn primary" data-act="resume">▶ LANJUT</button>
-    <button class="btn" data-act="restart">↻ ULANGI</button>
+    <button class="btn" data-act="restart">↻ PERTARUNGAN BARU</button>
     <button class="btn ghost" data-act="menu">⌂ MENU UTAMA</button>
   </div>
 
   <!-- GAME OVER -->
   <div class="screen" id="scr-over">
     <h2 class="title" id="overTitle">VICTORY</h2>
-    <p class="result-sub" id="overSub">Kamu menghancurkan musuh!</p>
+    <div class="winner-display">
+      <div class="winner-orb" id="winnerOrb"></div>
+      <div class="winner-name" id="winnerName">—</div>
+    </div>
+    <p class="result-sub" id="overSub">Pemenang pertarungan!</p>
     <div class="result-stats">
-      <div class="stat"><div class="v" id="ovScore">0</div><div class="l">SCORE</div></div>
-      <div class="stat"><div class="v" id="ovTime">0:00</div><div class="l">WAKTU</div></div>
-      <div class="stat"><div class="v" id="ovCombo">x1</div><div class="l">COMBO MAX</div></div>
+      <div class="stat"><div class="v" id="ovBalls">0</div><div class="l">TOTAL BOLA</div></div>
+      <div class="stat"><div class="v" id="ovTime">0:00</div><div class="l">DURASI</div></div>
+      <div class="stat"><div class="v" id="ovSurvivors">0</div><div class="l">BERTAHAN</div></div>
     </div>
     <div class="board" id="boardList"></div>
-    <button class="btn primary" data-act="restart">↻ MAIN LAGI</button>
+    <button class="btn primary" data-act="restart">↻ PERTARUNGAN BARU</button>
     <button class="btn ghost" data-act="menu">⌂ MENU UTAMA</button>
   </div>
 
@@ -352,13 +299,13 @@ h2.title{
 'use strict';
 
 /* ============================================================
-   1. SETUP CANVAS & SKALA
+   1. SETUP CANVAS
    ============================================================ */
 const canvas = document.getElementById('game');
 const ctx    = canvas.getContext('2d');
 let W = 0, H = 0, DPR = 1, SCALE = 1;
 let bgGrad = null;
-const arena = { cx: 0, cy: 0, r: 300 };
+const arena = { cx: 0, cy: 0, r: 200 };
 
 function resize(){
   DPR = Math.min(window.devicePixelRatio || 1, 2);
@@ -372,7 +319,8 @@ function resize(){
 
   arena.cx = W / 2;
   arena.cy = H / 2;
-  arena.r  = Math.max(140, Math.min(W, H) * 0.40);
+  // ARENA KECIL — supaya bola cepat bertemu & chaos
+  arena.r  = clamp(Math.min(W, H) * 0.30, 95, 250);
   SCALE    = Math.max(0.55, Math.min(W, H) / 800);
 
   bgGrad = ctx.createLinearGradient(0, 0, W, H);
@@ -384,7 +332,7 @@ window.addEventListener('resize', resize);
 window.addEventListener('orientationchange', () => setTimeout(resize, 120));
 
 /* ============================================================
-   2. AUDIO (Web Audio API)
+   2. AUDIO
    ============================================================ */
 const Sound = {
   ctx: null, master: null, noiseBuf: null, ok: false,
@@ -394,7 +342,7 @@ const Sound = {
       const AC = window.AudioContext || window.webkitAudioContext;
       this.ctx = new AC();
       this.master = this.ctx.createGain();
-      this.master.gain.value = 0.30;
+      this.master.gain.value = 0.28;
       this.master.connect(this.ctx.destination);
       const len = Math.floor(this.ctx.sampleRate * 0.5);
       const buf = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
@@ -432,12 +380,10 @@ const Sound = {
     s.connect(f); f.connect(g); g.connect(this.master);
     s.start(t); s.stop(t + dur + 0.02);
   },
-  hit(s){ this.tone(90 + s * 90, 0.16, 'square', 0.10 + s * 0.16, 45); this.noise(0.10, 0.08 + s * 0.14, 500 + s * 1000, 1.2); },
-  dash(){ this.tone(700, 0.16, 'sawtooth', 0.09, 210); this.noise(0.13, 0.06, 2400, 2); },
-  pick(){ this.tone(700, 0.09, 'sine', 0.12); setTimeout(() => this.tone(1120, 0.13, 'sine', 0.11), 65); },
-  bounce(){ this.tone(180, 0.06, 'triangle', 0.05, 130); },
-  win(){ [523,659,784,1047].forEach((f,i) => setTimeout(() => this.tone(f, 0.3, 'triangle', 0.15), i * 105)); },
-  lose(){ [392,330,262,175].forEach((f,i) => setTimeout(() => this.tone(f, 0.34, 'sawtooth', 0.11), i * 135)); },
+  hit(s){ this.tone(80 + s * 80, 0.14, 'square', 0.07 + s * 0.13, 40); this.noise(0.09, 0.06 + s * 0.11, 500 + s * 900, 1.2); },
+  dash(){ this.tone(650, 0.14, 'sawtooth', 0.07, 200); this.noise(0.11, 0.05, 2200, 2); },
+  pick(){ this.tone(700, 0.09, 'sine', 0.10); setTimeout(() => this.tone(1120, 0.13, 'sine', 0.09), 65); },
+  win(){ [523,659,784,1047,1319].forEach((f,i) => setTimeout(() => this.tone(f, 0.32, 'triangle', 0.14), i * 100)); },
   ui(){ this.tone(560, 0.06, 'sine', 0.07); }
 };
 
@@ -451,68 +397,56 @@ const fmtTime = s => {
   const ss = Math.floor(s % 60);
   return m + ':' + (ss < 10 ? '0' : '') + ss;
 };
-const MAX_PARTICLES = 200;
+const MAX_PARTICLES = 220;
 
 /* ============================================================
-   4. DATA SKIN
+   4. PALET BOLA — tiap game dipilih acak
    ============================================================ */
-const SKINS = [
-  { id:'cyan',  name:'CYAN BLAZE',  color:'#31d7ff', light:'#d6faff', req:0,    desc:'Default' },
-  { id:'magma', name:'MAGMA CORE',  color:'#ff5b2e', light:'#ffd9a8', req:500,  desc:'500 pts' },
-  { id:'toxic', name:'TOXIC LIME',  color:'#6dff4d', light:'#e2ffd0', req:1500, desc:'1500 pts' },
-  { id:'void',  name:'VOID PURPLE', color:'#b04dff', light:'#ecd4ff', req:3000, desc:'3000 pts' },
-  { id:'gold',  name:'GOLDEN GOD',  color:'#ffcc33', light:'#fff6cc', req:6000, desc:'6000 pts' }
+const BALL_DEFS = [
+  { name:'CYAN',   color:'#31d7ff', light:'#d6faff' },
+  { name:'MAGMA',  color:'#ff5b2e', light:'#ffd9a8' },
+  { name:'TOXIC',  color:'#6dff4d', light:'#e2ffd0' },
+  { name:'VOID',   color:'#b04dff', light:'#ecd4ff' },
+  { name:'GOLD',   color:'#ffcc33', light:'#fff6cc' },
+  { name:'ROSE',   color:'#ff3d7f', light:'#ffc4dc' },
+  { name:'AQUA',   color:'#00ffaa', light:'#b0ffe0' },
+  { name:'ORCHID', color:'#ff77ff', light:'#ffd6ff' },
+  { name:'AMBER',  color:'#ffa500', light:'#ffe0a0' },
+  { name:'INDIGO', color:'#7b68ee', light:'#d0c8ff' },
+  { name:'TURQ',   color:'#00ced1', light:'#b0f0f2' },
+  { name:'CORAL',  color:'#ff6347', light:'#ffc0b0' },
+  { name:'LIME',   color:'#32cd32', light:'#b8ffb8' },
+  { name:'PINK',   color:'#ff69b4', light:'#ffc8e0' },
+  { name:'BLUE',   color:'#1e90ff', light:'#b0d8ff' }
 ];
 
 /* ============================================================
-   5. DIFFICULTY
+   5. DIFFICULTY (mempengaruhi agresivitas AI global)
    ============================================================ */
 const DIFF = {
-  easy:   { aiPower:0.62, aiLead:0.05, dashChance:0.35, dmgMul:0.70, spdMul:0.86 },
-  normal: { aiPower:0.82, aiLead:0.12, dashChance:0.75, dmgMul:1.00, spdMul:1.00 },
-  hard:   { aiPower:0.97, aiLead:0.20, dashChance:1.30, dmgMul:1.35, spdMul:1.14 }
+  easy:   { aiPower:0.62, dashChance:0.30, dmgMul:0.75 },
+  normal: { aiPower:0.85, dashChance:0.75, dmgMul:1.00 },
+  hard:   { aiPower:1.05, dashChance:1.35, dmgMul:1.30 }
 };
 
 /* ============================================================
-   6. LOCALSTORAGE
-   ============================================================ */
-const LS_BEST = 'bvb_best', LS_BOARD = 'bvb_board', LS_SKIN = 'bvb_skin';
-function getBest(){ return parseInt(localStorage.getItem(LS_BEST) || '0', 10) || 0; }
-function setBest(v){ localStorage.setItem(LS_BEST, String(Math.floor(v))); }
-function getBoard(){
-  try { return JSON.parse(localStorage.getItem(LS_BOARD)) || []; } catch(e){ return []; }
-}
-function addBoard(score, win){
-  let b = getBoard();
-  b.push({ s: Math.floor(score), w: win ? 1 : 0, d: Date.now() });
-  b.sort((a, c) => c.s - a.s);
-  b = b.slice(0, 5);
-  try { localStorage.setItem(LS_BOARD, JSON.stringify(b)); } catch(e){}
-  return b;
-}
-
-/* ============================================================
-   7. STATE GLOBAL
+   6. STATE GLOBAL
    ============================================================ */
 const G = {
-  mode: 'menu',              // menu | playing | paused | over
+  mode: 'menu',
   difficulty: 'normal',
-  player: null, enemy: null,
-  powerups: [], particles: [],
-  score: 0, combo: 0, comboTimer: 0, maxCombo: 1,
+  balls: [],
+  powerups: [],
+  particles: [],
   elapsed: 0,
   shake: 0, flash: 0, flashColor: '#ffffff',
   timeScale: 1, slowmo: 0, ending: false, endTimer: 0,
-  spawnTimer: 2.5,
-  skinId: localStorage.getItem(LS_SKIN) || 'cyan'
+  spawnTimer: 3.0,
+  totalBalls: 0
 };
 
-let inputMode = 'pointer';   // 'pointer' | 'key'
-const keys = {};
-const pointer = { x: 0, y: 0, active: false };
-
 /* ============================================================
-   8. KELAS PARTICLE
+   7. PARTIKEL
    ============================================================ */
 class Particle {
   constructor(x, y, vx, vy, life, size, color){
@@ -537,14 +471,29 @@ class Particle {
   }
 }
 
+function burst(x, y, count, color, speed, size){
+  for (let i = 0; i < count; i++){
+    if (G.particles.length >= MAX_PARTICLES) break;
+    const a = Math.random() * Math.PI * 2;
+    const s = speed * (0.25 + Math.random() * 0.95);
+    G.particles.push(new Particle(
+      x, y,
+      Math.cos(a) * s, Math.sin(a) * s,
+      0.35 + Math.random() * 0.55,
+      size * (0.5 + Math.random()),
+      color
+    ));
+  }
+}
+
 /* ============================================================
-   9. KELAS POWER-UP
+   8. POWER-UP
    ============================================================ */
 const PU_DEF = {
-  speed:  { color:'#ffd93d', label:'SPEED'  },
-  heal:   { color:'#4dff88', label:'HEAL'   },
-  shield: { color:'#4fc3ff', label:'SHIELD' },
-  big:    { color:'#c05bff', label:'BIG'    }
+  speed:  { color:'#ffd93d' },
+  heal:   { color:'#4dff88' },
+  shield: { color:'#4fc3ff' },
+  big:    { color:'#c05bff' }
 };
 const PU_KEYS = Object.keys(PU_DEF);
 
@@ -552,7 +501,7 @@ class PowerUp {
   constructor(type, x, y){
     this.type = type;
     this.x = x; this.y = y;
-    this.r = 17 * SCALE;
+    this.r = 14 * SCALE;
     this.color = PU_DEF[type].color;
     this.spin = Math.random() * Math.PI * 2;
     this.life = 16;
@@ -568,16 +517,12 @@ class PowerUp {
     const R = this.r * pulse;
     ctx.save();
     ctx.translate(this.x, this.y);
-
-    // glow luar
-    ctx.shadowBlur = 22;
+    ctx.shadowBlur = 20;
     ctx.shadowColor = this.color;
-
-    // badan (rounded square berputar)
     ctx.rotate(this.spin);
     ctx.fillStyle = 'rgba(10,5,25,0.9)';
     ctx.strokeStyle = this.color;
-    ctx.lineWidth = 2.5;
+    ctx.lineWidth = 2.2;
     const s = R * 0.92;
     ctx.beginPath();
     if (ctx.roundRect) ctx.roundRect(-s, -s, s * 2, s * 2, s * 0.42);
@@ -585,11 +530,10 @@ class PowerUp {
     ctx.fill(); ctx.stroke();
     ctx.rotate(-this.spin);
 
-    // ikon
-    ctx.shadowBlur = 12;
+    ctx.shadowBlur = 10;
     ctx.fillStyle = this.color;
     ctx.strokeStyle = this.color;
-    ctx.lineWidth = 2.2;
+    ctx.lineWidth = 2;
     const k = R * 0.52;
     if (this.type === 'speed'){
       ctx.beginPath();
@@ -612,7 +556,6 @@ class PowerUp {
     }
     ctx.restore();
 
-    // timer kedip saat hampir hilang
     if (this.life < 4){
       ctx.globalAlpha = 0.35 + 0.65 * Math.abs(Math.sin(this.life * 9));
       ctx.strokeStyle = this.color;
@@ -624,10 +567,14 @@ class PowerUp {
 }
 
 /* ============================================================
-   10. KELAS BALL
+   9. BALL
    ============================================================ */
+let ballIdCounter = 0;
+
 class Ball {
   constructor(o){
+    this.id = ++ballIdCounter;
+    this.name = o.name;
     this.x = o.x; this.y = o.y;
     this.vx = 0; this.vy = 0;
     this.baseR = o.r;
@@ -638,508 +585,278 @@ class Ball {
     this.mass = this.baseMass;
     this.color = o.color;
     this.light = o.light;
-    this.isPlayer = !!o.isPlayer;
     this.speedMul = o.speedMul || 1;
+    this.aggression = o.aggression || 1;
 
     this.trail = [];
-    this.angle = 0;
+    this.wanderAngle = Math.random() * Math.PI * 2;
+    this.wobbleOffset = Math.random() * Math.PI * 2;
 
-    // status efek
-    this.dashCd = 0;  this.dashMax = 2.0;
+    this.dashCd = Math.random() * 1.5;
+    this.dashMax = o.dashMax || 2.0;
     this.dashTime = 0;
     this.shield = 0;
     this.boost = 0;
     this.big = 0;
-    this.invuln = 0;
+    this.invuln = 0.6;
     this.hitFlash = 0;
     this.hitCd = 0;
 
     this.alive = true;
     this.outside = false;
-    this.outWarn = 0;
-    this.deathTimer = 0;
+    this.deathTime = 0;
   }
 }
 
 /* ============================================================
-   11. INPUT
+   10. SETUP GAME
    ============================================================ */
-function setupInput(){
-  // Keyboard
-  window.addEventListener('keydown', e => {
-    const k = e.key.toLowerCase();
-    keys[k] = true;
-    if (['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright'].includes(k)){
-      inputMode = 'key';
-    }
-    if (k === ' '){
-      e.preventDefault();
-      inputMode = 'key';
-      tryDash(G.player);
-    }
-    if (k === 'escape'){
-      e.preventDefault();
-      if (G.mode === 'playing') pauseGame();
-      else if (G.mode === 'paused') resumeGame();
-    }
-  });
-  window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
-
-  // Mouse
-  canvas.addEventListener('mousemove', e => {
-    pointer.x = e.clientX; pointer.y = e.clientY;
-    pointer.active = true;
-    inputMode = 'pointer';
-  });
-  canvas.addEventListener('mouseleave', () => { pointer.active = false; });
-
-  // Touch
-  const onTouch = e => {
-    e.preventDefault();
-    document.body.classList.add('touch');
-    const t = e.touches[0];
-    if (t){
-      pointer.x = t.clientX; pointer.y = t.clientY;
-      pointer.active = true;
-      inputMode = 'pointer';
-    }
-  };
-  canvas.addEventListener('touchstart', onTouch, { passive:false });
-  canvas.addEventListener('touchmove',  onTouch, { passive:false });
-  canvas.addEventListener('touchend', e => {
-    if (e.touches.length === 0) pointer.active = false;
-    else onTouch(e);
-  }, { passive:false });
-
-  // Tombol DASH mobile
-  const db = document.getElementById('dashBtn');
-  db.addEventListener('touchstart', e => { e.preventDefault(); tryDash(G.player); }, { passive:false });
-  db.addEventListener('click', e => { e.preventDefault(); tryDash(G.player); });
-
-  // Cegah context menu & scroll
-  canvas.addEventListener('contextmenu', e => e.preventDefault());
-  document.addEventListener('touchmove', e => {
-    if (e.target === canvas) e.preventDefault();
-  }, { passive:false });
-
-  // Init audio pada gesture pertama
-  const boot = () => { Sound.init(); Sound.resume(); };
-  window.addEventListener('pointerdown', boot, { once:true });
-  window.addEventListener('keydown', boot, { once:true });
-  window.addEventListener('touchstart', boot, { once:true });
+function shuffledPick(arr, n){
+  const copy = arr.slice();
+  for (let i = copy.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy.slice(0, n);
 }
 
-/* ============================================================
-   12. START / RESET GAME
-   ============================================================ */
+function findSpawnSpot(balls, r){
+  for (let attempt = 0; attempt < 40; attempt++){
+    const angle = Math.random() * Math.PI * 2;
+    const dist = Math.random() * arena.r * 0.68;
+    const x = arena.cx + Math.cos(angle) * dist;
+    const y = arena.cy + Math.sin(angle) * dist;
+    let ok = true;
+    for (const b of balls){
+      const d = Math.hypot(b.x - x, b.y - y);
+      if (d < b.r + r + 5 * SCALE){ ok = false; break; }
+    }
+    if (ok) return { x, y };
+  }
+  const angle = Math.random() * Math.PI * 2;
+  return {
+    x: arena.cx + Math.cos(angle) * arena.r * 0.6,
+    y: arena.cy + Math.sin(angle) * arena.r * 0.6
+  };
+}
+
 function startGame(){
   Sound.init(); Sound.resume();
 
-  const skin = SKINS.find(s => s.id === G.skinId) || SKINS[0];
-  const cfg  = DIFF[G.difficulty];
+  // Arena size determines how many balls fit
+  const count = clamp(Math.round(arena.r / 22), 6, 12);
+  const defs = shuffledPick(BALL_DEFS, count);
 
-  G.player = new Ball({
-    x: arena.cx - arena.r * 0.52, y: arena.cy,
-    r: 25 * SCALE, hp: 100, mass: 1,
-    color: skin.color, light: skin.light,
-    isPlayer: true, speedMul: 1
-  });
+  const ballBaseR = clamp(arena.r * 0.078, 9, 19);
+  G.balls = [];
 
-  G.enemy = new Ball({
-    x: arena.cx + arena.r * 0.52, y: arena.cy,
-    r: 25 * SCALE, hp: 100, mass: 1,
-    color: '#ff3d7f', light: '#ffc4dc',
-    isPlayer: false, speedMul: cfg.spdMul
+  defs.forEach((def, i) => {
+    // Setiap bola punya properti acak yang berbeda
+    const r         = ballBaseR * rand(0.85, 1.18);
+    const hp        = Math.round(rand(55, 115));
+    const speedMul  = rand(0.82, 1.20);
+    const aggression= rand(0.55, 1.25);
+    const mass      = r * r * 0.012;
+    const dashMax   = rand(1.6, 2.5);
+
+    const spot = findSpawnSpot(G.balls, r);
+
+    G.balls.push(new Ball({
+      name: def.name,
+      x: spot.x, y: spot.y,
+      r, hp, mass,
+      color: def.color, light: def.light,
+      speedMul, aggression, dashMax
+    }));
   });
 
   G.powerups = [];
   G.particles = [];
-  G.score = 0; G.combo = 0; G.comboTimer = 0; G.maxCombo = 1;
   G.elapsed = 0;
   G.shake = 0; G.flash = 0; G.slowmo = 0; G.timeScale = 1;
   G.ending = false; G.endTimer = 0;
-  G.spawnTimer = 2.2;
+  G.spawnTimer = 2.6;
+  G.totalBalls = G.balls.length;
   G.mode = 'playing';
 
-  pointer.active = false;
+  buildBallChips();
   showScreen(null);
   document.getElementById('hud').classList.remove('hidden');
-}
-
-function pauseGame(){
-  if (G.mode !== 'playing') return;
-  G.mode = 'paused';
-  showScreen('scr-pause');
-}
-function resumeGame(){
-  if (G.mode !== 'paused') return;
-  G.mode = 'playing';
-  showScreen(null);
-}
-
-function showGameOver(){
-  G.mode = 'over';
-  document.getElementById('hud').classList.add('hidden');
-
-  const win = G.player.alive && !G.enemy.alive;
-  let finalScore = G.score + (win ? 600 + Math.max(0, 300 - G.elapsed * 5) : 0);
-  finalScore = Math.floor(finalScore);
-
-  // Simpan rekor
-  const prevBest = getBest();
-  if (finalScore > prevBest) setBest(finalScore);
-  const board = addBoard(finalScore, win);
-
-  document.getElementById('overTitle').textContent = win ? 'VICTORY' : 'DEFEAT';
-  document.getElementById('overTitle').className = 'title ' + (win ? 'win' : 'lose');
-  document.getElementById('overSub').textContent = win
-    ? 'Musuh hancur! Arena adalah milikmu.'
-    : (G.enemy.alive ? 'Bola kamu keluar arena...' : 'Kamu dihancurkan musuh.');
-
-  document.getElementById('ovScore').textContent = finalScore;
-  document.getElementById('ovTime').textContent  = fmtTime(G.elapsed);
-  document.getElementById('ovCombo').textContent = 'x' + G.maxCombo;
-
-  // Leaderboard
-  const bl = document.getElementById('boardList');
-  bl.innerHTML = '';
-  if (board.length === 0){
-    bl.innerHTML = '<div class="row"><span class="rk">-</span>Belum ada skor</div>';
-  } else {
-    board.forEach((r, i) => {
-      const d = new Date(r.d);
-      const el = document.createElement('div');
-      el.className = 'row' + (r.s === finalScore ? ' me' : '');
-      el.innerHTML =
-        '<span class="rk">#' + (i + 1) + '</span>' +
-        '<span>' + (r.w ? '🏆' : '•') + '</span>' +
-        '<span class="dt">' + d.toLocaleDateString('id-ID', {day:'2-digit',month:'short'}) + '</span>' +
-        '<span class="sc">' + r.s + '</span>';
-      bl.appendChild(el);
-    });
-  }
-
-  document.getElementById('bestScore').textContent = getBest();
-  showScreen('scr-over');
+  updateHUD();
 }
 
 /* ============================================================
-   13. POWER-UP SPAWN
+   11. AI BALL
    ============================================================ */
-function spawnPowerUp(){
-  if (G.powerups.length >= 3) return;
-  const type = PU_KEYS[Math.floor(Math.random() * PU_KEYS.length)];
-  const ang  = Math.random() * Math.PI * 2;
-  const dist = Math.random() * arena.r * 0.72;
-  const x = arena.cx + Math.cos(ang) * dist;
-  const y = arena.cy + Math.sin(ang) * dist;
-  G.powerups.push(new PowerUp(type, x, y));
-}
-
-function applyPowerUp(ball, pu){
-  switch (pu.type){
-    case 'speed':  ball.boost  = 6.5; break;
-    case 'heal':   ball.hp = Math.min(ball.maxHp, ball.hp + 32); break;
-    case 'shield': ball.shield = 7.0; break;
-    case 'big':    ball.big    = 8.0; break;
-  }
-  // efek suara & partikel
-  Sound.pick();
-  burst(pu.x, pu.y, 22, pu.color, 260, 4, true);
-  G.flash = Math.min(0.30, G.flash + 0.16);
-  G.flashColor = pu.color;
-
-  // skor kecil untuk player
-  if (ball === G.player) G.score += 25;
-}
-
-/* ============================================================
-   14. PARTIKEL
-   ============================================================ */
-function burst(x, y, count, color, speed, size, additive){
-  for (let i = 0; i < count; i++){
-    if (G.particles.length >= MAX_PARTICLES) break;
-    const a = Math.random() * Math.PI * 2;
-    const s = speed * (0.25 + Math.random() * 0.95);
-    G.particles.push(new Particle(
-      x, y,
-      Math.cos(a) * s, Math.sin(a) * s,
-      0.35 + Math.random() * 0.55,
-      size * (0.5 + Math.random()),
-      color
-    ));
-  }
-}
-
-function bigExplosion(ball){
-  burst(ball.x, ball.y, 46, ball.color, 620, 7, true);
-  burst(ball.x, ball.y, 26, '#ffffff', 420, 5, true);
-  G.shake = 34;
-  G.flash = 0.75;
-  G.flashColor = ball.color;
-  Sound.hit(1);
-}
-
-/* ============================================================
-   15. DAMAGE
-   ============================================================ */
-function applyDamage(target, amount, source){
-  if (amount <= 0 || !target.alive) return;
-  if (target.invuln > 0) return;
-
-  let dmg = amount;
-  if (target.shield > 0) dmg *= 0.35;
-
-  target.hp -= dmg;
-  target.hitFlash = 0.28;
-  target.invuln = 0.06;
-
-  // Combo & skor hanya untuk player
-  if (source === G.player){
-    if (G.comboTimer > 0) G.combo = Math.min(G.combo + 1, 12);
-    else G.combo = 1;
-    G.comboTimer = 2.3;
-    if (G.combo > G.maxCombo) G.maxCombo = G.combo;
-    const mult = 1 + (G.combo - 1) * 0.3;
-    G.score += dmg * 3.2 * mult;
-  }
-
-  burst(target.x, target.y, Math.min(18, 5 + Math.floor(dmg)), target.color, 150 + dmg * 9, 3.6, true);
-
-  if (target.hp <= 0){
-    target.hp = 0;
-    target.alive = false;
-    target.deathTimer = 0;
-    bigExplosion(target);
-  }
-}
-
-/* ============================================================
-   16. DASH
-   ============================================================ */
-function tryDash(ball){
-  if (!ball || !ball.alive || G.mode !== 'playing' || G.ending) return;
-  if (ball.dashCd > 0) return;
-
-  let dx = 0, dy = 0;
-  const sp = Math.hypot(ball.vx, ball.vy);
-
-  if (sp > 40){
-    dx = ball.vx / sp; dy = ball.vy / sp;
-  } else if (ball === G.player){
-    // pakai arah input terakhir / kursor
-    if (inputMode === 'pointer' && pointer.active){
-      const ddx = pointer.x - ball.x, ddy = pointer.y - ball.y;
-      const dl = Math.hypot(ddx, ddy) || 1;
-      dx = ddx / dl; dy = ddy / dl;
-    } else if (G.enemy){
-      const ddx = G.enemy.x - ball.x, ddy = G.enemy.y - ball.y;
-      const dl = Math.hypot(ddx, ddy) || 1;
-      dx = ddx / dl; dy = ddy / dl;
-    }
-  } else if (G.player){
-    const ddx = G.player.x - ball.x, ddy = G.player.y - ball.y;
-    const dl = Math.hypot(ddx, ddy) || 1;
-    dx = ddx / dl; dy = ddy / dl;
-  }
-
-  const impulse = 1150 * SCALE;
-  ball.vx += dx * impulse;
-  ball.vy += dy * impulse;
-  ball.dashTime = 0.24;
-  ball.dashCd = ball.dashMax;
-  ball.invuln = Math.max(ball.invuln, 0.20);
-
-  // efek
-  Sound.dash();
-  burst(ball.x, ball.y, 18, ball.light, 320, 4.5, true);
-  G.shake = Math.max(G.shake, 9);
-  G.flash = Math.min(0.42, G.flash + 0.22);
-  G.flashColor = ball.color;
-}
-
-/* ============================================================
-   17. UPDATE: INPUT PEMAIN
-   ============================================================ */
-function getPlayerInput(ball){
-  const inp = { x: 0, y: 0, power: 0 };
-
-  if (inputMode === 'key'){
-    let kx = 0, ky = 0;
-    if (keys['w'] || keys['arrowup'])    ky -= 1;
-    if (keys['s'] || keys['arrowdown'])  ky += 1;
-    if (keys['a'] || keys['arrowleft'])  kx -= 1;
-    if (keys['d'] || keys['arrowright']) kx += 1;
-    const l = Math.hypot(kx, ky);
-    if (l > 0){ inp.x = kx / l; inp.y = ky / l; inp.power = 1; }
-  } else if (pointer.active){
-    const dx = pointer.x - ball.x;
-    const dy = pointer.y - ball.y;
-    const d  = Math.hypot(dx, dy);
-    const dead = 22 * SCALE;
-    if (d > dead){
-      inp.x = dx / d;
-      inp.y = dy / d;
-      inp.power = clamp((d - dead) / (130 * SCALE), 0.18, 1);
-    }
-  }
-  return inp;
-}
-
-/* ============================================================
-   18. UPDATE: AI MUSUH
-   ============================================================ */
-function getAIInput(ai, player, dt){
+function ballAI(b, allBalls, dt){
+  if (!b.alive) return { x:0, y:0, power:0 };
   const cfg = DIFF[G.difficulty];
-  const inp = { x: 0, y: 0, power: 0 };
-  if (!player || !player.alive){ return inp; }
 
-  // ---- Target: posisi player yang diprediksi ----
-  const leadX = player.x + player.vx * cfg.aiLead;
-  const leadY = player.y + player.vy * cfg.aiLead;
-  let tx = leadX - ai.x, ty = leadY - ai.y;
-  let dist = Math.hypot(tx, ty) || 1;
-  let dx = tx / dist, dy = ty / dist;
-
-  // ---- Kejar power-up jika berguna ----
-  let puTarget = null, puDist = 1e9;
-  for (const pu of G.powerups){
-    const d = Math.hypot(pu.x - ai.x, pu.y - ai.y);
-    let useful = false;
-    if (pu.type === 'heal'   && ai.hp < ai.maxHp * 0.7) useful = true;
-    if (pu.type === 'shield' && ai.shield <= 0)          useful = true;
-    if (pu.type === 'big'    && ai.big <= 0)             useful = true;
-    if (pu.type === 'speed'  && ai.boost <= 0)           useful = true;
-    if (useful && d < puDist){ puDist = d; puTarget = pu; }
+  // Cari musuh terdekat
+  let nearest = null, nd2 = Infinity;
+  for (const o of allBalls){
+    if (o === b || !o.alive) continue;
+    const d2 = (o.x - b.x) * (o.x - b.x) + (o.y - b.y) * (o.y - b.y);
+    if (d2 < nd2){ nd2 = d2; nearest = o; }
   }
-  if (puTarget && puDist < dist * 1.15 && puDist < arena.r * 0.8){
-    const ddx = puTarget.x - ai.x, ddy = puTarget.y - ai.y;
-    const dl = Math.hypot(ddx, ddy) || 1;
-    dx = ddx / dl; dy = ddy / dl;
+  const nd = Math.sqrt(nd2);
+
+  let dx = 0, dy = 0, power = 0;
+  const lowHp = b.hp < b.maxHp * 0.35;
+
+  if (nearest && !lowHp){
+    // Kejar
+    dx = nearest.x - b.x;
+    dy = nearest.y - b.y;
+    const l = Math.hypot(dx, dy) || 1;
+    dx /= l; dy /= l;
+    power = 0.75 * b.aggression * cfg.aiPower;
+  } else if (nearest && lowHp){
+    // Kabur
+    dx = b.x - nearest.x;
+    dy = b.y - nearest.y;
+    const l = Math.hypot(dx, dy) || 1;
+    dx /= l; dy /= l;
+    power = 0.9;
+  } else {
+    // Wandering
+    b.wanderAngle += (Math.random() - 0.5) * dt * 4;
+    dx = Math.cos(b.wanderAngle);
+    dy = Math.sin(b.wanderAngle);
+    power = 0.55;
   }
 
-  // ---- Hindari tepi arena ----
-  const ax = ai.x - arena.cx, ay = ai.y - arena.cy;
+  // Hindari tepi arena
+  const ax = b.x - arena.cx, ay = b.y - arena.cy;
   const ad = Math.hypot(ax, ay) || 1;
-  const safe = arena.r * 0.74;
+  const safe = arena.r * 0.68;
   if (ad > safe){
     const w = clamp((ad - safe) / (arena.r - safe), 0, 1);
     const nx = -ax / ad, ny = -ay / ad;
-    dx = dx * (1 - w) + nx * w * 1.8;
-    dy = dy * (1 - w) + ny * w * 1.8;
+    dx = dx * (1 - w) + nx * w * 2.4;
+    dy = dy * (1 - w) + ny * w * 2.4;
     const l = Math.hypot(dx, dy) || 1;
     dx /= l; dy /= l;
   }
 
-  // ---- Strafe sedikit supaya tidak lurus terus ----
+  // Wobble supaya gerak tidak lurus monoton
   const t = performance.now() / 1000;
-  const strafe = Math.sin(t * 1.3 + ai.baseR) * 0.30;
+  const wob = Math.sin(t * 2.2 + b.wobbleOffset) * 0.35;
   const px = -dy, py = dx;
-  dx += px * strafe; dy += py * strafe;
+  dx += px * wob; dy += py * wob;
   const l2 = Math.hypot(dx, dy) || 1;
   dx /= l2; dy /= l2;
 
-  inp.x = dx; inp.y = dy;
-  inp.power = cfg.aiPower;
-
-  // ---- Dash AI ----
-  if (ai.dashCd <= 0 && dist < arena.r * 0.55 && dist > ai.r + player.r){
-    // pastikan dash tidak keluar arena
-    const testX = ai.x + dx * 200 * SCALE;
-    const testY = ai.y + dy * 200 * SCALE;
-    const td = Math.hypot(testX - arena.cx, testY - arena.cy);
-    if (td < arena.r * 0.96){
-      // peluang per detik
-      if (Math.random() < cfg.dashChance * dt){
-        // arahkan tepat ke player
-        const ddx = player.x - ai.x, ddy = player.y - ai.y;
-        const dl = Math.hypot(ddx, ddy) || 1;
-        ai.vx = ddx / dl * 0;
-        // gunakan mekanisme dash normal
-        const saveVx = ai.vx, saveVy = ai.vy;
-        ai.vx = (ddx / dl) * 300; ai.vy = (ddy / dl) * 300;
-        tryDash(ai);
-        // (tryDash akan menambah impuls ke arah velocity)
-      }
+  // Dash AI
+  if (b.dashCd <= 0 && nearest && nd < arena.r * 0.55 && nd > b.r + nearest.r){
+    if (Math.random() < 0.55 * cfg.dashChance * dt * b.aggression){
+      const ddx = nearest.x - b.x;
+      const ddy = nearest.y - b.y;
+      const dl = Math.hypot(ddx, ddy) || 1;
+      b.vx = (ddx / dl) * 280 * SCALE;
+      b.vy = (ddy / dl) * 280 * SCALE;
+      tryDash(b);
     }
   }
 
-  return inp;
+  return { x: dx, y: dy, power };
 }
 
 /* ============================================================
-   19. FISIKA BOLA
+   12. DASH
+   ============================================================ */
+function tryDash(ball){
+  if (!ball || !ball.alive || G.ending) return;
+  if (ball.dashCd > 0) return;
+
+  let dx = 0, dy = 0;
+  const sp = Math.hypot(ball.vx, ball.vy);
+  if (sp > 30){ dx = ball.vx / sp; dy = ball.vy / sp; }
+  else {
+    const a = Math.random() * Math.PI * 2;
+    dx = Math.cos(a); dy = Math.sin(a);
+  }
+
+  const impulse = 950 * SCALE;
+  ball.vx += dx * impulse;
+  ball.vy += dy * impulse;
+  ball.dashTime = 0.22;
+  ball.dashCd = ball.dashMax;
+  ball.invuln = Math.max(ball.invuln, 0.18);
+
+  Sound.dash();
+  burst(ball.x, ball.y, 12, ball.light, 280, 4);
+  G.shake = Math.max(G.shake, 6);
+  G.flash = Math.min(0.32, G.flash + 0.15);
+  G.flashColor = ball.color;
+}
+
+/* ============================================================
+   13. FISIKA BALL
    ============================================================ */
 function stepBall(b, input, dt){
-  const maxSpeed = 400 * SCALE * b.speedMul
+  const maxSpeed = 370 * SCALE * b.speedMul
                  * (b.boost > 0 ? 1.5 : 1)
                  * (b.big   > 0 ? 0.85 : 1);
 
-  const accel = maxSpeed * 3.2;
+  const accel = maxSpeed * 3.4;
 
   b.vx += input.x * input.power * accel * dt;
   b.vy += input.y * input.power * accel * dt;
 
-  // damping (gesekan)
-  const damp = Math.exp(-3.2 * dt);
+  const damp = Math.exp(-3.0 * dt);
   b.vx *= damp;
   b.vy *= damp;
 
-  // batas kecepatan absolut
   const sp = Math.hypot(b.vx, b.vy);
-  const hardCap = maxSpeed * 2.8;
+  const hardCap = maxSpeed * 2.6;
   if (sp > hardCap){
     const k = hardCap / sp;
     b.vx *= k; b.vy *= k;
   }
 
-  // integrasi posisi
   b.x += b.vx * dt;
   b.y += b.vy * dt;
 
-  // radius & massa dinamis (big ball)
+  // Radius & massa dinamis
   const targetR = b.baseR * (b.big > 0 ? 1.45 : 1);
   b.r += (targetR - b.r) * Math.min(1, dt * 8);
   const ratio = b.r / b.baseR;
   b.mass = b.baseMass * ratio * ratio;
 
-  // trail
+  // Trail
   const speedNow = Math.hypot(b.vx, b.vy);
-  if (speedNow > 50 * SCALE){
+  if (speedNow > 45 * SCALE){
     b.trail.push({ x: b.x, y: b.y, r: b.r });
-    if (b.trail.length > 14) b.trail.shift();
-  } else if (b.trail.length > 0 && Math.random() < 0.5){
+    if (b.trail.length > 12) b.trail.shift();
+  } else if (b.trail.length > 0 && Math.random() < 0.4){
     b.trail.shift();
   }
-
-  b.angle += speedNow * dt * 0.012;
 }
 
 function stepTimers(b, dt){
-  if (b.dashCd  > 0) b.dashCd  -= dt;
-  if (b.dashTime> 0) b.dashTime-= dt;
-  if (b.shield  > 0) b.shield  -= dt;
-  if (b.boost   > 0) b.boost   -= dt;
-  if (b.big     > 0) b.big     -= dt;
-  if (b.invuln  > 0) b.invuln  -= dt;
-  if (b.hitFlash> 0) b.hitFlash-= dt;
-  if (b.hitCd   > 0) b.hitCd   -= dt;
-  if (b.outWarn > 0) b.outWarn -= dt;
+  if (b.dashCd   > 0) b.dashCd   -= dt;
+  if (b.dashTime > 0) b.dashTime -= dt;
+  if (b.shield   > 0) b.shield   -= dt;
+  if (b.boost    > 0) b.boost    -= dt;
+  if (b.big      > 0) b.big      -= dt;
+  if (b.invuln   > 0) b.invuln   -= dt;
+  if (b.hitFlash > 0) b.hitFlash -= dt;
+  if (b.hitCd    > 0) b.hitCd    -= dt;
 }
 
 /* ============================================================
-   20. TABRAKAN BOLA
+   14. TABRAKAN
    ============================================================ */
 function handleCollision(a, b){
   const dx = b.x - a.x, dy = b.y - a.y;
   let d = Math.hypot(dx, dy);
   const minD = a.r + b.r;
   if (d >= minD) return;
-  if (d === 0){ d = 0.01; }
+  if (d === 0) d = 0.01;
 
   const nx = dx / d, ny = dy / d;
 
-  // Pisahkan posisi (berdasarkan massa)
   const overlap = minD - d;
   const tm = a.mass + b.mass;
   a.x -= nx * overlap * (b.mass / tm);
@@ -1147,91 +864,106 @@ function handleCollision(a, b){
   b.x += nx * overlap * (a.mass / tm);
   b.y += ny * overlap * (a.mass / tm);
 
-  // Kecepatan relatif sepanjang normal
   const rvx = b.vx - a.vx;
   const rvy = b.vy - a.vy;
   const relN = rvx * nx + rvy * ny;
-  if (relN > 0) return; // sudah memisah
+  if (relN > 0) return;
 
-  // Impuls elastis
-  const e = 1.0;
+  const e = 0.96;
   const j = -(1 + e) * relN / (1 / a.mass + 1 / b.mass);
   a.vx -= (j * nx) / a.mass;
   a.vy -= (j * ny) / a.mass;
   b.vx += (j * nx) / b.mass;
   b.vy += (j * ny) / b.mass;
 
-  const impact = Math.abs(relN);
-
-  // Cooldown agar tidak multi-hit dalam 1 kontak
   if (a.hitCd > 0 || b.hitCd > 0) return;
 
-  // Damage berdasarkan kecepatan masing-masing
-  const spA = Math.hypot(a.vx, a.vy);
-  const spB = Math.hypot(b.vx, b.vy);
-  const threshold = 140 * SCALE;
-
-  let dmgToA = Math.max(0, spB - threshold) * 0.11;
-  let dmgToB = Math.max(0, spA - threshold) * 0.11;
-
-  if (b.dashTime > 0) dmgToA *= 2.0;
-  if (a.dashTime > 0) dmgToB *= 2.0;
-
-  // Kesulitan: musuh memberi damage lebih besar di hard
+  const impact = Math.abs(relN);
+  const threshold = 95 * SCALE;
   const cfg = DIFF[G.difficulty];
-  if (b === G.enemy) dmgToA *= cfg.dmgMul;
 
-  const CAP = 28;
+  let dmgToA = Math.max(0, impact - threshold) * 0.10;
+  let dmgToB = dmgToA;
+
+  if (b.dashTime > 0) dmgToA *= 1.9;
+  if (a.dashTime > 0) dmgToB *= 1.9;
+
+  dmgToA *= cfg.dmgMul;
+  dmgToB *= cfg.dmgMul;
+
+  const CAP = 22;
   dmgToA = Math.min(dmgToA, CAP);
   dmgToB = Math.min(dmgToB, CAP);
 
   const total = dmgToA + dmgToB;
-  if (total > 3.5){
+  if (total > 3){
     const midX = (a.x + b.x) / 2, midY = (a.y + b.y) / 2;
-    G.shake = Math.min(28, G.shake + total * 0.95);
-    G.flash = Math.min(0.45, G.flash + total * 0.016);
+    G.shake = Math.min(16, G.shake + total * 0.65);
+    G.flash = Math.min(0.28, G.flash + total * 0.012);
     G.flashColor = '#ffffff';
-    burst(midX, midY, Math.min(20, 4 + Math.floor(total)), '#ffffff', 190 + total * 11, 3.4, true);
-    Sound.hit(clamp(total / 26, 0.15, 1));
-    a.hitCd = b.hitCd = 0.18;
+    burst(midX, midY, Math.min(11, 3 + Math.floor(total)), '#ffffff', 150 + total * 9, 3);
+    Sound.hit(clamp(total / 24, 0.12, 0.9));
+    a.hitCd = b.hitCd = 0.16;
   }
 
-  applyDamage(a, dmgToA, b);
-  applyDamage(b, dmgToB, a);
+  applyDamage(a, dmgToA);
+  applyDamage(b, dmgToB);
+}
+
+function applyDamage(target, amount){
+  if (amount <= 0 || !target.alive) return;
+  if (target.invuln > 0) return;
+
+  let dmg = amount;
+  if (target.shield > 0) dmg *= 0.4;
+
+  target.hp -= dmg;
+  target.hitFlash = 0.25;
+  target.invuln = 0.05;
+
+  burst(target.x, target.y, Math.min(13, 4 + Math.floor(dmg)), target.color, 130 + dmg * 8, 3.2);
+
+  if (target.hp <= 0){
+    target.hp = 0;
+    target.alive = false;
+    target.deathTime = performance.now();
+    bigExplosion(target);
+  }
+}
+
+function bigExplosion(ball){
+  burst(ball.x, ball.y, 44, ball.color, 600, 6.5);
+  burst(ball.x, ball.y, 24, '#ffffff', 400, 4.5);
+  G.shake = Math.min(38, G.shake + 26);
+  G.flash = Math.min(0.75, G.flash + 0.5);
+  G.flashColor = ball.color;
+  Sound.hit(1);
 }
 
 /* ============================================================
-   21. RING-OUT (KELUAR ARENA)
+   15. RING-OUT
    ============================================================ */
 function checkRingOut(b, dt){
+  if (!b.alive) return;
   const dx = b.x - arena.cx;
   const dy = b.y - arena.cy;
   const d = Math.hypot(dx, dy) || 0.001;
   b.outside = d > arena.r;
 
-  if (!b.outside){
-    b.outWarn = 0;
-    return;
-  }
+  if (!b.outside) return;
 
-  b.outWarn = 0.5;
-
-  // Tarikan balik ke arena (rubber band)
   const nx = dx / d, ny = dy / d;
   const pull = 2400 * SCALE;
   b.vx -= nx * pull * dt;
   b.vy -= ny * pull * dt;
 
-  // Damage berkelanjutan
   const over = (d - arena.r) / (arena.r * 0.5);
-  let dot = 20 * (0.5 + over) * dt;
+  let dot = 22 * (0.5 + over) * dt;
   if (b.shield > 0) dot *= 0.5;
   b.hp -= dot;
 
-  // Efek visual
-  if (Math.random() < 0.5){
-    const a = Math.atan2(dy, dx);
-    burst(b.x, b.y, 1, '#ff3b6b', 90, 3, true);
+  if (Math.random() < 0.4){
+    burst(b.x, b.y, 1, '#ff3b6b', 90, 3);
   }
 
   if (b.hp <= 0 && b.alive){
@@ -1241,62 +973,56 @@ function checkRingOut(b, dt){
     return;
   }
 
-  // Ring out total
   if (d > arena.r * 1.5 && b.alive){
     b.alive = false;
-    b.ringOut = true;
     bigExplosion(b);
     G.shake = 40;
-    G.flash = 0.9;
+    G.flash = 0.85;
     G.flashColor = '#ff3b6b';
   }
 }
 
 /* ============================================================
-   22. UPDATE UTAMA
+   16. UPDATE UTAMA
    ============================================================ */
 function update(dt){
-  const p = G.player, e = G.enemy;
-  if (!p || !e) return;
-
   G.elapsed += dt;
 
-  // ---- Input ----
-  if (!G.ending){
-    stepBall(p, getPlayerInput(p), dt);
-    stepBall(e, getAIInput(e, p, dt), dt);
-    handleCollision(p, e);
-  } else {
-    // saat ending, bola tetap bergerak dengan fisika saja
-    stepBall(p, { x:0, y:0, power:0 }, dt);
-    stepBall(e, { x:0, y:0, power:0 }, dt);
+  // Update setiap bola
+  for (const b of G.balls){
+    if (!b.alive){
+      // fade out trail saat mati
+      if (b.trail.length > 0) b.trail.shift();
+      continue;
+    }
+    const inp = G.ending ? { x:0, y:0, power:0 } : ballAI(b, G.balls, dt);
+    stepBall(b, inp, dt);
+    stepTimers(b, dt);
+    checkRingOut(b, dt);
   }
 
-  stepTimers(p, dt);
-  stepTimers(e, dt);
-  checkRingOut(p, dt);
-  checkRingOut(e, dt);
-
-  // ---- Combo timer ----
-  if (G.comboTimer > 0){
-    G.comboTimer -= dt;
-    if (G.comboTimer <= 0){ G.combo = 0; G.comboTimer = 0; }
+  // Cek tabrakan antar semua pasangan
+  const alive = G.balls.filter(b => b.alive);
+  for (let i = 0; i < alive.length; i++){
+    for (let j = i + 1; j < alive.length; j++){
+      handleCollision(alive[i], alive[j]);
+    }
   }
 
-  // ---- Spawn power-up ----
+  // Spawn power-up
   G.spawnTimer -= dt;
-  if (G.spawnTimer <= 0){
+  if (G.spawnTimer <= 0 && !G.ending){
     spawnPowerUp();
-    G.spawnTimer = rand(4.5, 7.5);
+    G.spawnTimer = rand(3.5, 6.5);
   }
 
-  // ---- Update power-up & pickup ----
+  // Update power-ups
   for (let i = G.powerups.length - 1; i >= 0; i--){
     const pu = G.powerups[i];
     pu.update(dt);
     if (pu.life <= 0){ G.powerups.splice(i, 1); continue; }
 
-    for (const ball of [p, e]){
+    for (const ball of G.balls){
       if (!ball.alive) continue;
       const d = Math.hypot(pu.x - ball.x, pu.y - ball.y);
       if (d < ball.r + pu.r){
@@ -1307,7 +1033,7 @@ function update(dt){
     }
   }
 
-  // ---- Partikel ----
+  // Partikel
   for (let i = G.particles.length - 1; i >= 0; i--){
     const pt = G.particles[i];
     pt.update(dt);
@@ -1317,26 +1043,50 @@ function update(dt){
     G.particles.splice(0, G.particles.length - MAX_PARTICLES);
   }
 
-  // ---- Cek kematian / akhir pertandingan ----
-  if (!G.ending && (!p.alive || !e.alive)){
-    G.ending = true;
-    G.endTimer = 1.7;
-    G.slowmo = 1.7;
-    G.shake = Math.max(G.shake, 22);
-    if (p.alive && !e.alive) Sound.win();
-    else Sound.lose();
+  // Cek akhir pertandingan
+  if (!G.ending){
+    const aliveCount = G.balls.filter(b => b.alive).length;
+    if (aliveCount <= 1){
+      G.ending = true;
+      G.endTimer = 1.8;
+      G.slowmo = 1.8;
+      G.shake = Math.max(G.shake, 24);
+      if (aliveCount === 1) Sound.win();
+    }
   }
 }
 
+function applyPowerUp(ball, pu){
+  switch (pu.type){
+    case 'speed':  ball.boost  = 6.5; break;
+    case 'heal':   ball.hp = Math.min(ball.maxHp, ball.hp + 32); break;
+    case 'shield': ball.shield = 7.0; break;
+    case 'big':    ball.big    = 8.0; break;
+  }
+  Sound.pick();
+  burst(pu.x, pu.y, 18, pu.color, 240, 3.8);
+  G.flash = Math.min(0.28, G.flash + 0.14);
+  G.flashColor = pu.color;
+}
+
+function spawnPowerUp(){
+  if (G.powerups.length >= 3) return;
+  const type = PU_KEYS[Math.floor(Math.random() * PU_KEYS.length)];
+  const ang  = Math.random() * Math.PI * 2;
+  const dist = Math.random() * arena.r * 0.72;
+  const x = arena.cx + Math.cos(ang) * dist;
+  const y = arena.cy + Math.sin(ang) * dist;
+  G.powerups.push(new PowerUp(type, x, y));
+}
+
 /* ============================================================
-   23. RENDER
+   17. RENDER
    ============================================================ */
 function drawBackground(){
   ctx.fillStyle = bgGrad;
   ctx.fillRect(0, 0, W, H);
 
-  // Grid animasi
-  const sp = 62;
+  const sp = 60;
   const off = (performance.now() * 0.022) % sp;
   ctx.lineWidth = 1;
   ctx.strokeStyle = 'rgba(90,140,255,0.065)';
@@ -1345,10 +1095,9 @@ function drawBackground(){
   for (let y = -off; y < H + sp; y += sp){ ctx.moveTo(0, y); ctx.lineTo(W, y); }
   ctx.stroke();
 
-  // Cahaya radial di belakang arena
-  const g = ctx.createRadialGradient(arena.cx, arena.cy, 0, arena.cx, arena.cy, arena.r * 1.7);
-  g.addColorStop(0,   'rgba(90,45,200,0.36)');
-  g.addColorStop(0.55,'rgba(45,20,120,0.14)');
+  const g = ctx.createRadialGradient(arena.cx, arena.cy, 0, arena.cx, arena.cy, arena.r * 1.8);
+  g.addColorStop(0,   'rgba(90,45,200,0.34)');
+  g.addColorStop(0.55,'rgba(45,20,120,0.13)');
   g.addColorStop(1,   'rgba(0,0,0,0)');
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, W, H);
@@ -1357,60 +1106,60 @@ function drawBackground(){
 function drawArena(){
   const t = performance.now() / 1000;
 
-  // Zona bahaya
+  // Zona bahaya (ring-out)
   const dz = ctx.createRadialGradient(arena.cx, arena.cy, arena.r * 0.98, arena.cx, arena.cy, arena.r * 1.5);
-  dz.addColorStop(0, 'rgba(255,60,90,0.13)');
+  dz.addColorStop(0, 'rgba(255,60,90,0.15)');
   dz.addColorStop(1, 'rgba(255,60,90,0)');
   ctx.fillStyle = dz;
   ctx.beginPath(); ctx.arc(arena.cx, arena.cy, arena.r * 1.5, 0, Math.PI * 2); ctx.fill();
 
   // Lantai arena
   const fg = ctx.createRadialGradient(arena.cx, arena.cy, 0, arena.cx, arena.cy, arena.r);
-  fg.addColorStop(0,   'rgba(40,25,95,0.55)');
-  fg.addColorStop(0.7, 'rgba(22,12,64,0.38)');
-  fg.addColorStop(1,   'rgba(70,25,140,0.14)');
+  fg.addColorStop(0,   'rgba(50,30,110,0.6)');
+  fg.addColorStop(0.7, 'rgba(25,14,72,0.42)');
+  fg.addColorStop(1,   'rgba(80,30,150,0.16)');
   ctx.fillStyle = fg;
   ctx.beginPath(); ctx.arc(arena.cx, arena.cy, arena.r, 0, Math.PI * 2); ctx.fill();
 
-  // Garis dalam berputar
+  // Ring dalam berputar
   ctx.save();
   ctx.translate(arena.cx, arena.cy);
-  ctx.rotate(t * 0.28);
+  ctx.rotate(t * 0.30);
   ctx.strokeStyle = 'rgba(120,220,255,0.28)';
   ctx.lineWidth = 2;
-  ctx.setLineDash([16, 24]);
-  ctx.beginPath(); ctx.arc(0, 0, arena.r * 0.86, 0, Math.PI * 2); ctx.stroke();
+  ctx.setLineDash([14, 22]);
+  ctx.beginPath(); ctx.arc(0, 0, arena.r * 0.84, 0, Math.PI * 2); ctx.stroke();
   ctx.setLineDash([]);
   ctx.restore();
 
   // Lingkaran tengah
-  ctx.strokeStyle = 'rgba(162,91,255,0.30)';
+  ctx.strokeStyle = 'rgba(162,91,255,0.32)';
   ctx.lineWidth = 1.5;
-  ctx.beginPath(); ctx.arc(arena.cx, arena.cy, arena.r * 0.30, 0, Math.PI * 2); ctx.stroke();
-  ctx.beginPath(); ctx.arc(arena.cx, arena.cy, arena.r * 0.14, 0, Math.PI * 2); ctx.stroke();
+  ctx.beginPath(); ctx.arc(arena.cx, arena.cy, arena.r * 0.32, 0, Math.PI * 2); ctx.stroke();
+  ctx.beginPath(); ctx.arc(arena.cx, arena.cy, arena.r * 0.15, 0, Math.PI * 2); ctx.stroke();
 
   // Border neon utama
   ctx.save();
-  ctx.shadowBlur = 34;
+  ctx.shadowBlur = 36;
   ctx.shadowColor = '#4fd8ff';
   ctx.strokeStyle = '#7ef0ff';
   ctx.lineWidth = 4;
   ctx.beginPath(); ctx.arc(arena.cx, arena.cy, arena.r, 0, Math.PI * 2); ctx.stroke();
   ctx.restore();
 
-  // Border luar (ungu)
+  // Border ungu luar
   ctx.save();
-  ctx.shadowBlur = 22;
+  ctx.shadowBlur = 20;
   ctx.shadowColor = '#a25bff';
   ctx.strokeStyle = 'rgba(162,91,255,0.65)';
   ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.arc(arena.cx, arena.cy, arena.r + 9, 0, Math.PI * 2); ctx.stroke();
+  ctx.beginPath(); ctx.arc(arena.cx, arena.cy, arena.r + 8, 0, Math.PI * 2); ctx.stroke();
   ctx.restore();
 
-  // Garis batas ring-out
+  // Garis ring-out
   ctx.save();
-  ctx.setLineDash([10, 14]);
-  ctx.strokeStyle = 'rgba(255,59,107,0.45)';
+  ctx.setLineDash([9, 13]);
+  ctx.strokeStyle = 'rgba(255,59,107,0.42)';
   ctx.lineWidth = 2;
   ctx.beginPath(); ctx.arc(arena.cx, arena.cy, arena.r * 1.5, 0, Math.PI * 2); ctx.stroke();
   ctx.setLineDash([]);
@@ -1425,7 +1174,7 @@ function drawBall(b){
   for (let i = 0; i < b.trail.length; i++){
     const p = b.trail[i];
     const f = i / b.trail.length;
-    ctx.globalAlpha = f * 0.28;
+    ctx.globalAlpha = f * 0.25;
     ctx.fillStyle = b.color;
     ctx.beginPath();
     ctx.arc(p.x, p.y, Math.max(1, b.r * f * 0.92), 0, Math.PI * 2);
@@ -1434,16 +1183,13 @@ function drawBall(b){
   ctx.globalAlpha = 1;
   ctx.globalCompositeOperation = 'source-over';
 
-  if (!b.alive){
-    // efek kematian
-    return;
-  }
+  if (!b.alive) return;
 
   const pulse = b.dashTime > 0 ? 1.06 : 1;
 
-  // Aura glow
+  // Glow + badan
   ctx.save();
-  ctx.shadowBlur = 34;
+  ctx.shadowBlur = 30;
   ctx.shadowColor = b.color;
   const g = ctx.createRadialGradient(
     b.x - b.r * 0.32, b.y - b.r * 0.32, b.r * 0.08,
@@ -1459,14 +1205,14 @@ function drawBall(b){
   ctx.restore();
 
   // Rim
-  ctx.strokeStyle = 'rgba(255,255,255,0.75)';
-  ctx.lineWidth = 2;
+  ctx.strokeStyle = 'rgba(255,255,255,0.78)';
+  ctx.lineWidth = 1.8;
   ctx.beginPath();
   ctx.arc(b.x, b.y, b.r * pulse - 1, 0, Math.PI * 2);
   ctx.stroke();
 
-  // Highlight atas
-  ctx.globalAlpha = 0.35;
+  // Highlight
+  ctx.globalAlpha = 0.32;
   ctx.fillStyle = '#ffffff';
   ctx.beginPath();
   ctx.ellipse(b.x - b.r * 0.3, b.y - b.r * 0.38, b.r * 0.28, b.r * 0.18, -0.6, 0, Math.PI * 2);
@@ -1476,10 +1222,10 @@ function drawBall(b){
   // Mata
   const sp = Math.hypot(b.vx, b.vy);
   let ex = 0, ey = 0;
-  if (sp > 15){ ex = b.vx / sp; ey = b.vy / sp; }
+  if (sp > 12){ ex = b.vx / sp; ey = b.vy / sp; }
   const px = -ey, py = ex;
   const eOff = b.r * 0.34;
-  const eyeR = b.r * 0.185;
+  const eyeR = b.r * 0.19;
   const pupR = b.r * 0.095;
   for (const s of [-1, 1]){
     const cx2 = b.x + ex * eOff * 0.6 + px * eOff * 0.72 * s;
@@ -1490,36 +1236,35 @@ function drawBall(b){
     ctx.beginPath(); ctx.arc(cx2 + ex * eyeR * 0.38, cy2 + ey * eyeR * 0.38, pupR, 0, Math.PI * 2); ctx.fill();
   }
 
-  // Shield ring
+  // Shield
   if (b.shield > 0){
-    const a = clamp(b.shield / 1.2, 0, 1) * 0.75;
     ctx.save();
-    ctx.globalAlpha = 0.45 + Math.sin(performance.now() / 110) * 0.18;
+    ctx.globalAlpha = 0.4 + Math.sin(performance.now() / 110) * 0.18;
     ctx.strokeStyle = '#4fc3ff';
-    ctx.lineWidth = 3;
-    ctx.shadowBlur = 20;
+    ctx.lineWidth = 2.6;
+    ctx.shadowBlur = 18;
     ctx.shadowColor = '#4fc3ff';
     ctx.beginPath();
-    ctx.arc(b.x, b.y, b.r + 9, 0, Math.PI * 2);
+    ctx.arc(b.x, b.y, b.r + 8, 0, Math.PI * 2);
     ctx.stroke();
     ctx.restore();
   }
 
-  // Speed boost ring
+  // Speed ring
   if (b.boost > 0){
     ctx.save();
     ctx.globalAlpha = 0.55;
     ctx.strokeStyle = '#ffd93d';
     ctx.lineWidth = 2;
-    ctx.setLineDash([7, 9]);
+    ctx.setLineDash([6, 8]);
     ctx.beginPath();
-    ctx.arc(b.x, b.y, b.r + 5, performance.now() / 220, performance.now() / 220 + Math.PI * 1.7);
+    ctx.arc(b.x, b.y, b.r + 4, performance.now() / 220, performance.now() / 220 + Math.PI * 1.7);
     ctx.stroke();
     ctx.setLineDash([]);
     ctx.restore();
   }
 
-  // Flash saat kena hit
+  // Hit flash
   if (b.hitFlash > 0){
     ctx.globalAlpha = clamp(b.hitFlash * 2.6, 0, 0.85);
     ctx.fillStyle = '#ffffff';
@@ -1527,15 +1272,15 @@ function drawBall(b){
     ctx.globalAlpha = 1;
   }
 
-  // Indikator di luar arena
+  // Ring-out warning
   if (b.outside && b.alive){
     ctx.save();
     ctx.globalAlpha = 0.6 + Math.sin(performance.now() / 90) * 0.4;
     ctx.strokeStyle = '#ff3b6b';
     ctx.lineWidth = 3;
-    ctx.shadowBlur = 18;
+    ctx.shadowBlur = 16;
     ctx.shadowColor = '#ff3b6b';
-    ctx.beginPath(); ctx.arc(b.x, b.y, b.r + 14, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(b.x, b.y, b.r + 13, 0, Math.PI * 2); ctx.stroke();
     ctx.restore();
   }
 }
@@ -1553,14 +1298,29 @@ function render(){
 
   drawArena();
 
-  // Power-ups
   for (const pu of G.powerups) pu.draw();
 
-  // Bola
-  if (G.enemy)  drawBall(G.enemy);
-  if (G.player) drawBall(G.player);
+  // Balls: draw dead trails first, then alive balls on top
+  for (const b of G.balls){
+    if (!b.alive && b.trail.length > 0){
+      ctx.globalCompositeOperation = 'lighter';
+      for (let i = 0; i < b.trail.length; i++){
+        const p = b.trail[i];
+        const f = i / b.trail.length;
+        ctx.globalAlpha = f * 0.15;
+        ctx.fillStyle = b.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, Math.max(1, b.r * f * 0.7), 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = 'source-over';
+    }
+  }
+  for (const b of G.balls){
+    if (b.alive) drawBall(b);
+  }
 
-  // Partikel (additive)
   ctx.globalCompositeOperation = 'lighter';
   for (const p of G.particles) p.draw();
   ctx.globalCompositeOperation = 'source-over';
@@ -1568,58 +1328,139 @@ function render(){
 
   ctx.restore();
 
-  // Flash layar
+  // Flash
   if (G.flash > 0.01){
     ctx.globalAlpha = Math.min(0.75, G.flash);
     ctx.fillStyle = G.flashColor;
     ctx.fillRect(0, 0, W, H);
     ctx.globalAlpha = 1;
   }
-
-  // Vignette merah saat player di luar arena
-  if (G.mode === 'playing' && G.player && G.player.outside && G.player.alive){
-    const v = ctx.createRadialGradient(W/2, H/2, Math.min(W,H)*0.25, W/2, H/2, Math.max(W,H)*0.72);
-    v.addColorStop(0, 'rgba(255,0,60,0)');
-    v.addColorStop(1, 'rgba(255,0,60,' + (0.28 + Math.sin(performance.now()/110) * 0.12) + ')');
-    ctx.fillStyle = v;
-    ctx.fillRect(0, 0, W, H);
-  }
 }
 
 /* ============================================================
-   24. HUD
+   18. HUD
    ============================================================ */
 const hudEls = {
-  pHP:      document.getElementById('pHP'),
-  eHP:      document.getElementById('eHP'),
-  timer:    document.getElementById('hudTimer'),
-  score:    document.getElementById('hudScore'),
-  dashFill: document.getElementById('dashFill'),
-  comboEl:  document.getElementById('comboEl')
+  alive: document.getElementById('aliveCount'),
+  total: document.getElementById('totalBalls'),
+  timer: document.getElementById('hudTimer'),
+  list:  document.getElementById('ballList')
 };
 
+function buildBallChips(){
+  hudEls.list.innerHTML = '';
+  G.balls.forEach(b => {
+    const chip = document.createElement('div');
+    chip.className = 'ball-chip';
+    chip.dataset.id = b.id;
+    chip.innerHTML =
+      '<div class="dot" style="background:' + b.color + ';box-shadow:0 0 8px ' + b.color + '"></div>' +
+      '<div class="hp-mini"><div class="hp-mini-fill" style="background:' + b.color + '"></div></div>';
+    hudEls.list.appendChild(chip);
+  });
+}
+
 function updateHUD(){
-  const p = G.player, e = G.enemy;
-  if (!p || !e) return;
-
-  hudEls.pHP.style.width = Math.max(0, (p.hp / p.maxHp) * 100) + '%';
-  hudEls.eHP.style.width = Math.max(0, (e.hp / e.maxHp) * 100) + '%';
+  const aliveCount = G.balls.filter(b => b.alive).length;
+  hudEls.alive.textContent = aliveCount;
+  hudEls.total.textContent = G.totalBalls;
   hudEls.timer.textContent = fmtTime(G.elapsed);
-  hudEls.score.textContent = 'SCORE ' + Math.floor(G.score);
 
-  const cdPct = p.dashCd <= 0 ? 100 : (1 - p.dashCd / p.dashMax) * 100;
-  hudEls.dashFill.style.width = clamp(cdPct, 0, 100) + '%';
-
-  if (G.combo > 1){
-    hudEls.comboEl.textContent = 'COMBO x' + G.combo;
-    hudEls.comboEl.classList.add('show');
-  } else {
-    hudEls.comboEl.classList.remove('show');
-  }
+  G.balls.forEach(b => {
+    const chip = hudEls.list.querySelector('[data-id="' + b.id + '"]');
+    if (!chip) return;
+    const fill = chip.querySelector('.hp-mini-fill');
+    fill.style.width = Math.max(0, (b.hp / b.maxHp) * 100) + '%';
+    if (!b.alive) chip.classList.add('dead');
+  });
 }
 
 /* ============================================================
-   25. LOOP UTAMA
+   19. GAME OVER SCREEN
+   ============================================================ */
+function showGameOver(){
+  G.mode = 'over';
+  document.getElementById('hud').classList.add('hidden');
+
+  const alive = G.balls.filter(b => b.alive);
+  let winner = alive[0] || null;
+
+  // Jika tidak ada yang hidup, cari yang paling lama bertahan
+  // (yang mati paling akhir)
+  if (!winner){
+    let last = null, lastT = -1;
+    for (const b of G.balls){
+      if (b.deathTime > lastT){ lastT = b.deathTime; last = b; }
+    }
+    winner = last;
+  }
+
+  const orb = document.getElementById('winnerOrb');
+  const nm  = document.getElementById('winnerName');
+  const sub = document.getElementById('overSub');
+  const title = document.getElementById('overTitle');
+
+  if (winner){
+    orb.style.background = 'radial-gradient(circle at 35% 30%,' + winner.light + ',' + winner.color + ')';
+    orb.style.color = winner.color;
+    nm.style.color = winner.color;
+    nm.textContent = winner.name;
+    title.textContent = '🏆 PEMENANG';
+    title.style.color = winner.color;
+    title.style.textShadow = '0 0 26px ' + winner.color;
+    sub.textContent = 'Bola ' + winner.name + ' bertahan sampai akhir!';
+  } else {
+    orb.style.background = '#666';
+    nm.style.color = '#aaa';
+    nm.textContent = 'DRAW';
+    title.textContent = 'DRAW';
+    sub.textContent = 'Semua bola hancur bersamaan!';
+  }
+
+  document.getElementById('ovBalls').textContent = G.totalBalls;
+  document.getElementById('ovTime').textContent  = fmtTime(G.elapsed);
+  document.getElementById('ovSurvivors').textContent = alive.length;
+
+  // Simpan ke leaderboard lokal (durasi & jumlah bola)
+  const entry = {
+    s: G.totalBalls * 100 - Math.floor(G.elapsed),
+    balls: G.totalBalls,
+    time: Math.floor(G.elapsed),
+    d: Date.now()
+  };
+  let board = [];
+  try { board = JSON.parse(localStorage.getItem('bvb_battle_board')) || []; } catch(e){}
+  board.push(entry);
+  board.sort((a, c) => c.s - a.s);
+  board = board.slice(0, 5);
+  try { localStorage.setItem('bvb_battle_board', JSON.stringify(board)); } catch(e){}
+
+  const bl = document.getElementById('boardList');
+  bl.innerHTML = '';
+  if (board.length === 0){
+    bl.innerHTML = '<div class="row"><span class="rk">-</span>Belum ada riwayat</div>';
+  } else {
+    board.forEach((r, i) => {
+      const d = new Date(r.d);
+      const el = document.createElement('div');
+      el.className = 'row' + (r.d === entry.d ? ' me' : '');
+      el.innerHTML =
+        '<span class="rk">#' + (i + 1) + '</span>' +
+        '<span>' + r.balls + ' bola</span>' +
+        '<span class="dt">' + fmtTime(r.time) + '</span>' +
+        '<span class="dt">' + d.toLocaleDateString('id-ID', {day:'2-digit',month:'short'}) + '</span>';
+      bl.appendChild(el);
+    });
+  }
+
+  document.getElementById('bestScore').textContent =
+    board.length ? (board[0].balls + ' bola · ' + fmtTime(board[0].time)) : '—';
+
+  showScreen('scr-over');
+}
+
+/* ============================================================
+   20. LOOP UTAMA
    ============================================================ */
 let lastTime = performance.now();
 
@@ -1630,7 +1471,6 @@ function loop(now){
   lastTime = now;
   if (rdt > 0.05) rdt = 0.05;
 
-  // Slow-motion
   const targetTS = G.slowmo > 0 ? 0.18 : 1;
   G.timeScale += (targetTS - G.timeScale) * Math.min(1, rdt * 7);
   if (G.slowmo > 0){
@@ -1640,11 +1480,9 @@ function loop(now){
 
   const dt = rdt * G.timeScale;
 
-  // Update
   if (G.mode === 'playing'){
     update(dt);
 
-    // Timer ending (real time)
     if (G.ending){
       G.endTimer -= rdt;
       if (G.endTimer <= 0){
@@ -1654,27 +1492,23 @@ function loop(now){
     }
   }
 
-  // Decay efek layar
-  G.shake    = Math.max(0, G.shake - rdt * 55);
-  G.flash    = Math.max(0, G.flash - rdt * 2.4);
+  G.shake = Math.max(0, G.shake - rdt * 55);
+  G.flash = Math.max(0, G.flash - rdt * 2.4);
 
-  // Render
   render();
 
-  // HUD
   if (G.mode === 'playing' || G.mode === 'paused') updateHUD();
 }
 
 /* ============================================================
-   26. UI / MENU LOGIC
+   21. UI LOGIC
    ============================================================ */
 const overlay = document.getElementById('overlay');
 const screens = {
-  menu:    document.getElementById('scr-menu'),
-  howto:   document.getElementById('scr-howto'),
-  skins:   document.getElementById('scr-skins'),
-  pause:   document.getElementById('scr-pause'),
-  over:    document.getElementById('scr-over')
+  menu:  document.getElementById('scr-menu'),
+  howto: document.getElementById('scr-howto'),
+  pause: document.getElementById('scr-pause'),
+  over:  document.getElementById('scr-over')
 };
 
 function showScreen(name){
@@ -1684,51 +1518,37 @@ function showScreen(name){
   overlay.classList.toggle('hidden', name === null);
 }
 
-/* ---- Skin Grid ---- */
-function renderSkins(){
-  const grid = document.getElementById('skinGrid');
-  grid.innerHTML = '';
-  const best = getBest();
-  SKINS.forEach(sk => {
-    const unlocked = best >= sk.req;
-    const div = document.createElement('div');
-    div.className = 'skin' + (unlocked ? '' : ' locked') + (G.skinId === sk.id ? ' sel' : '');
-    div.innerHTML =
-      '<div class="orb" style="background:radial-gradient(circle at 35% 30%,' + sk.light + ',' + sk.color + ');color:' + sk.color + '"></div>' +
-      '<div class="nm">' + sk.name + '</div>' +
-      '<div class="rq">' + (unlocked ? (G.skinId === sk.id ? 'TERPILIH' : 'SIAP') : '🔒 ' + sk.req) + '</div>';
-    div.addEventListener('click', () => {
-      if (!unlocked){ Sound.tone(140, 0.14, 'square', 0.09); return; }
-      G.skinId = sk.id;
-      try { localStorage.setItem(LS_SKIN, sk.id); } catch(e){}
-      Sound.ui();
-      renderSkins();
-    });
-    grid.appendChild(div);
-  });
+function pauseGame(){
+  if (G.mode !== 'playing') return;
+  G.mode = 'paused';
+  showScreen('scr-pause');
+}
+function resumeGame(){
+  if (G.mode !== 'paused') return;
+  G.mode = 'playing';
+  showScreen(null);
 }
 
-/* ---- Tombol Menu ---- */
 document.querySelectorAll('[data-act]').forEach(btn => {
   btn.addEventListener('click', () => {
     Sound.init(); Sound.resume(); Sound.ui();
     const act = btn.getAttribute('data-act');
-    if (act === 'play')      startGame();
-    if (act === 'howto')     showScreen('howto');
-    if (act === 'skins'){ renderSkins(); showScreen('skins'); }
-    if (act === 'back')      showScreen('menu');
-    if (act === 'resume')    resumeGame();
-    if (act === 'restart')   startGame();
+    if (act === 'play')    startGame();
+    if (act === 'howto')   showScreen('howto');
+    if (act === 'back')    showScreen('menu');
+    if (act === 'resume')  resumeGame();
+    if (act === 'restart') startGame();
     if (act === 'menu'){
       G.mode = 'menu';
+      G.balls = [];
+      G.powerups = [];
+      G.particles = [];
       document.getElementById('hud').classList.add('hidden');
-      document.getElementById('bestScore').textContent = getBest();
       showScreen('menu');
     }
   });
 });
 
-/* ---- Difficulty ---- */
 document.querySelectorAll('[data-diff]').forEach(chip => {
   chip.addEventListener('click', () => {
     Sound.ui();
@@ -1738,21 +1558,20 @@ document.querySelectorAll('[data-diff]').forEach(chip => {
   });
 });
 
+window.addEventListener('keydown', e => {
+  if (e.key === 'Escape'){
+    e.preventDefault();
+    if (G.mode === 'playing') pauseGame();
+    else if (G.mode === 'paused') resumeGame();
+  }
+});
+
 /* ============================================================
-   27. INISIALISASI
+   22. INIT
    ============================================================ */
 resize();
-setupInput();
-renderSkins();
-document.getElementById('bestScore').textContent = getBest();
+document.getElementById('bestScore').textContent = '—';
 showScreen('menu');
-
-// Deteksi device sentuh
-if ('ontouchstart' in window || navigator.maxTouchPoints > 0){
-  document.body.classList.add('touch');
-}
-
-// Mulai loop
 requestAnimationFrame(loop);
 
 })();
