@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
+<title>Ball vs Ball — Neon Arena</title>
+<style>
+/* ============================================================
+   RESET & DASAR
+   ============================================================ */
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{
+  height:100%;overflow:hidden;background:#04020e;
+  font-family:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',sans-serif;
+  color:#fff;-webkit-user-select:none;user-select:none;
+  touch-action:none;-webkit-tap-highlight-color:transparent;
+}
+canvas{position:fixed;inset:0;display:block;}
+
+/* ============================================================
+   HUD
+   ============================================================ */
+#hud{position:fixed;inset:0;pointer-events:none;z-index:10;transition:opacity .35s;}
+#hud.hidden{opacity:0;}
+
+.hud-top{
+  position:absolute;top:0;left:0;right:0;
+  display:flex;justify-content:space-between;align-items:flex-start;
+  padding:14px 18px;gap:10px;
+}
+.hp-wrap{flex:1;max-width:34%;}
+.hp-wrap.right{text-align:right;}
+.hp-name{
+  font-size:11px;letter-spacing:2.5px;font-weight:700;
+  margin-bottom:5px;opacity:.85;text-shadow:0 0 10px currentColor;
+}
+.hp-wrap.left .hp-name{color:#5fe6ff;}
+.hp-wrap.right .hp-name{color:#ff5f9e;}
+.hp-bar{
+  height:16px;border-radius:9px;overflow:hidden;
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:inset 0 0 12px rgba(0,0,0,.6);
+  position:relative;
+}
+.hp-fill{
+  height:100%;width:100%;border-radius:8px;
+  background:linear-gradient(90deg,#0aa6d6,#5fe6ff,#b6f7ff);
+  box-shadow:0 0 16px #5fe6ff;
+  transition:width .18s ease-out;
+}
+.hp-fill.enemy{
+  background:linear-gradient(90deg,#ffb6d5,#ff5f9e,#c81e63);
+  box-shadow:0 0 16px #ff5f9e;
+  margin-left:auto;
+}
+.hp-wrap.right .hp-bar{display:flex;justify-content:flex-end;}
+
+.hud-center{text-align:center;min-width:120px;}
+.timer{
+  font-size:26px;font-weight:800;letter-spacing:2px;
+  text-shadow:0 0 18px #a25bff,0 0 34px #a25bff;
+  font-variant-numeric:tabular-nums;
+}
+.score{
+  font-size:12px;letter-spacing:2px;font-weight:700;
+  color:#ffd93d;text-shadow:0 0 12px #ffd93d;margin-top:2px;
+}
+
+.hud-bottom{
+  position:absolute;left:0;right:0;bottom:20px;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+}
+.dash-wrap{width:min(280px,60vw);text-align:center;}
+.dash-label{
+  font-size:10px;letter-spacing:2.5px;font-weight:700;
+  opacity:.75;margin-bottom:5px;
+}
+.dash-bar{
+  height:9px;border-radius:5px;overflow:hidden;
+  background:rgba(255,255,255,.09);
+  border:1px solid rgba(255,255,255,.16);
+}
+.dash-fill{
+  height:100%;width:100%;border-radius:5px;
+  background:linear-gradient(90deg,#a25bff,#ff5fd2,#ffd93d);
+  box-shadow:0 0 14px #ff5fd2;
+  transition:width .06s linear;
+}
+.combo{
+  font-size:16px;font-weight:900;letter-spacing:2px;
+  color:#ffd93d;text-shadow:0 0 16px #ff9d00;
+  opacity:0;transform:scale(.7);transition:all .18s;
+}
+.combo.show{opacity:1;transform:scale(1);}
+
+#dashBtn{
+  position:absolute;right:22px;bottom:26px;
+  width:92px;height:92px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.35);
+  background:radial-gradient(circle at 35% 30%,rgba(162,91,255,.65),rgba(70,20,140,.5));
+  color:#fff;font-weight:900;font-size:14px;letter-spacing:2px;
+  box-shadow:0 0 28px rgba(162,91,255,.7),inset 0 0 20px rgba(255,255,255,.18);
+  pointer-events:auto;display:none;
+  -webkit-appearance:none;appearance:none;
+}
+#dashBtn:active{transform:scale(.92);background:radial-gradient(circle at 35% 30%,rgba(255,120,220,.8),rgba(120,30,180,.6));}
+body.touch #dashBtn{display:block;}
+
+/* ============================================================
+   OVERLAY / MENU
+   ============================================================ */
+#overlay{
+  position:fixed;inset:0;z-index:20;
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 50% 45%,rgba(30,10,70,.72),rgba(3,1,12,.93));
+  backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);
+  padding:18px;overflow-y:auto;
+}
+#overlay.hidden{display:none;}
+.screen{display:none;flex-direction:column;align-items:center;width:100%;max-width:520px;}
+.screen.active{display:flex;animation:fadeUp .32s ease-out;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+h1.logo{
+  font-size:clamp(34px,9vw,58px);font-weight:900;letter-spacing:4px;
+  line-height:1;text-align:center;margin-bottom:6px;
+  background:linear-gradient(90deg,#5fe6ff,#a25bff,#ff5f9e,#ffd93d);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 22px rgba(162,91,255,.85));
+}
+h1.logo span{
+  -webkit-text-fill-color:#fff;color:#fff;
+  font-size:.55em;text-shadow:0 0 20px #ff5f9e;
+}
+.sub{
+  font-size:12px;letter-spacing:4px;opacity:.6;margin-bottom:26px;
+  text-transform:uppercase;
+}
+h2.title{
+  font-size:clamp(24px,6vw,34px);font-weight:900;letter-spacing:3px;
+  margin-bottom:16px;text-align:center;
+  text-shadow:0 0 22px rgba(162,91,255,.9);
+}
+
+.btn{
+  width:100%;padding:14px 20px;margin-bottom:11px;
+  border-radius:14px;cursor:pointer;
+  font-size:15px;font-weight:800;letter-spacing:2.5px;
+  color:#dff6ff;background:rgba(255,255,255,.055);
+  border:1.5px solid rgba(120,200,255,.35);
+  transition:all .16s;-webkit-appearance:none;appearance:none;
+  text-transform:uppercase;
+}
+.btn:hover,.btn:active{
+  background:rgba(95,230,255,.16);
+  border-color:#5fe6ff;color:#fff;
+  box-shadow:0 0 26px rgba(95,230,255,.55);
+  transform:translateY(-2px);
+}
+.btn.primary{
+  background:linear-gradient(100deg,rgba(162,91,255,.85),rgba(255,95,158,.85));
+  border-color:rgba(255,255,255,.5);color:#fff;
+  box-shadow:0 0 30px rgba(200,80,220,.6);
+  font-size:17px;padding:17px;
+}
+.btn.primary:hover{box-shadow:0 0 44px rgba(255,95,200,.9);}
+.btn.ghost{opacity:.8;font-size:13px;padding:11px;}
+
+.diff-row{margin:12px 0 16px;width:100%;text-align:center;}
+.diff-row>span{font-size:10px;letter-spacing:3px;opacity:.55;display:block;margin-bottom:9px;}
+.diff-btns{display:flex;gap:9px;justify-content:center;}
+.chip{
+  flex:1;padding:10px 6px;border-radius:11px;cursor:pointer;
+  font-size:12px;font-weight:800;letter-spacing:1.5px;
+  background:rgba(255,255,255,.05);color:#b9c7dd;
+  border:1.5px solid rgba(255,255,255,.14);
+  transition:all .16s;-webkit-appearance:none;appearance:none;
+}
+.chip.active{
+  background:linear-gradient(120deg,rgba(95,230,255,.28),rgba(162,91,255,.28));
+  border-color:#5fe6ff;color:#fff;box-shadow:0 0 20px rgba(95,230,255,.45);
+}
+.best{
+  margin-top:8px;font-size:11px;letter-spacing:2px;opacity:.65;
+}
+.best span{color:#ffd93d;font-weight:800;text-shadow:0 0 12px #ffd93d;}
+
+/* Kartu petunjuk */
+.card{
+  background:rgba(255,255,255,.045);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:16px;padding:18px 20px;width:100%;
+  margin-bottom:14px;font-size:13.5px;line-height:1.85;
+}
+.card b{color:#5fe6ff;text-shadow:0 0 10px rgba(95,230,255,.7);}
+.card .k{
+  display:inline-block;padding:1px 8px;border-radius:6px;
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);
+  font-weight:700;font-size:12px;margin:0 2px;
+}
+.card ul{list-style:none;}
+.card li{margin-bottom:5px;}
+
+/* Skin grid */
+.skin-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));
+  gap:11px;width:100%;margin-bottom:16px;
+}
+.skin{
+  border-radius:14px;padding:12px 6px 9px;text-align:center;cursor:pointer;
+  background:rgba(255,255,255,.05);
+  border:1.5px solid rgba(255,255,255,.13);
+  transition:all .16s;position:relative;overflow:hidden;
+}
+.skin .orb{
+  width:38px;height:38px;border-radius:50%;margin:0 auto 7px;
+  box-shadow:0 0 20px currentColor;
+}
+.skin .nm{font-size:10px;letter-spacing:1px;font-weight:700;opacity:.9;}
+.skin .rq{font-size:9px;opacity:.55;margin-top:2px;letter-spacing:.5px;}
+.skin.locked{opacity:.4;cursor:not-allowed;}
+.skin.locked .orb{filter:grayscale(1);}
+.skin.sel{border-color:#ffd93d;box-shadow:0 0 26px rgba(255,217,61,.55);background:rgba(255,217,61,.1);}
+
+/* Leaderboard */
+.board{width:100%;margin-bottom:14px;}
+.board .row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 14px;border-radius:10px;margin-bottom:5px;
+  background:rgba(255,255,255,.045);font-size:13px;
+  border-left:3px solid rgba(162,91,255,.7);
+}
+.board .row.me{border-left-color:#ffd93d;background:rgba(255,217,61,.1);}
+.board .rk{font-weight:900;opacity:.55;width:24px;}
+.board .sc{margin-left:auto;font-weight:800;color:#ffd93d;letter-spacing:1px;}
+.board .dt{font-size:10px;opacity:.4;margin-left:10px;}
+.result-sub{font-size:12px;letter-spacing:2px;opacity:.65;margin-bottom:18px;text-align:center;}
+.result-stats{
+  display:flex;gap:10px;width:100%;margin-bottom:16px;
+}
+.stat{
+  flex:1;text-align:center;padding:12px 6px;border-radius:13px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);
+}
+.stat .v{font-size:20px;font-weight:900;color:#5fe6ff;text-shadow:0 0 14px rgba(95,230,255,.8);}
+.stat .l{font-size:9px;letter-spacing:2px;opacity:.6;margin-top:3px;}
+.win{color:#4dff9e !important;text-shadow:0 0 26px #4dff9e !important;}
+.lose{color:#ff5f7e !important;text-shadow:0 0 26px #ff5f7e !important;}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<!-- ================= HUD ================= -->
+<div id="hud" class="hidden">
+  <div class="hud-top">
+    <div class="hp-wrap left">
+      <div class="hp-name">YOU</div>
+      <div class="hp-bar"><div class="hp-fill" id="pHP"></div></div>
+    </div>
+    <div class="hud-center">
+      <div class="timer" id="hudTimer">00:00</div>
+      <div class="score" id="hudScore">SCORE 0</div>
+    </div>
+    <div class="hp-wrap right">
+      <div class="hp-name">ENEMY</div>
+      <div class="hp-bar"><div class="hp-fill enemy" id="eHP"></div></div>
+    </div>
+  </div>
+  <div class="hud-bottom">
+    <div class="combo" id="comboEl">COMBO x2</div>
+    <div class="dash-wrap">
+      <div class="dash-label">DASH COOLDOWN</div>
+      <div class="dash-bar"><div class="dash-fill" id="dashFill"></div></div>
+    </div>
+  </div>
+  <button id="dashBtn">DASH</button>
+</div>
+
+<!-- ================= OVERLAY ================= -->
+<div id="overlay">
+
+  <!-- MENU UTAMA -->
+  <div class="screen active" id="scr-menu">
+    <h1 class="logo">BALL <span>VS</span> BALL</h1>
+    <p class="sub">Neon Arena Battle</p>
+    <button class="btn primary" data-act="play">▶ PLAY</button>
+    <button class="btn" data-act="howto">? HOW TO PLAY</button>
+    <button class="btn" data-act="skins">🎨 SKIN BOLA</button>
+    <div class="diff-row">
+      <span>DIFFICULTY</span>
+      <div class="diff-btns">
+        <button class="chip" data-diff="easy">EASY</button>
+        <button class="chip active" data-diff="normal">NORMAL</button>
+        <button class="chip" data-diff="hard">HARD</button>
+      </div>
+    </div>
+    <div class="best">BEST SCORE: <span id="bestScore">0</span></div>
+  </div>
+
+  <!-- HOW TO PLAY -->
+  <div class="screen" id="scr-howto">
+    <h2 class="title">HOW TO PLAY</h2>
+    <div class="card">
+      <ul>
+        <li><b>Gerak:</b> arahkan kursor mouse / sentuh layar, atau pakai <span class="k">W</span><span class="k">A</span><span class="k">S</span><span class="k">D</span> / <span class="k">↑</span><span class="k">←</span><span class="k">↓</span><span class="k">→</span></li>
+        <li><b>Dash:</b> tekan <span class="k">SPASI</span> (atau tombol DASH di mobile) untuk menerjang. Damage dash 2x lipat!</li>
+        <li><b>Damage:</b> makin cepat bola menabrak, makin besar damage-nya.</li>
+        <li><b>Ring Out:</b> bola yang terlempar keluar arena akan kena damage besar. Terlalu jauh = langsung kalah!</li>
+        <li><b>Power-Up:</b> ⚡ Speed · ✚ Heal · ◈ Shield · ⬤ Big Ball</li>
+        <li><b>Combo:</b> tabrak musuh berturut-turut untuk multiplier skor.</li>
+        <li><b>Pause:</b> tekan <span class="k">ESC</span></li>
+      </ul>
+    </div>
+    <button class="btn" data-act="back">← KEMBALI</button>
+  </div>
+
+  <!-- SKIN -->
+  <div class="screen" id="scr-skins">
+    <h2 class="title">PILIH SKIN</h2>
+    <div class="skin-grid" id="skinGrid"></div>
+    <button class="btn" data-act="back">← KEMBALI</button>
+  </div>
+
+  <!-- PAUSE -->
+  <div class="screen" id="scr-pause">
+    <h2 class="title">PAUSED</h2>
+    <button class="btn primary" data-act="resume">▶ LANJUT</button>
+    <button class="btn" data-act="restart">↻ ULANGI</button>
+    <button class="btn ghost" data-act="menu">⌂ MENU UTAMA</button>
+  </div>
+
+  <!-- GAME OVER -->
+  <div class="screen" id="scr-over">
+    <h2 class="title" id="overTitle">VICTORY</h2>
+    <p class="result-sub" id="overSub">Kamu menghancurkan musuh!</p>
+    <div class="result-stats">
+      <div class="stat"><div class="v" id="ovScore">0</div><div class="l">SCORE</div></div>
+      <div class="stat"><div class="v" id="ovTime">0:00</div><div class="l">WAKTU</div></div>
+      <div class="stat"><div class="v" id="ovCombo">x1</div><div class="l">COMBO MAX</div></div>
+    </div>
+    <div class="board" id="boardList"></div>
+    <button class="btn primary" data-act="restart">↻ MAIN LAGI</button>
+    <button class="btn ghost" data-act="menu">⌂ MENU UTAMA</button>
+  </div>
+
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ============================================================
+   1. SETUP CANVAS & SKALA
+   ============================================================ */
+const canvas = document.getElementById('game');
+const ctx    = canvas.getContext('2d');
+let W = 0, H = 0, DPR = 1, SCALE = 1;
+let bgGrad = null;
+const arena = { cx: 0, cy: 0, r: 300 };
+
+function resize(){
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = window.innerWidth;
+  H = window.innerHeight;
+  canvas.width  = Math.floor(W * DPR);
+  canvas.height = Math.floor(H * DPR);
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+  arena.cx = W / 2;
+  arena.cy = H / 2;
+  arena.r  = Math.max(140, Math.min(W, H) * 0.40);
+  SCALE    = Math.max(0.55, Math.min(W, H) / 800);
+
+  bgGrad = ctx.createLinearGradient(0, 0, W, H);
+  bgGrad.addColorStop(0,    '#050318');
+  bgGrad.addColorStop(0.45, '#0d0530');
+  bgGrad.addColorStop(1,    '#03010f');
+}
+window.addEventListener('resize', resize);
+window.addEventListener('orientationchange', () => setTimeout(resize, 120));
+
+/* ============================================================
+   2. AUDIO (Web Audio API)
+   ============================================================ */
+const Sound = {
+  ctx: null, master: null, noiseBuf: null, ok: false,
+  init(){
+    if (this.ctx) return;
+    try{
+      const AC = window.AudioContext || window.webkitAudioContext;
+      this.ctx = new AC();
+      this.master = this.ctx.createGain();
+      this.master.gain.value = 0.30;
+      this.master.connect(this.ctx.destination);
+      const len = Math.floor(this.ctx.sampleRate * 0.5);
+      const buf = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+      this.noiseBuf = buf;
+      this.ok = true;
+    }catch(e){ this.ok = false; }
+  },
+  resume(){ if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume(); },
+  tone(freq, dur, type, vol, slideTo){
+    if (!this.ok) return;
+    const t = this.ctx.currentTime;
+    const o = this.ctx.createOscillator();
+    const g = this.ctx.createGain();
+    o.type = type || 'sine';
+    o.frequency.setValueAtTime(freq, t);
+    if (slideTo) o.frequency.exponentialRampToValueAtTime(Math.max(30, slideTo), t + dur);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(Math.max(0.0005, vol), t + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(this.master);
+    o.start(t); o.stop(t + dur + 0.04);
+  },
+  noise(dur, vol, freq, q){
+    if (!this.ok) return;
+    const t = this.ctx.currentTime;
+    const s = this.ctx.createBufferSource();
+    s.buffer = this.noiseBuf;
+    const f = this.ctx.createBiquadFilter();
+    f.type = 'bandpass'; f.frequency.value = freq || 800; f.Q.value = q || 1;
+    const g = this.ctx.createGain();
+    g.gain.setValueAtTime(vol, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    s.connect(f); f.connect(g); g.connect(this.master);
+    s.start(t); s.stop(t + dur + 0.02);
+  },
+  hit(s){ this.tone(90 + s * 90, 0.16, 'square', 0.10 + s * 0.16, 45); this.noise(0.10, 0.08 + s * 0.14, 500 + s * 1000, 1.2); },
+  dash(){ this.tone(700, 0.16, 'sawtooth', 0.09, 210); this.noise(0.13, 0.06, 2400, 2); },
+  pick(){ this.tone(700, 0.09, 'sine', 0.12); setTimeout(() => this.tone(1120, 0.13, 'sine', 0.11), 65); },
+  bounce(){ this.tone(180, 0.06, 'triangle', 0.05, 130); },
+  win(){ [523,659,784,1047].forEach((f,i) => setTimeout(() => this.tone(f, 0.3, 'triangle', 0.15), i * 105)); },
+  lose(){ [392,330,262,175].forEach((f,i) => setTimeout(() => this.tone(f, 0.34, 'sawtooth', 0.11), i * 135)); },
+  ui(){ this.tone(560, 0.06, 'sine', 0.07); }
+};
+
+/* ============================================================
+   3. UTILITAS
+   ============================================================ */
+const rand  = (a, b) => a + Math.random() * (b - a);
+const clamp = (v, a, b) => v < a ? a : (v > b ? b : v);
+const fmtTime = s => {
+  const m = Math.floor(s / 60);
+  const ss = Math.floor(s % 60);
+  return m + ':' + (ss < 10 ? '0' : '') + ss;
+};
+const MAX_PARTICLES = 200;
+
+/* ============================================================
+   4. DATA SKIN
+   ============================================================ */
+const SKINS = [
+  { id:'cyan',  name:'CYAN BLAZE',  color:'#31d7ff', light:'#d6faff', req:0,    desc:'Default' },
+  { id:'magma', name:'MAGMA CORE',  color:'#ff5b2e', light:'#ffd9a8', req:500,  desc:'500 pts' },
+  { id:'toxic', name:'TOXIC LIME',  color:'#6dff4d', light:'#e2ffd0', req:1500, desc:'1500 pts' },
+  { id:'void',  name:'VOID PURPLE', color:'#b04dff', light:'#ecd4ff', req:3000, desc:'3000 pts' },
+  { id:'gold',  name:'GOLDEN GOD',  color:'#ffcc33', light:'#fff6cc', req:6000, desc:'6000 pts' }
+];
+
+/* ============================================================
+   5. DIFFICULTY
+   ============================================================ */
+const DIFF = {
+  easy:   { aiPower:0.62, aiLead:0.05, dashChance:0.35, dmgMul:0.70, spdMul:0.86 },
+  normal: { aiPower:0.82, aiLead:0.12, dashChance:0.75, dmgMul:1.00, spdMul:1.00 },
+  hard:   { aiPower:0.97, aiLead:0.20, dashChance:1.30, dmgMul:1.35, spdMul:1.14 }
+};
+
+/* ============================================================
+   6. LOCALSTORAGE
+   ============================================================ */
+const LS_BEST = 'bvb_best', LS_BOARD = 'bvb_board', LS_SKIN = 'bvb_skin';
+function getBest(){ return parseInt(localStorage.getItem(LS_BEST) || '0', 10) || 0; }
+function setBest(v){ localStorage.setItem(LS_BEST, String(Math.floor(v))); }
+function getBoard(){
+  try { return JSON.parse(localStorage.getItem(LS_BOARD)) || []; } catch(e){ return []; }
+}
+function addBoard(score, win){
+  let b = getBoard();
+  b.push({ s: Math.floor(score), w: win ? 1 : 0, d: Date.now() });
+  b.sort((a, c) => c.s - a.s);
+  b = b.slice(0, 5);
+  try { localStorage.setItem(LS_BOARD, JSON.stringify(b)); } catch(e){}
+  return b;
+}
+
+/* ============================================================
+   7. STATE GLOBAL
+   ============================================================ */
+const G = {
+  mode: 'menu',              // menu | playing | paused | over
+  difficulty: 'normal',
+  player: null, enemy: null,
+  powerups: [], particles: [],
+  score: 0, combo: 0, comboTimer: 0, maxCombo: 1,
+  elapsed: 0,
+  shake: 0, flash: 0, flashColor: '#ffffff',
+  timeScale: 1, slowmo: 0, ending: false, endTimer: 0,
+  spawnTimer: 2.5,
+  skinId: localStorage.getItem(LS_SKIN) || 'cyan'
+};
+
+let inputMode = 'pointer';   // 'pointer' | 'key'
+const keys = {};
+const pointer = { x: 0, y: 0, active: false };
+
+/* ============================================================
+   8. KELAS PARTICLE
+   ============================================================ */
+class Particle {
+  constructor(x, y, vx, vy, life, size, color){
+    this.x = x; this.y = y; this.vx = vx; this.vy = vy;
+    this.life = life; this.maxLife = life;
+    this.size = size; this.color = color;
+  }
+  update(dt){
+    this.x += this.vx * dt;
+    this.y += this.vy * dt;
+    const d = Math.pow(0.14, dt);
+    this.vx *= d; this.vy *= d;
+    this.life -= dt;
+  }
+  draw(){
+    const a = Math.max(0, this.life / this.maxLife);
+    ctx.globalAlpha = a;
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, Math.max(0.4, this.size * a), 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+/* ============================================================
+   9. KELAS POWER-UP
+   ============================================================ */
+const PU_DEF = {
+  speed:  { color:'#ffd93d', label:'SPEED'  },
+  heal:   { color:'#4dff88', label:'HEAL'   },
+  shield: { color:'#4fc3ff', label:'SHIELD' },
+  big:    { color:'#c05bff', label:'BIG'    }
+};
+const PU_KEYS = Object.keys(PU_DEF);
+
+class PowerUp {
+  constructor(type, x, y){
+    this.type = type;
+    this.x = x; this.y = y;
+    this.r = 17 * SCALE;
+    this.color = PU_DEF[type].color;
+    this.spin = Math.random() * Math.PI * 2;
+    this.life = 16;
+    this.bob = Math.random() * Math.PI * 2;
+  }
+  update(dt){
+    this.spin += dt * 1.7;
+    this.bob  += dt * 2.6;
+    this.life -= dt;
+  }
+  draw(){
+    const pulse = 1 + Math.sin(this.bob) * 0.09;
+    const R = this.r * pulse;
+    ctx.save();
+    ctx.translate(this.x, this.y);
+
+    // glow luar
+    ctx.shadowBlur = 22;
+    ctx.shadowColor = this.color;
+
+    // badan (rounded square berputar)
+    ctx.rotate(this.spin);
+    ctx.fillStyle = 'rgba(10,5,25,0.9)';
+    ctx.strokeStyle = this.color;
+    ctx.lineWidth = 2.5;
+    const s = R * 0.92;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(-s, -s, s * 2, s * 2, s * 0.42);
+    else ctx.rect(-s, -s, s * 2, s * 2);
+    ctx.fill(); ctx.stroke();
+    ctx.rotate(-this.spin);
+
+    // ikon
+    ctx.shadowBlur = 12;
+    ctx.fillStyle = this.color;
+    ctx.strokeStyle = this.color;
+    ctx.lineWidth = 2.2;
+    const k = R * 0.52;
+    if (this.type === 'speed'){
+      ctx.beginPath();
+      ctx.moveTo(k * 0.3, -k); ctx.lineTo(-k * 0.6, k * 0.1);
+      ctx.lineTo(-k * 0.05, k * 0.1); ctx.lineTo(-k * 0.3, k);
+      ctx.lineTo(k * 0.6, -k * 0.12); ctx.lineTo(k * 0.05, -k * 0.12);
+      ctx.closePath(); ctx.fill();
+    } else if (this.type === 'heal'){
+      ctx.fillRect(-k * 0.28, -k, k * 0.56, k * 2);
+      ctx.fillRect(-k, -k * 0.28, k * 2, k * 0.56);
+    } else if (this.type === 'shield'){
+      ctx.beginPath();
+      ctx.moveTo(0, -k); ctx.lineTo(k * 0.85, -k * 0.4);
+      ctx.lineTo(k * 0.85, k * 0.25); ctx.lineTo(0, k);
+      ctx.lineTo(-k * 0.85, k * 0.25); ctx.lineTo(-k * 0.85, -k * 0.4);
+      ctx.closePath(); ctx.stroke();
+    } else {
+      ctx.beginPath(); ctx.arc(0, 0, k * 0.5, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(0, 0, k, 0, Math.PI * 2); ctx.stroke();
+    }
+    ctx.restore();
+
+    // timer kedip saat hampir hilang
+    if (this.life < 4){
+      ctx.globalAlpha = 0.35 + 0.65 * Math.abs(Math.sin(this.life * 9));
+      ctx.strokeStyle = this.color;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(this.x, this.y, R * 1.5, 0, Math.PI * 2); ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+  }
+}
+
+/* ============================================================
+   10. KELAS BALL
+   ============================================================ */
+class Ball {
+  constructor(o){
+    this.x = o.x; this.y = o.y;
+    this.vx = 0; this.vy = 0;
+    this.baseR = o.r;
+    this.r = o.r;
+    this.maxHp = o.hp;
+    this.hp = o.hp;
+    this.baseMass = o.mass || 1;
+    this.mass = this.baseMass;
+    this.color = o.color;
+    this.light = o.light;
+    this.isPlayer = !!o.isPlayer;
+    this.speedMul = o.speedMul || 1;
+
+    this.trail = [];
+    this.angle = 0;
+
+    // status efek
+    this.dashCd = 0;  this.dashMax = 2.0;
+    this.dashTime = 0;
+    this.shield = 0;
+    this.boost = 0;
+    this.big = 0;
+    this.invuln = 0;
+    this.hitFlash = 0;
+    this.hitCd = 0;
+
+    this.alive = true;
+    this.outside = false;
+    this.outWarn = 0;
+    this.deathTimer = 0;
+  }
+}
+
+/* ============================================================
+   11. INPUT
+   ============================================================ */
+function setupInput(){
+  // Keyboard
+  window.addEventListener('keydown', e => {
+    const k = e.key.toLowerCase();
+    keys[k] = true;
+    if (['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright'].includes(k)){
+      inputMode = 'key';
+    }
+    if (k === ' '){
+      e.preventDefault();
+      inputMode = 'key';
+      tryDash(G.player);
+    }
+    if (k === 'escape'){
+      e.preventDefault();
+      if (G.mode === 'playing') pauseGame();
+      else if (G.mode === 'paused') resumeGame();
+    }
+  });
+  window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+
+  // Mouse
+  canvas.addEventListener('mousemove', e => {
+    pointer.x = e.clientX; pointer.y = e.clientY;
+    pointer.active = true;
+    inputMode = 'pointer';
+  });
+  canvas.addEventListener('mouseleave', () => { pointer.active = false; });
+
+  // Touch
+  const onTouch = e => {
+    e.preventDefault();
+    document.body.classList.add('touch');
+    const t = e.touches[0];
+    if (t){
+      pointer.x = t.clientX; pointer.y = t.clientY;
+      pointer.active = true;
+      inputMode = 'pointer';
+    }
+  };
+  canvas.addEventListener('touchstart', onTouch, { passive:false });
+  canvas.addEventListener('touchmove',  onTouch, { passive:false });
+  canvas.addEventListener('touchend', e => {
+    if (e.touches.length === 0) pointer.active = false;
+    else onTouch(e);
+  }, { passive:false });
+
+  // Tombol DASH mobile
+  const db = document.getElementById('dashBtn');
+  db.addEventListener('touchstart', e => { e.preventDefault(); tryDash(G.player); }, { passive:false });
+  db.addEventListener('click', e => { e.preventDefault(); tryDash(G.player); });
+
+  // Cegah context menu & scroll
+  canvas.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('touchmove', e => {
+    if (e.target === canvas) e.preventDefault();
+  }, { passive:false });
+
+  // Init audio pada gesture pertama
+  const boot = () => { Sound.init(); Sound.resume(); };
+  window.addEventListener('pointerdown', boot, { once:true });
+  window.addEventListener('keydown', boot, { once:true });
+  window.addEventListener('touchstart', boot, { once:true });
+}
+
+/* ============================================================
+   12. START / RESET GAME
+   ============================================================ */
+function startGame(){
+  Sound.init(); Sound.resume();
+
+  const skin = SKINS.find(s => s.id === G.skinId) || SKINS[0];
+  const cfg  = DIFF[G.difficulty];
+
+  G.player = new Ball({
+    x: arena.cx - arena.r * 0.52, y: arena.cy,
+    r: 25 * SCALE, hp: 100, mass: 1,
+    color: skin.color, light: skin.light,
+    isPlayer: true, speedMul: 1
+  });
+
+  G.enemy = new Ball({
+    x: arena.cx + arena.r * 0.52, y: arena.cy,
+    r: 25 * SCALE, hp: 100, mass: 1,
+    color: '#ff3d7f', light: '#ffc4dc',
+    isPlayer: false, speedMul: cfg.spdMul
+  });
+
+  G.powerups = [];
+  G.particles = [];
+  G.score = 0; G.combo = 0; G.comboTimer = 0; G.maxCombo = 1;
+  G.elapsed = 0;
+  G.shake = 0; G.flash = 0; G.slowmo = 0; G.timeScale = 1;
+  G.ending = false; G.endTimer = 0;
+  G.spawnTimer = 2.2;
+  G.mode = 'playing';
+
+  pointer.active = false;
+  showScreen(null);
+  document.getElementById('hud').classList.remove('hidden');
+}
+
+function pauseGame(){
+  if (G.mode !== 'playing') return;
+  G.mode = 'paused';
+  showScreen('scr-pause');
+}
+function resumeGame(){
+  if (G.mode !== 'paused') return;
+  G.mode = 'playing';
+  showScreen(null);
+}
+
+function showGameOver(){
+  G.mode = 'over';
+  document.getElementById('hud').classList.add('hidden');
+
+  const win = G.player.alive && !G.enemy.alive;
+  let finalScore = G.score + (win ? 600 + Math.max(0, 300 - G.elapsed * 5) : 0);
+  finalScore = Math.floor(finalScore);
+
+  // Simpan rekor
+  const prevBest = getBest();
+  if (finalScore > prevBest) setBest(finalScore);
+  const board = addBoard(finalScore, win);
+
+  document.getElementById('overTitle').textContent = win ? 'VICTORY' : 'DEFEAT';
+  document.getElementById('overTitle').className = 'title ' + (win ? 'win' : 'lose');
+  document.getElementById('overSub').textContent = win
+    ? 'Musuh hancur! Arena adalah milikmu.'
+    : (G.enemy.alive ? 'Bola kamu keluar arena...' : 'Kamu dihancurkan musuh.');
+
+  document.getElementById('ovScore').textContent = finalScore;
+  document.getElementById('ovTime').textContent  = fmtTime(G.elapsed);
+  document.getElementById('ovCombo').textContent = 'x' + G.maxCombo;
+
+  // Leaderboard
+  const bl = document.getElementById('boardList');
+  bl.innerHTML = '';
+  if (board.length === 0){
+    bl.innerHTML = '<div class="row"><span class="rk">-</span>Belum ada skor</div>';
+  } else {
+    board.forEach((r, i) => {
+      const d = new Date(r.d);
+      const el = document.createElement('div');
+      el.className = 'row' + (r.s === finalScore ? ' me' : '');
+      el.innerHTML =
+        '<span class="rk">#' + (i + 1) + '</span>' +
+        '<span>' + (r.w ? '🏆' : '•') + '</span>' +
+        '<span class="dt">' + d.toLocaleDateString('id-ID', {day:'2-digit',month:'short'}) + '</span>' +
+        '<span class="sc">' + r.s + '</span>';
+      bl.appendChild(el);
+    });
+  }
+
+  document.getElementById('bestScore').textContent = getBest();
+  showScreen('scr-over');
+}
+
+/* ============================================================
+   13. POWER-UP SPAWN
+   ============================================================ */
+function spawnPowerUp(){
+  if (G.powerups.length >= 3) return;
+  const type = PU_KEYS[Math.floor(Math.random() * PU_KEYS.length)];
+  const ang  = Math.random() * Math.PI * 2;
+  const dist = Math.random() * arena.r * 0.72;
+  const x = arena.cx + Math.cos(ang) * dist;
+  const y = arena.cy + Math.sin(ang) * dist;
+  G.powerups.push(new PowerUp(type, x, y));
+}
+
+function applyPowerUp(ball, pu){
+  switch (pu.type){
+    case 'speed':  ball.boost  = 6.5; break;
+    case 'heal':   ball.hp = Math.min(ball.maxHp, ball.hp + 32); break;
+    case 'shield': ball.shield = 7.0; break;
+    case 'big':    ball.big    = 8.0; break;
+  }
+  // efek suara & partikel
+  Sound.pick();
+  burst(pu.x, pu.y, 22, pu.color, 260, 4, true);
+  G.flash = Math.min(0.30, G.flash + 0.16);
+  G.flashColor = pu.color;
+
+  // skor kecil untuk player
+  if (ball === G.player) G.score += 25;
+}
+
+/* ============================================================
+   14. PARTIKEL
+   ============================================================ */
+function burst(x, y, count, color, speed, size, additive){
+  for (let i = 0; i < count; i++){
+    if (G.particles.length >= MAX_PARTICLES) break;
+    const a = Math.random() * Math.PI * 2;
+    const s = speed * (0.25 + Math.random() * 0.95);
+    G.particles.push(new Particle(
+      x, y,
+      Math.cos(a) * s, Math.sin(a) * s,
+      0.35 + Math.random() * 0.55,
+      size * (0.5 + Math.random()),
+      color
+    ));
+  }
+}
+
+function bigExplosion(ball){
+  burst(ball.x, ball.y, 46, ball.color, 620, 7, true);
+  burst(ball.x, ball.y, 26, '#ffffff', 420, 5, true);
+  G.shake = 34;
+  G.flash = 0.75;
+  G.flashColor = ball.color;
+  Sound.hit(1);
+}
+
+/* ============================================================
+   15. DAMAGE
+   ============================================================ */
+function applyDamage(target, amount, source){
+  if (amount <= 0 || !target.alive) return;
+  if (target.invuln > 0) return;
+
+  let dmg = amount;
+  if (target.shield > 0) dmg *= 0.35;
+
+  target.hp -= dmg;
+  target.hitFlash = 0.28;
+  target.invuln = 0.06;
+
+  // Combo & skor hanya untuk player
+  if (source === G.player){
+    if (G.comboTimer > 0) G.combo = Math.min(G.combo + 1, 12);
+    else G.combo = 1;
+    G.comboTimer = 2.3;
+    if (G.combo > G.maxCombo) G.maxCombo = G.combo;
+    const mult = 1 + (G.combo - 1) * 0.3;
+    G.score += dmg * 3.2 * mult;
+  }
+
+  burst(target.x, target.y, Math.min(18, 5 + Math.floor(dmg)), target.color, 150 + dmg * 9, 3.6, true);
+
+  if (target.hp <= 0){
+    target.hp = 0;
+    target.alive = false;
+    target.deathTimer = 0;
+    bigExplosion(target);
+  }
+}
+
+/* ============================================================
+   16. DASH
+   ============================================================ */
+function tryDash(ball){
+  if (!ball || !ball.alive || G.mode !== 'playing' || G.ending) return;
+  if (ball.dashCd > 0) return;
+
+  let dx = 0, dy = 0;
+  const sp = Math.hypot(ball.vx, ball.vy);
+
+  if (sp > 40){
+    dx = ball.vx / sp; dy = ball.vy / sp;
+  } else if (ball === G.player){
+    // pakai arah input terakhir / kursor
+    if (inputMode === 'pointer' && pointer.active){
+      const ddx = pointer.x - ball.x, ddy = pointer.y - ball.y;
+      const dl = Math.hypot(ddx, ddy) || 1;
+      dx = ddx / dl; dy = ddy / dl;
+    } else if (G.enemy){
+      const ddx = G.enemy.x - ball.x, ddy = G.enemy.y - ball.y;
+      const dl = Math.hypot(ddx, ddy) || 1;
+      dx = ddx / dl; dy = ddy / dl;
+    }
+  } else if (G.player){
+    const ddx = G.player.x - ball.x, ddy = G.player.y - ball.y;
+    const dl = Math.hypot(ddx, ddy) || 1;
+    dx = ddx / dl; dy = ddy / dl;
+  }
+
+  const impulse = 1150 * SCALE;
+  ball.vx += dx * impulse;
+  ball.vy += dy * impulse;
+  ball.dashTime = 0.24;
+  ball.dashCd = ball.dashMax;
+  ball.invuln = Math.max(ball.invuln, 0.20);
+
+  // efek
+  Sound.dash();
+  burst(ball.x, ball.y, 18, ball.light, 320, 4.5, true);
+  G.shake = Math.max(G.shake, 9);
+  G.flash = Math.min(0.42, G.flash + 0.22);
+  G.flashColor = ball.color;
+}
+
+/* ============================================================
+   17. UPDATE: INPUT PEMAIN
+   ============================================================ */
+function getPlayerInput(ball){
+  const inp = { x: 0, y: 0, power: 0 };
+
+  if (inputMode === 'key'){
+    let kx = 0, ky = 0;
+    if (keys['w'] || keys['arrowup'])    ky -= 1;
+    if (keys['s'] || keys['arrowdown'])  ky += 1;
+    if (keys['a'] || keys['arrowleft'])  kx -= 1;
+    if (keys['d'] || keys['arrowright']) kx += 1;
+    const l = Math.hypot(kx, ky);
+    if (l > 0){ inp.x = kx / l; inp.y = ky / l; inp.power = 1; }
+  } else if (pointer.active){
+    const dx = pointer.x - ball.x;
+    const dy = pointer.y - ball.y;
+    const d  = Math.hypot(dx, dy);
+    const dead = 22 * SCALE;
+    if (d > dead){
+      inp.x = dx / d;
+      inp.y = dy / d;
+      inp.power = clamp((d - dead) / (130 * SCALE), 0.18, 1);
+    }
+  }
+  return inp;
+}
+
+/* ============================================================
+   18. UPDATE: AI MUSUH
+   ============================================================ */
+function getAIInput(ai, player, dt){
+  const cfg = DIFF[G.difficulty];
+  const inp = { x: 0, y: 0, power: 0 };
+  if (!player || !player.alive){ return inp; }
+
+  // ---- Target: posisi player yang diprediksi ----
+  const leadX = player.x + player.vx * cfg.aiLead;
+  const leadY = player.y + player.vy * cfg.aiLead;
+  let tx = leadX - ai.x, ty = leadY - ai.y;
+  let dist = Math.hypot(tx, ty) || 1;
+  let dx = tx / dist, dy = ty / dist;
+
+  // ---- Kejar power-up jika berguna ----
+  let puTarget = null, puDist = 1e9;
+  for (const pu of G.powerups){
+    const d = Math.hypot(pu.x - ai.x, pu.y - ai.y);
+    let useful = false;
+    if (pu.type === 'heal'   && ai.hp < ai.maxHp * 0.7) useful = true;
+    if (pu.type === 'shield' && ai.shield <= 0)          useful = true;
+    if (pu.type === 'big'    && ai.big <= 0)             useful = true;
+    if (pu.type === 'speed'  && ai.boost <= 0)           useful = true;
+    if (useful && d < puDist){ puDist = d; puTarget = pu; }
+  }
+  if (puTarget && puDist < dist * 1.15 && puDist < arena.r * 0.8){
+    const ddx = puTarget.x - ai.x, ddy = puTarget.y - ai.y;
+    const dl = Math.hypot(ddx, ddy) || 1;
+    dx = ddx / dl; dy = ddy / dl;
+  }
+
+  // ---- Hindari tepi arena ----
+  const ax = ai.x - arena.cx, ay = ai.y - arena.cy;
+  const ad = Math.hypot(ax, ay) || 1;
+  const safe = arena.r * 0.74;
+  if (ad > safe){
+    const w = clamp((ad - safe) / (arena.r - safe), 0, 1);
+    const nx = -ax / ad, ny = -ay / ad;
+    dx = dx * (1 - w) + nx * w * 1.8;
+    dy = dy * (1 - w) + ny * w * 1.8;
+    const l = Math.hypot(dx, dy) || 1;
+    dx /= l; dy /= l;
+  }
+
+  // ---- Strafe sedikit supaya tidak lurus terus ----
+  const t = performance.now() / 1000;
+  const strafe = Math.sin(t * 1.3 + ai.baseR) * 0.30;
+  const px = -dy, py = dx;
+  dx += px * strafe; dy += py * strafe;
+  const l2 = Math.hypot(dx, dy) || 1;
+  dx /= l2; dy /= l2;
+
+  inp.x = dx; inp.y = dy;
+  inp.power = cfg.aiPower;
+
+  // ---- Dash AI ----
+  if (ai.dashCd <= 0 && dist < arena.r * 0.55 && dist > ai.r + player.r){
+    // pastikan dash tidak keluar arena
+    const testX = ai.x + dx * 200 * SCALE;
+    const testY = ai.y + dy * 200 * SCALE;
+    const td = Math.hypot(testX - arena.cx, testY - arena.cy);
+    if (td < arena.r * 0.96){
+      // peluang per detik
+      if (Math.random() < cfg.dashChance * dt){
+        // arahkan tepat ke player
+        const ddx = player.x - ai.x, ddy = player.y - ai.y;
+        const dl = Math.hypot(ddx, ddy) || 1;
+        ai.vx = ddx / dl * 0;
+        // gunakan mekanisme dash normal
+        const saveVx = ai.vx, saveVy = ai.vy;
+        ai.vx = (ddx / dl) * 300; ai.vy = (ddy / dl) * 300;
+        tryDash(ai);
+        // (tryDash akan menambah impuls ke arah velocity)
+      }
+    }
+  }
+
+  return inp;
+}
+
+/* ============================================================
+   19. FISIKA BOLA
+   ============================================================ */
+function stepBall(b, input, dt){
+  const maxSpeed = 400 * SCALE * b.speedMul
+                 * (b.boost > 0 ? 1.5 : 1)
+                 * (b.big   > 0 ? 0.85 : 1);
+
+  const accel = maxSpeed * 3.2;
+
+  b.vx += input.x * input.power * accel * dt;
+  b.vy += input.y * input.power * accel * dt;
+
+  // damping (gesekan)
+  const damp = Math.exp(-3.2 * dt);
+  b.vx *= damp;
+  b.vy *= damp;
+
+  // batas kecepatan absolut
+  const sp = Math.hypot(b.vx, b.vy);
+  const hardCap = maxSpeed * 2.8;
+  if (sp > hardCap){
+    const k = hardCap / sp;
+    b.vx *= k; b.vy *= k;
+  }
+
+  // integrasi posisi
+  b.x += b.vx * dt;
+  b.y += b.vy * dt;
+
+  // radius & massa dinamis (big ball)
+  const targetR = b.baseR * (b.big > 0 ? 1.45 : 1);
+  b.r += (targetR - b.r) * Math.min(1, dt * 8);
+  const ratio = b.r / b.baseR;
+  b.mass = b.baseMass * ratio * ratio;
+
+  // trail
+  const speedNow = Math.hypot(b.vx, b.vy);
+  if (speedNow > 50 * SCALE){
+    b.trail.push({ x: b.x, y: b.y, r: b.r });
+    if (b.trail.length > 14) b.trail.shift();
+  } else if (b.trail.length > 0 && Math.random() < 0.5){
+    b.trail.shift();
+  }
+
+  b.angle += speedNow * dt * 0.012;
+}
+
+function stepTimers(b, dt){
+  if (b.dashCd  > 0) b.dashCd  -= dt;
+  if (b.dashTime> 0) b.dashTime-= dt;
+  if (b.shield  > 0) b.shield  -= dt;
+  if (b.boost   > 0) b.boost   -= dt;
+  if (b.big     > 0) b.big     -= dt;
+  if (b.invuln  > 0) b.invuln  -= dt;
+  if (b.hitFlash> 0) b.hitFlash-= dt;
+  if (b.hitCd   > 0) b.hitCd   -= dt;
+  if (b.outWarn > 0) b.outWarn -= dt;
+}
+
+/* ============================================================
+   20. TABRAKAN BOLA
+   ============================================================ */
+function handleCollision(a, b){
+  const dx = b.x - a.x, dy = b.y - a.y;
+  let d = Math.hypot(dx, dy);
+  const minD = a.r + b.r;
+  if (d >= minD) return;
+  if (d === 0){ d = 0.01; }
+
+  const nx = dx / d, ny = dy / d;
+
+  // Pisahkan posisi (berdasarkan massa)
+  const overlap = minD - d;
+  const tm = a.mass + b.mass;
+  a.x -= nx * overlap * (b.mass / tm);
+  a.y -= ny * overlap * (b.mass / tm);
+  b.x += nx * overlap * (a.mass / tm);
+  b.y += ny * overlap * (a.mass / tm);
+
+  // Kecepatan relatif sepanjang normal
+  const rvx = b.vx - a.vx;
+  const rvy = b.vy - a.vy;
+  const relN = rvx * nx + rvy * ny;
+  if (relN > 0) return; // sudah memisah
+
+  // Impuls elastis
+  const e = 1.0;
+  const j = -(1 + e) * relN / (1 / a.mass + 1 / b.mass);
+  a.vx -= (j * nx) / a.mass;
+  a.vy -= (j * ny) / a.mass;
+  b.vx += (j * nx) / b.mass;
+  b.vy += (j * ny) / b.mass;
+
+  const impact = Math.abs(relN);
+
+  // Cooldown agar tidak multi-hit dalam 1 kontak
+  if (a.hitCd > 0 || b.hitCd > 0) return;
+
+  // Damage berdasarkan kecepatan masing-masing
+  const spA = Math.hypot(a.vx, a.vy);
+  const spB = Math.hypot(b.vx, b.vy);
+  const threshold = 140 * SCALE;
+
+  let dmgToA = Math.max(0, spB - threshold) * 0.11;
+  let dmgToB = Math.max(0, spA - threshold) * 0.11;
+
+  if (b.dashTime > 0) dmgToA *= 2.0;
+  if (a.dashTime > 0) dmgToB *= 2.0;
+
+  // Kesulitan: musuh memberi damage lebih besar di hard
+  const cfg = DIFF[G.difficulty];
+  if (b === G.enemy) dmgToA *= cfg.dmgMul;
+
+  const CAP = 28;
+  dmgToA = Math.min(dmgToA, CAP);
+  dmgToB = Math.min(dmgToB, CAP);
+
+  const total = dmgToA + dmgToB;
+  if (total > 3.5){
+    const midX = (a.x + b.x) / 2, midY = (a.y + b.y) / 2;
+    G.shake = Math.min(28, G.shake + total * 0.95);
+    G.flash = Math.min(0.45, G.flash + total * 0.016);
+    G.flashColor = '#ffffff';
+    burst(midX, midY, Math.min(20, 4 + Math.floor(total)), '#ffffff', 190 + total * 11, 3.4, true);
+    Sound.hit(clamp(total / 26, 0.15, 1));
+    a.hitCd = b.hitCd = 0.18;
+  }
+
+  applyDamage(a, dmgToA, b);
+  applyDamage(b, dmgToB, a);
+}
+
+/* ============================================================
+   21. RING-OUT (KELUAR ARENA)
+   ============================================================ */
+function checkRingOut(b, dt){
+  const dx = b.x - arena.cx;
+  const dy = b.y - arena.cy;
+  const d = Math.hypot(dx, dy) || 0.001;
+  b.outside = d > arena.r;
+
+  if (!b.outside){
+    b.outWarn = 0;
+    return;
+  }
+
+  b.outWarn = 0.5;
+
+  // Tarikan balik ke arena (rubber band)
+  const nx = dx / d, ny = dy / d;
+  const pull = 2400 * SCALE;
+  b.vx -= nx * pull * dt;
+  b.vy -= ny * pull * dt;
+
+  // Damage berkelanjutan
+  const over = (d - arena.r) / (arena.r * 0.5);
+  let dot = 20 * (0.5 + over) * dt;
+  if (b.shield > 0) dot *= 0.5;
+  b.hp -= dot;
+
+  // Efek visual
+  if (Math.random() < 0.5){
+    const a = Math.atan2(dy, dx);
+    burst(b.x, b.y, 1, '#ff3b6b', 90, 3, true);
+  }
+
+  if (b.hp <= 0 && b.alive){
+    b.hp = 0;
+    b.alive = false;
+    bigExplosion(b);
+    return;
+  }
+
+  // Ring out total
+  if (d > arena.r * 1.5 && b.alive){
+    b.alive = false;
+    b.ringOut = true;
+    bigExplosion(b);
+    G.shake = 40;
+    G.flash = 0.9;
+    G.flashColor = '#ff3b6b';
+  }
+}
+
+/* ============================================================
+   22. UPDATE UTAMA
+   ============================================================ */
+function update(dt){
+  const p = G.player, e = G.enemy;
+  if (!p || !e) return;
+
+  G.elapsed += dt;
+
+  // ---- Input ----
+  if (!G.ending){
+    stepBall(p, getPlayerInput(p), dt);
+    stepBall(e, getAIInput(e, p, dt), dt);
+    handleCollision(p, e);
+  } else {
+    // saat ending, bola tetap bergerak dengan fisika saja
+    stepBall(p, { x:0, y:0, power:0 }, dt);
+    stepBall(e, { x:0, y:0, power:0 }, dt);
+  }
+
+  stepTimers(p, dt);
+  stepTimers(e, dt);
+  checkRingOut(p, dt);
+  checkRingOut(e, dt);
+
+  // ---- Combo timer ----
+  if (G.comboTimer > 0){
+    G.comboTimer -= dt;
+    if (G.comboTimer <= 0){ G.combo = 0; G.comboTimer = 0; }
+  }
+
+  // ---- Spawn power-up ----
+  G.spawnTimer -= dt;
+  if (G.spawnTimer <= 0){
+    spawnPowerUp();
+    G.spawnTimer = rand(4.5, 7.5);
+  }
+
+  // ---- Update power-up & pickup ----
+  for (let i = G.powerups.length - 1; i >= 0; i--){
+    const pu = G.powerups[i];
+    pu.update(dt);
+    if (pu.life <= 0){ G.powerups.splice(i, 1); continue; }
+
+    for (const ball of [p, e]){
+      if (!ball.alive) continue;
+      const d = Math.hypot(pu.x - ball.x, pu.y - ball.y);
+      if (d < ball.r + pu.r){
+        applyPowerUp(ball, pu);
+        G.powerups.splice(i, 1);
+        break;
+      }
+    }
+  }
+
+  // ---- Partikel ----
+  for (let i = G.particles.length - 1; i >= 0; i--){
+    const pt = G.particles[i];
+    pt.update(dt);
+    if (pt.life <= 0) G.particles.splice(i, 1);
+  }
+  if (G.particles.length > MAX_PARTICLES){
+    G.particles.splice(0, G.particles.length - MAX_PARTICLES);
+  }
+
+  // ---- Cek kematian / akhir pertandingan ----
+  if (!G.ending && (!p.alive || !e.alive)){
+    G.ending = true;
+    G.endTimer = 1.7;
+    G.slowmo = 1.7;
+    G.shake = Math.max(G.shake, 22);
+    if (p.alive && !e.alive) Sound.win();
+    else Sound.lose();
+  }
+}
+
+/* ============================================================
+   23. RENDER
+   ============================================================ */
+function drawBackground(){
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Grid animasi
+  const sp = 62;
+  const off = (performance.now() * 0.022) % sp;
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = 'rgba(90,140,255,0.065)';
+  ctx.beginPath();
+  for (let x = -off; x < W + sp; x += sp){ ctx.moveTo(x, 0); ctx.lineTo(x, H); }
+  for (let y = -off; y < H + sp; y += sp){ ctx.moveTo(0, y); ctx.lineTo(W, y); }
+  ctx.stroke();
+
+  // Cahaya radial di belakang arena
+  const g = ctx.createRadialGradient(arena.cx, arena.cy, 0, arena.cx, arena.cy, arena.r * 1.7);
+  g.addColorStop(0,   'rgba(90,45,200,0.36)');
+  g.addColorStop(0.55,'rgba(45,20,120,0.14)');
+  g.addColorStop(1,   'rgba(0,0,0,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+}
+
+function drawArena(){
+  const t = performance.now() / 1000;
+
+  // Zona bahaya
+  const dz = ctx.createRadialGradient(arena.cx, arena.cy, arena.r * 0.98, arena.cx, arena.cy, arena.r * 1.5);
+  dz.addColorStop(0, 'rgba(255,60,90,0.13)');
+  dz.addColorStop(1, 'rgba(255,60,90,0)');
+  ctx.fillStyle = dz;
+  ctx.beginPath(); ctx.arc(arena.cx, arena.cy, arena.r * 1.5, 0, Math.PI * 2); ctx.fill();
+
+  // Lantai arena
+  const fg = ctx.createRadialGradient(arena.cx, arena.cy, 0, arena.cx, arena.cy, arena.r);
+  fg.addColorStop(0,   'rgba(40,25,95,0.55)');
+  fg.addColorStop(0.7, 'rgba(22,12,64,0.38)');
+  fg.addColorStop(1,   'rgba(70,25,140,0.14)');
+  ctx.fillStyle = fg;
+  ctx.beginPath(); ctx.arc(arena.cx, arena.cy, arena.r, 0, Math.PI * 2); ctx.fill();
+
+  // Garis dalam berputar
+  ctx.save();
+  ctx.translate(arena.cx, arena.cy);
+  ctx.rotate(t * 0.28);
+  ctx.strokeStyle = 'rgba(120,220,255,0.28)';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([16, 24]);
+  ctx.beginPath(); ctx.arc(0, 0, arena.r * 0.86, 0, Math.PI * 2); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // Lingkaran tengah
+  ctx.strokeStyle = 'rgba(162,91,255,0.30)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.arc(arena.cx, arena.cy, arena.r * 0.30, 0, Math.PI * 2); ctx.stroke();
+  ctx.beginPath(); ctx.arc(arena.cx, arena.cy, arena.r * 0.14, 0, Math.PI * 2); ctx.stroke();
+
+  // Border neon utama
+  ctx.save();
+  ctx.shadowBlur = 34;
+  ctx.shadowColor = '#4fd8ff';
+  ctx.strokeStyle = '#7ef0ff';
+  ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.arc(arena.cx, arena.cy, arena.r, 0, Math.PI * 2); ctx.stroke();
+  ctx.restore();
+
+  // Border luar (ungu)
+  ctx.save();
+  ctx.shadowBlur = 22;
+  ctx.shadowColor = '#a25bff';
+  ctx.strokeStyle = 'rgba(162,91,255,0.65)';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(arena.cx, arena.cy, arena.r + 9, 0, Math.PI * 2); ctx.stroke();
+  ctx.restore();
+
+  // Garis batas ring-out
+  ctx.save();
+  ctx.setLineDash([10, 14]);
+  ctx.strokeStyle = 'rgba(255,59,107,0.45)';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(arena.cx, arena.cy, arena.r * 1.5, 0, Math.PI * 2); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+}
+
+function drawBall(b){
+  if (!b) return;
+
+  // Trail
+  ctx.globalCompositeOperation = 'lighter';
+  for (let i = 0; i < b.trail.length; i++){
+    const p = b.trail[i];
+    const f = i / b.trail.length;
+    ctx.globalAlpha = f * 0.28;
+    ctx.fillStyle = b.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, Math.max(1, b.r * f * 0.92), 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  ctx.globalCompositeOperation = 'source-over';
+
+  if (!b.alive){
+    // efek kematian
+    return;
+  }
+
+  const pulse = b.dashTime > 0 ? 1.06 : 1;
+
+  // Aura glow
+  ctx.save();
+  ctx.shadowBlur = 34;
+  ctx.shadowColor = b.color;
+  const g = ctx.createRadialGradient(
+    b.x - b.r * 0.32, b.y - b.r * 0.32, b.r * 0.08,
+    b.x, b.y, b.r * pulse
+  );
+  g.addColorStop(0, b.light);
+  g.addColorStop(0.55, b.color);
+  g.addColorStop(1, b.color);
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.arc(b.x, b.y, b.r * pulse, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  // Rim
+  ctx.strokeStyle = 'rgba(255,255,255,0.75)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(b.x, b.y, b.r * pulse - 1, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Highlight atas
+  ctx.globalAlpha = 0.35;
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.ellipse(b.x - b.r * 0.3, b.y - b.r * 0.38, b.r * 0.28, b.r * 0.18, -0.6, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.globalAlpha = 1;
+
+  // Mata
+  const sp = Math.hypot(b.vx, b.vy);
+  let ex = 0, ey = 0;
+  if (sp > 15){ ex = b.vx / sp; ey = b.vy / sp; }
+  const px = -ey, py = ex;
+  const eOff = b.r * 0.34;
+  const eyeR = b.r * 0.185;
+  const pupR = b.r * 0.095;
+  for (const s of [-1, 1]){
+    const cx2 = b.x + ex * eOff * 0.6 + px * eOff * 0.72 * s;
+    const cy2 = b.y + ey * eOff * 0.6 + py * eOff * 0.72 * s;
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath(); ctx.arc(cx2, cy2, eyeR, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#12101f';
+    ctx.beginPath(); ctx.arc(cx2 + ex * eyeR * 0.38, cy2 + ey * eyeR * 0.38, pupR, 0, Math.PI * 2); ctx.fill();
+  }
+
+  // Shield ring
+  if (b.shield > 0){
+    const a = clamp(b.shield / 1.2, 0, 1) * 0.75;
+    ctx.save();
+    ctx.globalAlpha = 0.45 + Math.sin(performance.now() / 110) * 0.18;
+    ctx.strokeStyle = '#4fc3ff';
+    ctx.lineWidth = 3;
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = '#4fc3ff';
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r + 9, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Speed boost ring
+  if (b.boost > 0){
+    ctx.save();
+    ctx.globalAlpha = 0.55;
+    ctx.strokeStyle = '#ffd93d';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([7, 9]);
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r + 5, performance.now() / 220, performance.now() / 220 + Math.PI * 1.7);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+  }
+
+  // Flash saat kena hit
+  if (b.hitFlash > 0){
+    ctx.globalAlpha = clamp(b.hitFlash * 2.6, 0, 0.85);
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+
+  // Indikator di luar arena
+  if (b.outside && b.alive){
+    ctx.save();
+    ctx.globalAlpha = 0.6 + Math.sin(performance.now() / 90) * 0.4;
+    ctx.strokeStyle = '#ff3b6b';
+    ctx.lineWidth = 3;
+    ctx.shadowBlur = 18;
+    ctx.shadowColor = '#ff3b6b';
+    ctx.beginPath(); ctx.arc(b.x, b.y, b.r + 14, 0, Math.PI * 2); ctx.stroke();
+    ctx.restore();
+  }
+}
+
+function render(){
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+  drawBackground();
+
+  ctx.save();
+  if (G.shake > 0.25){
+    const s = G.shake;
+    ctx.translate((Math.random() - 0.5) * s, (Math.random() - 0.5) * s);
+  }
+
+  drawArena();
+
+  // Power-ups
+  for (const pu of G.powerups) pu.draw();
+
+  // Bola
+  if (G.enemy)  drawBall(G.enemy);
+  if (G.player) drawBall(G.player);
+
+  // Partikel (additive)
+  ctx.globalCompositeOperation = 'lighter';
+  for (const p of G.particles) p.draw();
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.globalAlpha = 1;
+
+  ctx.restore();
+
+  // Flash layar
+  if (G.flash > 0.01){
+    ctx.globalAlpha = Math.min(0.75, G.flash);
+    ctx.fillStyle = G.flashColor;
+    ctx.fillRect(0, 0, W, H);
+    ctx.globalAlpha = 1;
+  }
+
+  // Vignette merah saat player di luar arena
+  if (G.mode === 'playing' && G.player && G.player.outside && G.player.alive){
+    const v = ctx.createRadialGradient(W/2, H/2, Math.min(W,H)*0.25, W/2, H/2, Math.max(W,H)*0.72);
+    v.addColorStop(0, 'rgba(255,0,60,0)');
+    v.addColorStop(1, 'rgba(255,0,60,' + (0.28 + Math.sin(performance.now()/110) * 0.12) + ')');
+    ctx.fillStyle = v;
+    ctx.fillRect(0, 0, W, H);
+  }
+}
+
+/* ============================================================
+   24. HUD
+   ============================================================ */
+const hudEls = {
+  pHP:      document.getElementById('pHP'),
+  eHP:      document.getElementById('eHP'),
+  timer:    document.getElementById('hudTimer'),
+  score:    document.getElementById('hudScore'),
+  dashFill: document.getElementById('dashFill'),
+  comboEl:  document.getElementById('comboEl')
+};
+
+function updateHUD(){
+  const p = G.player, e = G.enemy;
+  if (!p || !e) return;
+
+  hudEls.pHP.style.width = Math.max(0, (p.hp / p.maxHp) * 100) + '%';
+  hudEls.eHP.style.width = Math.max(0, (e.hp / e.maxHp) * 100) + '%';
+  hudEls.timer.textContent = fmtTime(G.elapsed);
+  hudEls.score.textContent = 'SCORE ' + Math.floor(G.score);
+
+  const cdPct = p.dashCd <= 0 ? 100 : (1 - p.dashCd / p.dashMax) * 100;
+  hudEls.dashFill.style.width = clamp(cdPct, 0, 100) + '%';
+
+  if (G.combo > 1){
+    hudEls.comboEl.textContent = 'COMBO x' + G.combo;
+    hudEls.comboEl.classList.add('show');
+  } else {
+    hudEls.comboEl.classList.remove('show');
+  }
+}
+
+/* ============================================================
+   25. LOOP UTAMA
+   ============================================================ */
+let lastTime = performance.now();
+
+function loop(now){
+  requestAnimationFrame(loop);
+
+  let rdt = (now - lastTime) / 1000;
+  lastTime = now;
+  if (rdt > 0.05) rdt = 0.05;
+
+  // Slow-motion
+  const targetTS = G.slowmo > 0 ? 0.18 : 1;
+  G.timeScale += (targetTS - G.timeScale) * Math.min(1, rdt * 7);
+  if (G.slowmo > 0){
+    G.slowmo -= rdt;
+    if (G.slowmo <= 0) G.slowmo = 0;
+  }
+
+  const dt = rdt * G.timeScale;
+
+  // Update
+  if (G.mode === 'playing'){
+    update(dt);
+
+    // Timer ending (real time)
+    if (G.ending){
+      G.endTimer -= rdt;
+      if (G.endTimer <= 0){
+        G.ending = false;
+        showGameOver();
+      }
+    }
+  }
+
+  // Decay efek layar
+  G.shake    = Math.max(0, G.shake - rdt * 55);
+  G.flash    = Math.max(0, G.flash - rdt * 2.4);
+
+  // Render
+  render();
+
+  // HUD
+  if (G.mode === 'playing' || G.mode === 'paused') updateHUD();
+}
+
+/* ============================================================
+   26. UI / MENU LOGIC
+   ============================================================ */
+const overlay = document.getElementById('overlay');
+const screens = {
+  menu:    document.getElementById('scr-menu'),
+  howto:   document.getElementById('scr-howto'),
+  skins:   document.getElementById('scr-skins'),
+  pause:   document.getElementById('scr-pause'),
+  over:    document.getElementById('scr-over')
+};
+
+function showScreen(name){
+  Object.keys(screens).forEach(k => {
+    screens[k].classList.toggle('active', k === name);
+  });
+  overlay.classList.toggle('hidden', name === null);
+}
+
+/* ---- Skin Grid ---- */
+function renderSkins(){
+  const grid = document.getElementById('skinGrid');
+  grid.innerHTML = '';
+  const best = getBest();
+  SKINS.forEach(sk => {
+    const unlocked = best >= sk.req;
+    const div = document.createElement('div');
+    div.className = 'skin' + (unlocked ? '' : ' locked') + (G.skinId === sk.id ? ' sel' : '');
+    div.innerHTML =
+      '<div class="orb" style="background:radial-gradient(circle at 35% 30%,' + sk.light + ',' + sk.color + ');color:' + sk.color + '"></div>' +
+      '<div class="nm">' + sk.name + '</div>' +
+      '<div class="rq">' + (unlocked ? (G.skinId === sk.id ? 'TERPILIH' : 'SIAP') : '🔒 ' + sk.req) + '</div>';
+    div.addEventListener('click', () => {
+      if (!unlocked){ Sound.tone(140, 0.14, 'square', 0.09); return; }
+      G.skinId = sk.id;
+      try { localStorage.setItem(LS_SKIN, sk.id); } catch(e){}
+      Sound.ui();
+      renderSkins();
+    });
+    grid.appendChild(div);
+  });
+}
+
+/* ---- Tombol Menu ---- */
+document.querySelectorAll('[data-act]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    Sound.init(); Sound.resume(); Sound.ui();
+    const act = btn.getAttribute('data-act');
+    if (act === 'play')      startGame();
+    if (act === 'howto')     showScreen('howto');
+    if (act === 'skins'){ renderSkins(); showScreen('skins'); }
+    if (act === 'back')      showScreen('menu');
+    if (act === 'resume')    resumeGame();
+    if (act === 'restart')   startGame();
+    if (act === 'menu'){
+      G.mode = 'menu';
+      document.getElementById('hud').classList.add('hidden');
+      document.getElementById('bestScore').textContent = getBest();
+      showScreen('menu');
+    }
+  });
+});
+
+/* ---- Difficulty ---- */
+document.querySelectorAll('[data-diff]').forEach(chip => {
+  chip.addEventListener('click', () => {
+    Sound.ui();
+    document.querySelectorAll('[data-diff]').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    G.difficulty = chip.getAttribute('data-diff');
+  });
+});
+
+/* ============================================================
+   27. INISIALISASI
+   ============================================================ */
+resize();
+setupInput();
+renderSkins();
+document.getElementById('bestScore').textContent = getBest();
+showScreen('menu');
+
+// Deteksi device sentuh
+if ('ontouchstart' in window || navigator.maxTouchPoints > 0){
+  document.body.classList.add('touch');
+}
+
+// Mulai loop
+requestAnimationFrame(loop);
+
+})();
+</script>
+</body>
+</html>
