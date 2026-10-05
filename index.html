@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
-<title>Ball vs Ball — 42 Abilities Auto Battle</title>
+<title>Ball vs Ball — 42 Abilities Straight-Line Battle</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{
@@ -115,7 +115,7 @@ h2.title{font-size:clamp(22px,5.5vw,30px);font-weight:900;letter-spacing:3px;mar
 <div id="overlay">
   <div class="screen active" id="scr-menu">
     <h1 class="logo">BALL <span>VS</span> BALL</h1>
-    <p class="sub">42 Kemampuan Unik · Auto Battle</p>
+    <p class="sub">42 Kemampuan Unik · Straight-Line Battle</p>
     <button class="btn primary" data-act="play">▶ PILIH BOLA & TONTON</button>
     <button class="btn" data-act="howto">? CARA MAIN</button>
     <button class="btn" data-act="balls">📖 DAFTAR BOLA (42)</button>
@@ -126,11 +126,11 @@ h2.title{font-size:clamp(22px,5.5vw,30px);font-weight:900;letter-spacing:3px;mar
     <div class="card">
       <ul>
         <li><b>Pilih satu bola</b> yang ingin kamu dukung, lalu tonton pertarungan otomatis.</li>
-        <li>Bola bergerak <b>sendiri</b>, lurus dan <b>memantul</b> di dinding arena.</li>
-        <li>Setiap bola punya <b>kemampuan unik</b> dan tampilan berbeda.</li>
-        <li><b>ATK</b> (merah) = seberapa besar damage yang diberikan saat menabrak.</li>
-        <li><b>DEF</b> (biru) = seberapa besar damage yang dikurangi saat ditabrak.</li>
-        <li><b>Hanya yang menabrak yang memberi damage!</b> Kalau kamu diam dan ditabrak, kamu kena damage tapi tidak memberi.</li>
+        <li>Bola bergerak <b>lurus</b> dan hanya <b>berbelok saat memantul</b> di dinding arena.</li>
+        <li>Kadang bola akan membelokkan arah pantulan ke arah musuh — jadikan taktik!</li>
+        <li><b>ATK</b> (merah) = besar damage yang diberikan saat menabrak.</li>
+        <li><b>DEF</b> (biru) = besar damage yang dikurangi saat ditabrak.</li>
+        <li><b>Hanya yang menabrak yang memberi damage!</b> Kalau diam dan ditabrak, kamu kena damage tapi tidak memberi.</li>
         <li>Dash memberikan bonus damage 1.8x. Bola dengan HP 0 kalah.</li>
         <li>Tekan <span class="k">ESC</span> untuk pause.</li>
       </ul>
@@ -284,22 +284,18 @@ const MAX_DAMAGE_NUMS = 40;
    4. 42 BOLA — with ATK & DEF
    ============================================================ */
 const BALLS = [
-  // TIER 5 — BALANCED
   { id:'basic',    name:'BASIC',    color:'#7ec8ff', light:'#dff0ff', hp:100, r:22, spd:1.00, atk:1.00, def:1.00, pwr:5, ability:'basic',    desc:'Seimbang tanpa kemampuan khusus.' },
   { id:'tank',     name:'TANK',     color:'#9b9b9b', light:'#e0e0e0', hp:180, r:28, spd:0.70, atk:0.70, def:1.55, pwr:5, ability:'tank',     desc:'HP & DEF tinggi, lambat.' },
   { id:'speedy',   name:'SPEEDY',   color:'#ffd93d', light:'#fff6cc', hp:80,  r:19, spd:1.60, atk:0.85, def:0.70, pwr:5, ability:'speedy',   desc:'Sangat cepat, DEF rendah.' },
-  // TIER 4 — SUPPORT
   { id:'magnet',   name:'MAGNET',   color:'#ff69b4', light:'#ffc8e0', hp:110, r:24, spd:0.95, atk:0.90, def:1.10, pwr:4, ability:'magnet',   desc:'Menarik power-up dari jauh.' },
   { id:'lucky',    name:'LUCKY',    color:'#ffd700', light:'#fff0a0', hp:105, r:22, spd:1.00, atk:0.95, def:1.00, pwr:4, ability:'lucky',    desc:'Power-up muncul lebih sering.' },
   { id:'wall',     name:'WALL',     color:'#666680', light:'#c0c0d0', hp:140, r:25, spd:0.85, atk:0.85, def:1.40, pwr:4, ability:'wall',     desc:'Kena damage → boost kecepatan.' },
-  // TIER 6 — MINOR
   { id:'healer',   name:'HEALER',   color:'#4dff88', light:'#d0ffe0', hp:85,  r:22, spd:1.00, atk:0.85, def:1.00, pwr:6, ability:'healer',   desc:'Regenerasi 6 HP per detik.' },
   { id:'shield',   name:'SHIELD',   color:'#4fc3ff', light:'#d0eeff', hp:85,  r:22, spd:0.95, atk:0.85, def:1.20, pwr:6, ability:'shield',   desc:'Shield beregenerasi tiap 9 detik.' },
   { id:'aura',     name:'AURA',     color:'#dda0dd', light:'#f5d0f5', hp:90,  r:24, spd:1.00, atk:0.85, def:1.05, pwr:6, ability:'aura',     desc:'Damage pasif di sekitar.' },
   { id:'bouncer',  name:'BOUNCER',  color:'#ff00ff', light:'#ffb0ff', hp:85,  r:22, spd:1.05, atk:0.95, def:0.95, pwr:6, ability:'bouncer',  desc:'Pantulan ekstra kuat.' },
   { id:'fire',     name:'FIRE',     color:'#ff4400', light:'#ffcc88', hp:85,  r:22, spd:1.05, atk:1.00, def:0.90, pwr:6, ability:'fire',     desc:'Meninggalkan jejak api.' },
   { id:'ice',      name:'ICE',      color:'#80ffff', light:'#e0ffff', hp:80,  r:22, spd:1.00, atk:0.90, def:1.00, pwr:6, ability:'ice',      desc:'Membekukan musuh saat menabrak.' },
-  // TIER 7 — KUAT
   { id:'freezer',  name:'FREEZER',  color:'#a8e8ff', light:'#e8f7ff', hp:80,  r:22, spd:1.00, atk:0.90, def:1.00, pwr:7, ability:'freezer',  desc:'Slow 55% selama 2.5 detik.' },
   { id:'poison',   name:'POISON',   color:'#9dff4d', light:'#e6ffd0', hp:80,  r:22, spd:1.00, atk:0.90, def:1.00, pwr:7, ability:'poison',   desc:'Racun berkelanjutan.' },
   { id:'exploder', name:'EXPLODER', color:'#ffa500', light:'#ffe0a0', hp:80,  r:22, spd:1.00, atk:1.00, def:0.90, pwr:7, ability:'exploder', desc:'Ledakan besar saat mati.' },
@@ -308,7 +304,6 @@ const BALLS = [
   { id:'boxer',    name:'BOXER',    color:'#ff6347', light:'#ffc0b0', hp:75,  r:22, spd:1.05, atk:1.30, def:0.85, pwr:7, ability:'boxer',    desc:'Knockback besar + damage ekstra.' },
   { id:'spinner',  name:'SPINNER',  color:'#00ced1', light:'#c0f8f8', hp:80,  r:24, spd:0.95, atk:1.00, def:1.00, pwr:7, ability:'spinner',  desc:'AoE damage di sekitar.' },
   { id:'sticky',   name:'STICKY',   color:'#88aa00', light:'#e0ff88', hp:80,  r:22, spd:1.00, atk:0.90, def:1.00, pwr:7, ability:'sticky',   desc:'Menempelkan musuh 1 detik.' },
-  // TIER 8 — SANGAT KUAT
   { id:'vampire',  name:'VAMPIRE',  color:'#b0004d', light:'#ffb0c8', hp:70,  r:22, spd:1.05, atk:1.10, def:0.90, pwr:8, ability:'vampire',  desc:'Mencuri 45% damage sebagai HP.' },
   { id:'ghost',    name:'GHOST',    color:'#c0c0ff', light:'#f0f0ff', hp:70,  r:22, spd:1.05, atk:1.00, def:1.15, pwr:8, ability:'ghost',    desc:'28% peluang menghindar.' },
   { id:'reflector',name:'REFLECTOR',color:'#ff77ff', light:'#ffd6ff', hp:70,  r:22, spd:1.00, atk:0.85, def:1.30, pwr:8, ability:'reflector',desc:'Memantulkan 55% damage.' },
@@ -320,10 +315,8 @@ const BALLS = [
   { id:'time',     name:'TIME',     color:'#4040ff', light:'#c0c0ff', hp:65,  r:22, spd:1.00, atk:0.90, def:1.15, pwr:8, ability:'time',     desc:'Melambatkan musuh di sekitar.' },
   { id:'mirror',   name:'MIRROR',   color:'#e0e0e0', light:'#ffffff', hp:70,  r:22, spd:1.00, atk:1.00, def:1.00, pwr:8, ability:'mirror',   desc:'Meniru kemampuan musuh.' },
   { id:'warrior',  name:'WARRIOR',  color:'#8b0000', light:'#ffb0b0', hp:70,  r:22, spd:1.00, atk:1.10, def:0.95, pwr:8, ability:'warrior',  desc:'3 dash tersimpan.' },
-  // TIER 9 — OP
   { id:'bomber',   name:'BOMBER',   color:'#ff5b2e', light:'#ffd9a8', hp:52,  r:22, spd:1.05, atk:1.45, def:0.65, pwr:9, ability:'bomber',   desc:'Meledak saat menabrak (AoE).' },
   { id:'sniper',   name:'SNIPER',   color:'#ffcc00', light:'#fff6cc', hp:55,  r:20, spd:1.00, atk:1.30, def:0.65, pwr:9, ability:'sniper',   desc:'Menembak proyektil tiap 2 detik.' },
-  // NEW TIER — TAMBAHAN
   { id:'paladin',  name:'PALADIN',  color:'#e8e0c8', light:'#fff9e6', hp:120, r:24, spd:0.90, atk:0.95, def:1.60, pwr:6, ability:'paladin',  desc:'DEF sangat tinggi, shield tiap 7 detik.' },
   { id:'assassin', name:'ASSASSIN', color:'#6a0dad', light:'#d8b0ff', hp:55,  r:21, spd:1.25, atk:1.60, def:0.60, pwr:9, ability:'assassin', desc:'ATK sangat tinggi, crit 40%.' },
   { id:'druid',    name:'DRUID',    color:'#6b8e23', light:'#d8e8a0', hp:90,  r:23, spd:1.00, atk:0.95, def:1.10, pwr:6, ability:'druid',    desc:'Regen 8 HP/detik.' },
@@ -478,10 +471,8 @@ function drawBallSymbol(id, r, t){
   ctx.lineWidth=Math.max(1.5,r*0.12);
   ctx.strokeStyle='rgba(255,255,255,0.9)';
   ctx.fillStyle='rgba(255,255,255,0.9)';
-
   switch(id){
-    case 'tank':
-    case 'golem': {
+    case 'tank': case 'golem': {
       ctx.beginPath();
       for (let i=0;i<6;i++){
         const a=i/6*Math.PI*2-Math.PI/2;
@@ -527,8 +518,7 @@ function drawBallSymbol(id, r, t){
       ctx.strokeRect(-S-bw/2,S*0.38,bw,bh);ctx.strokeRect(-S+bw/2,S*0.38,bw,bh);
       break;
     }
-    case 'healer':
-    case 'druid': {
+    case 'healer': case 'druid': {
       const th=S*0.34;
       ctx.beginPath();
       ctx.moveTo(-th,-S);ctx.lineTo(th,-S);ctx.lineTo(th,-th);
@@ -541,8 +531,7 @@ function drawBallSymbol(id, r, t){
       }
       break;
     }
-    case 'shield':
-    case 'paladin': {
+    case 'shield': case 'paladin': {
       ctx.beginPath();
       ctx.moveTo(0,-S);ctx.lineTo(S*0.8,-S*0.45);
       ctx.lineTo(S*0.8,S*0.2);ctx.lineTo(0,S);
@@ -564,9 +553,7 @@ function drawBallSymbol(id, r, t){
       ctx.stroke();
       break;
     }
-    case 'fire':
-    case 'phoenix':
-    case 'dragon': {
+    case 'fire': case 'phoenix': case 'dragon': {
       ctx.beginPath();
       ctx.moveTo(0,S);
       ctx.bezierCurveTo(-S*0.7,S*0.5,-S*0.6,-S*0.2,0,-S);
@@ -603,8 +590,7 @@ function drawBallSymbol(id, r, t){
       ctx.beginPath();ctx.arc(0,S*0.45,dr,0,Math.PI*2);ctx.fill();
       break;
     }
-    case 'exploder':
-    case 'bomber': {
+    case 'exploder': case 'bomber': {
       ctx.beginPath();ctx.arc(0,S*0.15,S*0.62,0,Math.PI*2);ctx.stroke();
       ctx.beginPath();
       ctx.moveTo(S*0.25,-S*0.35);
@@ -662,8 +648,7 @@ function drawBallSymbol(id, r, t){
       ctx.closePath(); ctx.fill();
       break;
     }
-    case 'ghost':
-    case 'oracle': {
+    case 'ghost': case 'oracle': {
       ctx.beginPath();
       for (let x=-S;x<=S;x+=2){
         const y=S*0.55+Math.sin(x/S*Math.PI*3)*S*0.16;
@@ -689,8 +674,7 @@ function drawBallSymbol(id, r, t){
       ctx.setLineDash([]);
       break;
     }
-    case 'giant':
-    case 'titan': {
+    case 'giant': case 'titan': {
       ctx.beginPath();
       ctx.moveTo(-S*0.8,S*0.3);ctx.lineTo(-S*0.8,-S*0.35);
       ctx.lineTo(-S*0.35,S*0);ctx.lineTo(0,-S*0.55);
@@ -709,16 +693,14 @@ function drawBallSymbol(id, r, t){
       ctx.stroke();
       break;
     }
-    case 'lightning':
-    case 'shaman': {
+    case 'lightning': case 'shaman': {
       ctx.beginPath();
       ctx.moveTo(S*0.2,-S);ctx.lineTo(-S*0.3,0);ctx.lineTo(S*0.1,0);
       ctx.lineTo(-S*0.2,S);ctx.lineTo(S*0.3,-S*0.1);ctx.lineTo(-S*0.1,-S*0.1);
       ctx.closePath(); ctx.fill();
       break;
     }
-    case 'ninja':
-    case 'assassin': {
+    case 'ninja': case 'assassin': {
       ctx.beginPath();
       for (let i=0;i<4;i++){
         const a=i/4*Math.PI*2-Math.PI/2;
@@ -729,9 +711,7 @@ function drawBallSymbol(id, r, t){
         ctx.lineTo(ix,iy);
       }
       ctx.closePath(); ctx.stroke();
-      if (id==='assassin'){
-        ctx.beginPath();ctx.arc(0,0,S*0.15,0,Math.PI*2);ctx.fill();
-      }
+      if (id==='assassin'){ ctx.beginPath();ctx.arc(0,0,S*0.15,0,Math.PI*2);ctx.fill(); }
       break;
     }
     case 'time': {
@@ -787,7 +767,7 @@ function drawBallSymbol(id, r, t){
 }
 
 /* ============================================================
-   9. BALL
+   9. BALL — STRAIGHT-LINE MOVEMENT
    ============================================================ */
 let ballIdSeq = 0;
 
@@ -814,7 +794,6 @@ class Ball {
 
     this.trail=[];
     this.angle=0;
-    this.steerTimer = 0.4 + Math.random()*0.8;
 
     this.dashCd=0;this.dashMax=2.0;this.dashTime=0;
     this.maxDashCharges=1;this.dashCharges=1;
@@ -826,6 +805,7 @@ class Ball {
     this.abilityCd=0;this.growth=0;this.revived=false;
     this.alive=true;this.outside=false;this.deathTime=0;
 
+    // Initial velocity — straight line
     const a = Math.random()*Math.PI*2;
     const sp = 340*SCALE*this.speedMul;
     this.vx = Math.cos(a)*sp;
@@ -843,6 +823,7 @@ class Ball {
       if (this.trail.length>0) this.trail.shift();
       return;
     }
+    // Timers
     if (this.dashCd>0){
       this.dashCd -= dt;
       if (this.dashCd<=0){
@@ -862,6 +843,7 @@ class Ball {
     if (this.invisible>0) this.invisible -= dt;
     if (this.abilityCd>0) this.abilityCd -= dt;
 
+    // DoT
     if (this.poisonTimer>0){
       this.poisonTimer -= dt;
       this.hp -= 25*dt/4;
@@ -877,52 +859,42 @@ class Ball {
 
     this.applyAbilityPassive(dt, enemy);
 
-    this.steerTimer -= dt;
+    // ===== MOVE STRAIGHT — NO RANDOM STEERING =====
     const frozen = this.freeze>0 || this.sticky>0;
 
-    if (!frozen && this.steerTimer<=0){
-      let angle;
-      if (enemy && enemy.alive && Math.random()<0.72){
-        const edx = enemy.x + enemy.vx*0.15 - this.x;
-        const edy = enemy.y + enemy.vy*0.15 - this.y;
-        angle = Math.atan2(edy, edx) + (Math.random()-0.5)*0.5;
-      } else {
-        angle = Math.random()*Math.PI*2;
-      }
-      const sp = this.speedMax;
-      this.vx = Math.cos(angle)*sp;
-      this.vy = Math.sin(angle)*sp;
-      this.steerTimer = 1.0 + Math.random()*1.8;
-      burst(this.x, this.y, 3, this.light, 70, 2);
-    }
-
     if (!frozen){
-      const sp = Math.hypot(this.vx,this.vy);
+      // Normalize speed to target speed (keeps direction unchanged)
+      const sp = Math.hypot(this.vx, this.vy);
       const targetSp = this.speedMax;
-      if (sp>1){
+      if (sp > 1){
+        const k = Math.min(1, dt*4);
         const targetVx = (this.vx/sp)*targetSp;
         const targetVy = (this.vy/sp)*targetSp;
-        const k = Math.min(1, dt*5);
-        this.vx += (targetVx-this.vx)*k;
-        this.vy += (targetVy-this.vy)*k;
+        this.vx += (targetVx - this.vx)*k;
+        this.vy += (targetVy - this.vy)*k;
       } else {
+        // Failsafe: give random direction if velocity is nearly zero
         const a = Math.random()*Math.PI*2;
         this.vx = Math.cos(a)*targetSp;
         this.vy = Math.sin(a)*targetSp;
       }
+      // Straight-line integration
       this.x += this.vx*dt;
       this.y += this.vy*dt;
     }
 
+    // Dynamic radius (grow/shrink)
     let targetR = this.baseR;
     if (this.growth>0) targetR *= (1 + this.growth*0.55);
     this.r += (targetR-this.r)*Math.min(1, dt*6);
     const ratio = this.r/this.baseR;
     this.mass = this.baseMass*ratio*ratio;
 
+    // Wall bounce — THE ONLY place direction changes
     this.handleWallBounce();
 
-    const sp2 = Math.hypot(this.vx,this.vy);
+    // Trail
+    const sp2 = Math.hypot(this.vx, this.vy);
     if (sp2>40*SCALE){
       this.trail.push({x:this.x,y:this.y,r:this.r});
       if (this.trail.length>12) this.trail.shift();
@@ -935,16 +907,35 @@ class Ball {
     const dx = this.x - arena.cx, dy = this.y - arena.cy;
     const d = Math.hypot(dx,dy)||0.001;
     const limit = arena.r - this.r;
-    if (d>limit){
-      const nx=dx/d, ny=dy/d;
+    if (d > limit){
+      const nx = dx/d, ny = dy/d;
+      // Push inside
       this.x = arena.cx + nx*limit;
       this.y = arena.cy + ny*limit;
       const dot = this.vx*nx + this.vy*ny;
-      if (dot>0){
-        let rest = 0.92;
+      if (dot > 0){
+        let rest = 0.96;
         if (this.ability==='bouncer') rest = 1.05;
+        // Reflect velocity
         this.vx -= (1+rest)*dot*nx;
         this.vy -= (1+rest)*dot*ny;
+
+        // SMART BOUNCE: sometimes aim bounce toward enemy
+        const enemy = (this === G.player) ? G.enemy : G.player;
+        if (enemy && enemy.alive && Math.random() < 0.50){
+          const edx = enemy.x + enemy.vx*0.2 - this.x;
+          const edy = enemy.y + enemy.vy*0.2 - this.y;
+          const el = Math.hypot(edx, edy) || 1;
+          const sp = Math.hypot(this.vx, this.vy);
+          const newVx = (edx/el) * sp;
+          const newVy = (edy/el) * sp;
+          // Blend: 55% new direction (toward enemy), 45% bounce
+          this.vx = this.vx*0.45 + newVx*0.55;
+          this.vy = this.vy*0.45 + newVy*0.55;
+          // Small spark to show AI bounce
+          burst(this.x, this.y, 4, this.light, 100, 2.5);
+        }
+
         const impact = Math.abs(dot);
         if (impact > 150*SCALE){
           if (this.ability==='bouncer') burst(this.x,this.y,8,'#ff00ff',180,3);
@@ -957,7 +948,6 @@ class Ball {
   applyAbilityPassive(dt, enemy){
     const ab = this.ability;
     const enemies = enemy ? [enemy] : [];
-
     if ((ab==='healer') && this.hp<this.maxHp) this.hp = Math.min(this.maxHp, this.hp+6*dt);
     if ((ab==='druid')  && this.hp<this.maxHp) this.hp = Math.min(this.maxHp, this.hp+8*dt);
     if ((ab==='shield' || ab==='paladin') && this.shield<=0 && this.abilityCd<=0){
@@ -1121,14 +1111,11 @@ class Ball {
   dealDamageTo(target, amount, isAbility){
     if (amount<=0 || !target.alive) return;
     if (target.invuln>0 && !isAbility) return;
-
     let dmg = amount;
     if (target.shield>0) dmg *= 0.4;
-
     const res = target.onTakeDamage(dmg, this);
     if (res.dodged) return;
     dmg = res.finalDamage;
-
     if ((this.ability==='ninja'||this.ability==='assassin') && Math.random()<(this.ability==='assassin'?0.40:0.30)){
       dmg *= 2;
       burst(target.x,target.y,10,'#a0a0b0',240,4);
@@ -1141,13 +1128,10 @@ class Ball {
       dmg *= 1.8;
       burst(target.x,target.y,8,'#1a1a1a',180,3.5);
     }
-
     target.hp -= dmg;
     target.hitFlash = 0.25;
     if (!isAbility) target.invuln = 0.06;
-
     if (this.isPlayer) G.playerDmgDealt += dmg;
-
     if (this.isPlayer && !isAbility){
       if (G.comboTimer>0) G.combo = Math.min(G.combo+1, 12);
       else G.combo = 1;
@@ -1155,12 +1139,8 @@ class Ball {
       if (G.combo>G.maxCombo) G.maxCombo = G.combo;
       G.score += dmg*(1+(G.combo-1)*0.3);
     }
-
-    // Floating damage number
     addDamageNum(target.x, target.y - target.r*0.5, dmg, this.isPlayer ? '#5fe6ff' : '#ff8080');
-
     burst(target.x,target.y, Math.min(12, 4+Math.floor(dmg)), target.color, 130+dmg*7, 3.2);
-
     if (target.hp<=0) target.die();
   }
 
@@ -1185,7 +1165,6 @@ class Ball {
       G.flashColor = c;
       return;
     }
-
     if (this.ability==='exploder'){
       const other = (this===G.player) ? G.enemy : G.player;
       if (other && other.alive){
@@ -1222,7 +1201,6 @@ class Ball {
     }
     ctx.globalAlpha = 1;
     ctx.globalCompositeOperation = 'source-over';
-
     if (!this.alive) return;
     const pulse = this.dashTime>0 ? 1.07 : 1;
     const alpha = this.invisible>0 ? 0.35 : 1;
@@ -1329,7 +1307,6 @@ function tryDash(ball){
   if (!ball || !ball.alive || G.ending) return;
   if (ball.freeze>0 || ball.sticky>0) return;
   if (ball.dashCd>0 || ball.dashCharges<=0) return;
-
   const enemy = (ball===G.player) ? G.enemy : G.player;
   let dx=0, dy=0;
   if (enemy && enemy.alive){
@@ -1340,7 +1317,6 @@ function tryDash(ball){
     const sp = Math.hypot(ball.vx,ball.vy)||1;
     dx = ball.vx/sp; dy = ball.vy/sp;
   }
-
   const impulse = 1100*SCALE;
   ball.vx += dx*impulse;
   ball.vy += dy*impulse;
@@ -1349,7 +1325,6 @@ function tryDash(ball){
   if (ball.dashCharges>0) ball.dashCd = 0.35;
   else ball.dashCd = ball.dashMax;
   ball.invuln = Math.max(ball.invuln, 0.20);
-
   Sound.dash();
   burst(ball.x,ball.y,16,ball.light,320,4.5);
   G.shake = Math.max(G.shake, 8);
@@ -1358,7 +1333,7 @@ function tryDash(ball){
 }
 
 /* ============================================================
-   11. COLLISION — NEW FORMULA
+   11. COLLISION
    ============================================================ */
 function handleCollision(a, b){
   const dx = b.x - a.x, dy = b.y - a.y;
@@ -1366,7 +1341,6 @@ function handleCollision(a, b){
   const minD = a.r + b.r;
   if (d >= minD) return;
   if (d === 0) d = 0.01;
-
   const nx = dx/d, ny = dy/d;
   const overlap = minD - d;
   const tm = a.mass + b.mass;
@@ -1390,41 +1364,22 @@ function handleCollision(a, b){
 
   if (a.hitCd>0 || b.hitCd>0) return;
 
-  // ===== NEW DAMAGE FORMULA =====
-  // Hitung komponen kecepatan masing-masing bola KE ARAH bola lawan.
-  // Hanya bola yang bergerak KE ARAH lawan yang memberi damage.
-  // n menunjuk dari a ke b.
-  const aTowardB = Math.max(0,  a.vx*nx + a.vy*ny);   // a bergerak menuju b
-  const bTowardA = Math.max(0, -(b.vx*nx + b.vy*ny)); // b bergerak menuju a
-
+  const aTowardB = Math.max(0,  a.vx*nx + a.vy*ny);
+  const bTowardA = Math.max(0, -(b.vx*nx + b.vy*ny));
   const impact = Math.abs(relN);
   const threshold = 70*SCALE;
   if (impact < threshold) return;
 
-  // Damage ke A dari B = seberapa cepat B menabrak A × ATK B / DEF A
-  // Damage ke B dari A = seberapa cepat A menabrak B × ATK A / DEF B
   let dmgToA = (bTowardA * b.attackStat * 0.30) / a.defenseStat;
   let dmgToB = (aTowardB * a.attackStat * 0.30) / b.defenseStat;
 
-  // Bonus dash
   if (b.dashTime>0) dmgToA *= 1.8;
   if (a.dashTime>0) dmgToB *= 1.8;
-
-  // Bouncer bonus
   if (b.ability==='bouncer') dmgToA *= 1.35;
   if (a.ability==='bouncer') dmgToB *= 1.35;
+  if (a.ability==='wall'){ dmgToA *= 1.25; a.vx *= 1.15; a.vy *= 1.15; }
+  if (b.ability==='wall'){ dmgToB *= 1.25; b.vx *= 1.15; b.vy *= 1.15; }
 
-  // Wall: ambil damage lebih, tapi speed boost
-  if (a.ability==='wall'){
-    dmgToA *= 1.25;
-    a.vx *= 1.15; a.vy *= 1.15;
-  }
-  if (b.ability==='wall'){
-    dmgToB *= 1.25;
-    b.vx *= 1.15; b.vy *= 1.15;
-  }
-
-  // Cap
   const CAP = 40;
   dmgToA = Math.min(dmgToA, CAP);
   dmgToB = Math.min(dmgToB, CAP);
@@ -1441,7 +1396,6 @@ function handleCollision(a, b){
     b.onHit(a, dmgToA);
     a.onHit(b, dmgToB);
   }
-
   b.dealDamageTo(a, dmgToA);
   a.dealDamageTo(b, dmgToB);
 }
@@ -1771,15 +1725,11 @@ function render(){
   if (G.enemy)  G.enemy.draw();
   if (G.player) G.player.draw();
   for (const pr of G.projectiles) pr.draw();
-
   ctx.globalCompositeOperation = 'lighter';
   for (const p of G.particles) p.draw();
   ctx.globalCompositeOperation = 'source-over';
   ctx.globalAlpha = 1;
-
-  // Damage numbers
   for (const dn of G.damageNums) dn.draw();
-
   ctx.restore();
   if (G.flash>0.01){
     ctx.globalAlpha = Math.min(0.75, G.flash);
@@ -1805,12 +1755,10 @@ function updateHUD(){
   hudEls.youHp.style.width = Math.max(0, (p.hp/p.maxHp)*100)+'%';
   hudEls.foeHp.style.width = Math.max(0, (e.hp/e.maxHp)*100)+'%';
   hudEls.timer.textContent = fmtTime(G.elapsed);
-
   if (G.combo>1){
     hudEls.comboEl.textContent = 'COMBO x'+G.combo;
     hudEls.comboEl.classList.add('show');
   } else hudEls.comboEl.classList.remove('show');
-
   const icons = [];
   const showStatus = (ball) => {
     if (!ball) return;
@@ -1901,7 +1849,7 @@ function makeBallCard(def){
   const pwrPips = Array.from({length:9}, (_,i) => {
     const on = i < def.pwr;
     const hi = def.pwr >= 8 && on;
-    return '<div class="pip'+(on?' on':'')+(hi?' hi':'')+'"></div>';
+    return '<div class="pip"+(on?' on':'')+(hi?' hi':'')+'"></div>';
   }).join('');
   card.innerHTML =
     '<div class="orb" style="background:radial-gradient(circle at 35% 30%,'+def.light+','+def.color+');box-shadow:0 0 14px '+def.color+'"></div>'+
