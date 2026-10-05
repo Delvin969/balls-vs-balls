@@ -175,6 +175,16 @@ h2.title{
 .stat .l{font-size:9px;letter-spacing:1.5px;opacity:.6;margin-top:3px;}
 .win{color:#4dff9e !important;text-shadow:0 0 26px #4dff9e !important;}
 .lose{color:#ff5f7e !important;text-shadow:0 0 26px #ff5f7e !important;}
+
+.key-hint{
+  font-size:10px;letter-spacing:1.5px;opacity:.55;
+  margin-top:2px;margin-bottom:10px;text-align:center;
+}
+.key-hint b{
+  display:inline-block;padding:2px 7px;border-radius:5px;margin:0 3px;
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);
+  font-size:10px;color:#5fe6ff;
+}
 </style>
 </head>
 <body>
@@ -272,7 +282,10 @@ h2.title{
       <div class="stat"><div class="v" id="ovDmg">0</div><div class="l">DMG DIBERIKAN</div></div>
       <div class="stat"><div class="v" id="ovCombo">x1</div><div class="l">COMBO MAX</div></div>
     </div>
-    <button class="btn primary" data-act="restart">↻ TONTON LAGI</button>
+    <div class="key-hint">
+      <b>R</b> main lagi · <b>M</b> menu utama · <b>ESC</b> menu utama
+    </div>
+    <button class="btn primary" data-act="restart">↻ MAIN LAGI</button>
     <button class="btn" data-act="play">🎯 GANTI BOLA</button>
     <button class="btn ghost" data-act="menu">⌂ MENU UTAMA</button>
   </div>
@@ -381,7 +394,7 @@ const fmtTime = s => {
 const MAX_PARTICLES = 220;
 
 /* ============================================================
-   4. 32 BOLA — kemampuan + HP balance
+   4. 32 BOLA
    ============================================================ */
 const BALLS = [
   { id:'basic',      name:'BASIC',      color:'#7ec8ff', light:'#dff0ff', hp:100, r:22, spd:1.00, dmg:1.00, pwr:5, ability:'basic',      desc:'Bola seimbang tanpa kemampuan khusus.' },
@@ -438,14 +451,26 @@ const G = {
 };
 
 /* ============================================================
-   6. INPUT (hanya ESC)
+   6. INPUT
    ============================================================ */
 function setupInput(){
   window.addEventListener('keydown', e => {
-    if (e.key === 'Escape'){
+    const k = e.key.toLowerCase();
+    if (k === 'escape'){
       e.preventDefault();
       if (G.mode === 'playing') pauseGame();
       else if (G.mode === 'paused') resumeGame();
+      else if (G.mode === 'over') goToMenu();
+      return;
+    }
+    if (G.mode === 'over'){
+      if (k === 'r' || k === 'enter'){
+        e.preventDefault();
+        restartGame();
+      } else if (k === 'm'){
+        e.preventDefault();
+        goToMenu();
+      }
     }
   });
   const boot = () => { Sound.init(); Sound.resume(); };
@@ -521,12 +546,11 @@ function burst(x, y, n, color, speed, size){
 }
 
 /* ============================================================
-   8. SYMBOL DRAWING — tampilan unik per bola
+   8. SYMBOLS
    ============================================================ */
 function drawBallSymbol(id, r, t){
   const S = r * 0.62;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
   ctx.lineWidth = Math.max(1.5, r * 0.12);
   ctx.strokeStyle = 'rgba(255,255,255,0.9)';
   ctx.fillStyle = 'rgba(255,255,255,0.9)';
@@ -545,8 +569,7 @@ function drawBallSymbol(id, r, t){
     case 'speedy': {
       for (let i=-1;i<=1;i++){
         ctx.beginPath();
-        ctx.moveTo(-S*0.85, i*S*0.42);
-        ctx.lineTo(S*0.6, i*S*0.42);
+        ctx.moveTo(-S*0.85, i*S*0.42); ctx.lineTo(S*0.6, i*S*0.42);
         ctx.stroke();
       }
       break;
@@ -557,7 +580,6 @@ function drawBallSymbol(id, r, t){
       ctx.moveTo(-S*0.7, -S*0.15); ctx.lineTo(-S*0.7, S*0.55);
       ctx.moveTo(S*0.7, -S*0.15);  ctx.lineTo(S*0.7, S*0.55);
       ctx.stroke();
-      ctx.fillStyle = 'rgba(255,255,255,0.9)';
       ctx.fillRect(-S*0.9, S*0.45, S*0.4, S*0.35);
       ctx.fillRect(S*0.5, S*0.45, S*0.4, S*0.35);
       break;
@@ -597,20 +619,15 @@ function drawBallSymbol(id, r, t){
     }
     case 'shield': {
       ctx.beginPath();
-      ctx.moveTo(0,-S);
-      ctx.lineTo(S*0.8,-S*0.45);
-      ctx.lineTo(S*0.8, S*0.2);
-      ctx.lineTo(0, S);
-      ctx.lineTo(-S*0.8, S*0.2);
-      ctx.lineTo(-S*0.8,-S*0.45);
+      ctx.moveTo(0,-S); ctx.lineTo(S*0.8,-S*0.45);
+      ctx.lineTo(S*0.8, S*0.2); ctx.lineTo(0, S);
+      ctx.lineTo(-S*0.8, S*0.2); ctx.lineTo(-S*0.8,-S*0.45);
       ctx.closePath(); ctx.stroke();
       break;
     }
     case 'aura': {
       for (let i=1;i<=3;i++){
-        ctx.beginPath();
-        ctx.arc(0,0,S*i/3,0,Math.PI*2);
-        ctx.stroke();
+        ctx.beginPath(); ctx.arc(0,0,S*i/3,0,Math.PI*2); ctx.stroke();
       }
       break;
     }
@@ -634,14 +651,11 @@ function drawBallSymbol(id, r, t){
     case 'ice': {
       for (let i=0;i<6;i++){
         const a = i/6*Math.PI*2;
-        ctx.beginPath();
-        ctx.moveTo(0,0);
-        ctx.lineTo(Math.cos(a)*S, Math.sin(a)*S);
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0,0);
+        ctx.lineTo(Math.cos(a)*S, Math.sin(a)*S); ctx.stroke();
         const bx = Math.cos(a)*S*0.62, by = Math.sin(a)*S*0.62;
         for (const da of [0.6, -0.6]){
-          ctx.beginPath();
-          ctx.moveTo(bx,by);
+          ctx.beginPath(); ctx.moveTo(bx,by);
           ctx.lineTo(bx+Math.cos(a+da)*S*0.28, by+Math.sin(a+da)*S*0.28);
           ctx.stroke();
         }
@@ -651,17 +665,13 @@ function drawBallSymbol(id, r, t){
     case 'freezer': {
       for (let i=0;i<6;i++){
         const a = i/6*Math.PI*2;
-        ctx.beginPath();
-        ctx.moveTo(0,0);
-        ctx.lineTo(Math.cos(a)*S, Math.sin(a)*S);
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0,0);
+        ctx.lineTo(Math.cos(a)*S, Math.sin(a)*S); ctx.stroke();
       }
-      ctx.fillStyle = 'rgba(255,255,255,0.9)';
       ctx.beginPath(); ctx.arc(0,0,S*0.28,0,Math.PI*2); ctx.fill();
       break;
     }
     case 'poison': {
-      ctx.fillStyle = 'rgba(255,255,255,0.9)';
       const dr = S*0.2;
       ctx.beginPath(); ctx.arc(-S*0.4,-S*0.15,dr,0,Math.PI*2); ctx.fill();
       ctx.beginPath(); ctx.arc( S*0.4,-S*0.15,dr,0,Math.PI*2); ctx.fill();
@@ -669,9 +679,7 @@ function drawBallSymbol(id, r, t){
       break;
     }
     case 'exploder': {
-      ctx.beginPath();
-      ctx.arc(0, S*0.15, S*0.62, 0, Math.PI*2);
-      ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, S*0.15, S*0.62, 0, Math.PI*2); ctx.stroke();
       ctx.beginPath();
       ctx.moveTo(S*0.25, -S*0.35);
       ctx.quadraticCurveTo(S*0.6, -S*0.9, S*0.15, -S*1.05);
@@ -682,25 +690,18 @@ function drawBallSymbol(id, r, t){
       ctx.beginPath();
       ctx.moveTo(-S*0.75,-S*0.35); ctx.lineTo(-S*0.1,-S*0.1);
       ctx.moveTo( S*0.75,-S*0.35); ctx.lineTo( S*0.1,-S*0.1);
-      ctx.stroke();
-      ctx.beginPath();
       ctx.moveTo(-S*0.4, S*0.4); ctx.lineTo(S*0.4, S*0.4);
       ctx.stroke();
       break;
     }
     case 'shrinker': {
       for (let i=1;i<=3;i++){
-        ctx.beginPath();
-        ctx.arc(0,0,S*i/3,0,Math.PI*2);
-        ctx.stroke();
+        ctx.beginPath(); ctx.arc(0,0,S*i/3,0,Math.PI*2); ctx.stroke();
       }
       break;
     }
     case 'boxer': {
-      ctx.beginPath();
-      ctx.arc(-S*0.2, 0, S*0.6, 0, Math.PI*2);
-      ctx.stroke();
-      ctx.fillStyle = 'rgba(255,255,255,0.9)';
+      ctx.beginPath(); ctx.arc(-S*0.2, 0, S*0.6, 0, Math.PI*2); ctx.stroke();
       ctx.fillRect(-S*0.95,-S*0.5,S*0.35,S*1);
       break;
     }
@@ -728,7 +729,6 @@ function drawBallSymbol(id, r, t){
       break;
     }
     case 'vampire': {
-      ctx.fillStyle = 'rgba(255,255,255,0.9)';
       ctx.beginPath();
       ctx.moveTo(-S*0.5,S*0.05); ctx.lineTo(-S*0.28,S*0.05); ctx.lineTo(-S*0.4,S*0.8);
       ctx.closePath(); ctx.fill();
@@ -751,8 +751,7 @@ function drawBallSymbol(id, r, t){
       ctx.moveTo(0,-S); ctx.lineTo(S,0); ctx.lineTo(0,S); ctx.lineTo(-S,0);
       ctx.closePath(); ctx.stroke();
       ctx.beginPath();
-      ctx.moveTo(-S*0.5,-S*0.5); ctx.lineTo(S*0.5,S*0.5);
-      ctx.stroke();
+      ctx.moveTo(-S*0.5,-S*0.5); ctx.lineTo(S*0.5,S*0.5); ctx.stroke();
       break;
     }
     case 'teleport': {
@@ -766,12 +765,9 @@ function drawBallSymbol(id, r, t){
     }
     case 'giant': {
       ctx.beginPath();
-      ctx.moveTo(-S*0.8, S*0.3);
-      ctx.lineTo(-S*0.8,-S*0.35);
-      ctx.lineTo(-S*0.35, S*0);
-      ctx.lineTo(0,-S*0.55);
-      ctx.lineTo(S*0.35, S*0);
-      ctx.lineTo(S*0.8,-S*0.35);
+      ctx.moveTo(-S*0.8, S*0.3); ctx.lineTo(-S*0.8,-S*0.35);
+      ctx.lineTo(-S*0.35, S*0); ctx.lineTo(0,-S*0.55);
+      ctx.lineTo(S*0.35, S*0); ctx.lineTo(S*0.8,-S*0.35);
       ctx.lineTo(S*0.8, S*0.3);
       ctx.closePath(); ctx.stroke();
       break;
@@ -787,12 +783,8 @@ function drawBallSymbol(id, r, t){
     }
     case 'lightning': {
       ctx.beginPath();
-      ctx.moveTo(S*0.2,-S);
-      ctx.lineTo(-S*0.3,0);
-      ctx.lineTo(S*0.1,0);
-      ctx.lineTo(-S*0.2,S);
-      ctx.lineTo(S*0.3,-S*0.1);
-      ctx.lineTo(-S*0.1,-S*0.1);
+      ctx.moveTo(S*0.2,-S); ctx.lineTo(-S*0.3,0); ctx.lineTo(S*0.1,0);
+      ctx.lineTo(-S*0.2,S); ctx.lineTo(S*0.3,-S*0.1); ctx.lineTo(-S*0.1,-S*0.1);
       ctx.closePath(); ctx.fill();
       break;
     }
@@ -810,9 +802,7 @@ function drawBallSymbol(id, r, t){
       break;
     }
     case 'time': {
-      ctx.beginPath();
-      ctx.arc(0,0,S*0.85,0,Math.PI*2);
-      ctx.stroke();
+      ctx.beginPath(); ctx.arc(0,0,S*0.85,0,Math.PI*2); ctx.stroke();
       ctx.beginPath();
       ctx.moveTo(0,0); ctx.lineTo(0,-S*0.6);
       ctx.moveTo(0,0); ctx.lineTo(S*0.42, S*0.22);
@@ -832,14 +822,12 @@ function drawBallSymbol(id, r, t){
       ctx.moveTo(0,-S); ctx.lineTo(0,S*0.55);
       ctx.moveTo(-S*0.42, S*0.35); ctx.lineTo(S*0.42, S*0.35);
       ctx.stroke();
-      ctx.fillStyle = 'rgba(255,255,255,0.9)';
       ctx.beginPath();
       ctx.moveTo(0,-S*1.05); ctx.lineTo(-S*0.16,-S*0.75); ctx.lineTo(S*0.16,-S*0.75);
       ctx.closePath(); ctx.fill();
       break;
     }
     case 'bomber': {
-      ctx.fillStyle = 'rgba(255,255,255,0.9)';
       ctx.beginPath(); ctx.arc(0, S*0.2, S*0.62, 0, Math.PI*2); ctx.fill();
       ctx.strokeStyle = 'rgba(0,0,0,0.6)';
       ctx.lineWidth = Math.max(1.5, r*0.09);
@@ -860,9 +848,7 @@ function drawBallSymbol(id, r, t){
       break;
     }
     default: {
-      ctx.beginPath();
-      ctx.arc(0,0,S*0.4,0,Math.PI*2);
-      ctx.fill();
+      ctx.beginPath(); ctx.arc(0,0,S*0.4,0,Math.PI*2); ctx.fill();
     }
   }
 }
@@ -881,8 +867,7 @@ class Ball {
     this.light = def.light;
     this.ability = def.ability;
 
-    this.x=x; this.y=y;
-    this.vx=0; this.vy=0;
+    this.x=x; this.y=y; this.vx=0; this.vy=0;
     this.baseR = def.r * SCALE;
     this.r = this.baseR;
     this.maxHp = def.hp;
@@ -917,15 +902,13 @@ class Ball {
     this.abilityCd = 0;
     this.growth = 0;
     this.revived = false;
-    this.copiedAbility = null;
 
     this.alive = true;
     this.outside = false;
     this.deathTime = 0;
 
-    // Mulai dengan kecepatan
     const a = Math.random() * Math.PI * 2;
-    const sp = this.speedMax;
+    const sp = 340 * SCALE * this.speedMul;
     this.vx = Math.cos(a) * sp;
     this.vy = Math.sin(a) * sp;
   }
@@ -942,7 +925,6 @@ class Ball {
       return;
     }
 
-    // Timers
     if (this.dashCd > 0){
       this.dashCd -= dt;
       if (this.dashCd <= 0){
@@ -962,7 +944,6 @@ class Ball {
     if (this.invisible > 0)  this.invisible -= dt;
     if (this.abilityCd > 0)  this.abilityCd -= dt;
 
-    // DoT
     if (this.poisonTimer > 0){
       this.poisonTimer -= dt;
       this.hp -= 25 * dt / 4;
@@ -976,33 +957,27 @@ class Ball {
       if (this.hp <= 0){ this.die(); return; }
     }
 
-    // Ability passive
     this.applyAbilityPassive(dt, enemy);
 
-    // === STEERING (auto) ===
     this.steerTimer -= dt;
     const frozen = this.freeze > 0 || this.sticky > 0;
 
     if (!frozen && this.steerTimer <= 0){
       let angle;
       if (enemy && enemy.alive && Math.random() < 0.68){
-        // Chase enemy (with lead)
         const edx = enemy.x + enemy.vx * 0.15 - this.x;
         const edy = enemy.y + enemy.vy * 0.15 - this.y;
         angle = Math.atan2(edy, edx) + (Math.random() - 0.5) * 0.5;
       } else {
-        // Random direction
         angle = Math.random() * Math.PI * 2;
       }
       const sp = this.speedMax;
       this.vx = Math.cos(angle) * sp;
       this.vy = Math.sin(angle) * sp;
       this.steerTimer = 1.0 + Math.random() * 1.8;
-
       burst(this.x, this.y, 3, this.light, 70, 2);
     }
 
-    // === MOVE (no friction, constant speed) ===
     if (!frozen){
       const sp = Math.hypot(this.vx, this.vy);
       const targetSp = this.speedMax;
@@ -1021,17 +996,14 @@ class Ball {
       this.y += this.vy * dt;
     }
 
-    // Dynamic radius
     let targetR = this.baseR;
     if (this.growth > 0) targetR *= (1 + this.growth * 0.55);
     this.r += (targetR - this.r) * Math.min(1, dt * 6);
     const ratio = this.r / this.baseR;
     this.mass = this.baseMass * ratio * ratio;
 
-    // Wall bounce
     this.handleWallBounce();
 
-    // Trail
     const sp2 = Math.hypot(this.vx, this.vy);
     if (sp2 > 40 * SCALE){
       this.trail.push({x:this.x, y:this.y, r:this.r});
@@ -1101,7 +1073,6 @@ class Ball {
       burst(this.x, this.y, 15, '#7b68ee', 220, 4);
       this.x = arena.cx + Math.cos(a)*dist;
       this.y = arena.cy + Math.sin(a)*dist;
-      this.vx *= 0.3; this.vy *= 0.3;
       const sp = this.speedMax;
       const na = Math.random()*Math.PI*2;
       this.vx = Math.cos(na)*sp; this.vy = Math.sin(na)*sp;
@@ -1299,7 +1270,6 @@ class Ball {
   }
 
   draw(){
-    // Trail
     ctx.globalCompositeOperation = 'lighter';
     for (let i = 0; i < this.trail.length; i++){
       const p = this.trail[i];
@@ -1320,8 +1290,6 @@ class Ball {
 
     ctx.save();
     ctx.globalAlpha = alpha;
-
-    // Body glow
     ctx.shadowBlur = 30;
     ctx.shadowColor = this.color;
     const g = ctx.createRadialGradient(
@@ -1335,28 +1303,23 @@ class Ball {
     ctx.beginPath(); ctx.arc(this.x, this.y, this.r * pulse, 0, Math.PI*2); ctx.fill();
     ctx.restore();
 
-    // Rim
     ctx.globalAlpha = alpha;
     ctx.strokeStyle = 'rgba(255,255,255,0.78)';
     ctx.lineWidth = 2;
     ctx.beginPath(); ctx.arc(this.x, this.y, this.r*pulse - 1, 0, Math.PI*2); ctx.stroke();
 
-    // Highlight
     ctx.globalAlpha = alpha * 0.28;
     ctx.fillStyle = '#fff';
     ctx.beginPath();
     ctx.ellipse(this.x - this.r*0.3, this.y - this.r*0.38, this.r*0.28, this.r*0.18, -0.6, 0, Math.PI*2);
     ctx.fill();
-
     ctx.globalAlpha = alpha;
 
-    // === UNIQUE SYMBOL ===
     ctx.save();
     ctx.translate(this.x, this.y);
     drawBallSymbol(this.def.id, this.r, performance.now()/1000);
     ctx.restore();
 
-    // Eyes (on top of symbol, smaller)
     const sp = Math.hypot(this.vx, this.vy);
     let ex = 0, ey = 0;
     if (sp > 12){ ex = this.vx/sp; ey = this.vy/sp; }
@@ -1373,7 +1336,6 @@ class Ball {
       ctx.beginPath(); ctx.arc(cx2 + ex*eyeR*0.4, cy2 + ey*eyeR*0.4, pupR, 0, Math.PI*2); ctx.fill();
     }
 
-    // Shield
     if (this.shield > 0){
       ctx.save();
       ctx.globalAlpha = (0.4 + Math.sin(performance.now()/110) * 0.18) * alpha;
@@ -1383,7 +1345,6 @@ class Ball {
       ctx.beginPath(); ctx.arc(this.x, this.y, this.r + 8, 0, Math.PI*2); ctx.stroke();
       ctx.restore();
     }
-    // Freeze
     if (this.freeze > 0){
       ctx.save();
       ctx.globalAlpha = 0.55 * alpha;
@@ -1393,7 +1354,6 @@ class Ball {
       ctx.beginPath(); ctx.arc(this.x, this.y, this.r + 5, 0, Math.PI*2); ctx.stroke();
       ctx.restore();
     }
-    // Slow
     if (this.slow > 0){
       ctx.save();
       ctx.globalAlpha = 0.4 * alpha;
@@ -1404,19 +1364,16 @@ class Ball {
       ctx.setLineDash([]);
       ctx.restore();
     }
-    // Poison tint
     if (this.poisonTimer > 0){
       ctx.globalAlpha = 0.3 * alpha;
       ctx.fillStyle = '#9dff4d';
       ctx.beginPath(); ctx.arc(this.x, this.y, this.r * 0.9, 0, Math.PI*2); ctx.fill();
     }
-    // Burn tint
     if (this.burnTimer > 0){
       ctx.globalAlpha = 0.3 * alpha;
       ctx.fillStyle = '#ff4400';
       ctx.beginPath(); ctx.arc(this.x, this.y, this.r * 0.9, 0, Math.PI*2); ctx.fill();
     }
-    // Hit flash
     if (this.hitFlash > 0){
       ctx.globalAlpha = clamp(this.hitFlash * 2.6, 0, 0.85) * alpha;
       ctx.fillStyle = '#fff';
@@ -1531,7 +1488,6 @@ function handleCollision(a, b){
     burst(midX, midY, Math.min(14, 3 + Math.floor(total)), '#fff', 170 + total*9, 3.2);
     Sound.hit(clamp(total/26, 0.15, 1));
     a.hitCd = b.hitCd = 0.15;
-
     b.onHit(a, dmgToA);
     a.onHit(b, dmgToB);
   }
@@ -1610,7 +1566,7 @@ function spawnPowerUp(){
 }
 function applyPowerUp(ball, pu){
   switch (pu.type){
-    case 'speed':  ball.speedMul *= 1.4; ball._spdBuff = 6.5; break;
+    case 'speed':  ball.speedMul *= 1.4; break;
     case 'heal':   ball.hp = Math.min(ball.maxHp, ball.hp + 35); break;
     case 'shield': ball.shield = 6.0; break;
     case 'big':    ball.growth = Math.max(ball.growth, 0.55); break;
@@ -1691,11 +1647,9 @@ function update(dt){
   if (!p || !e) return;
   G.elapsed += dt;
 
-  // Update both balls (auto AI)
   p.update(dt, e);
   e.update(dt, p);
 
-  // Dash decisions (AI)
   const decideDash = (ball, enemy) => {
     if (!ball.alive || !enemy || !enemy.alive || G.ending) return;
     if (ball.dashCd > 0 || ball.dashCharges <= 0) return;
@@ -1709,10 +1663,8 @@ function update(dt){
   decideDash(p, e);
   decideDash(e, p);
 
-  // Collision
   if (p.alive && e.alive && !G.ending) handleCollision(p, e);
 
-  // Projectiles
   for (let i = G.projectiles.length - 1; i >= 0; i--){
     const pr = G.projectiles[i];
     pr.update(dt);
@@ -1728,7 +1680,6 @@ function update(dt){
     }
   }
 
-  // Hazards
   for (let i = G.hazards.length - 1; i >= 0; i--){
     const h = G.hazards[i];
     h.update(dt);
@@ -1743,7 +1694,6 @@ function update(dt){
     }
   }
 
-  // Spawn
   G.spawnTimer -= dt;
   if (G.spawnTimer <= 0 && !G.ending){
     spawnPowerUp();
@@ -1768,7 +1718,6 @@ function update(dt){
     }
   }
 
-  // Particles
   for (let i = G.particles.length - 1; i >= 0; i--){
     const pt = G.particles[i];
     pt.update(dt);
@@ -1778,13 +1727,11 @@ function update(dt){
     G.particles.splice(0, G.particles.length - MAX_PARTICLES);
   }
 
-  // Combo
   if (G.comboTimer > 0){
     G.comboTimer -= dt;
     if (G.comboTimer <= 0){ G.combo = 0; G.comboTimer = 0; }
   }
 
-  // End
   if (!G.ending && (!p.alive || !e.alive)){
     G.ending = true;
     G.endTimer = 1.8;
@@ -1988,7 +1935,7 @@ function showScreen(name){
 function pauseGame(){
   if (G.mode !== 'playing') return;
   G.mode = 'paused';
-  showScreen('scr-pause');
+  showScreen('pause');
 }
 function resumeGame(){
   if (G.mode !== 'paused') return;
@@ -1997,7 +1944,31 @@ function resumeGame(){
 }
 
 /* ============================================================
-   19. BALL GRIDS
+   19. GAME FLOW HELPERS (restart & menu)
+   ============================================================ */
+function restartGame(){
+  // Pastikan mode & state bersih
+  G.mode = 'menu';
+  const pDef = G.playerDef || BALL_MAP[selectedBallId] || BALL_MAP['basic'];
+  const eDef = G.enemyDef  || pickRandomEnemy(pDef);
+  G.playerDef = pDef;
+  G.enemyDef  = eDef;
+  startGame(pDef, eDef);
+}
+
+function goToMenu(){
+  G.mode = 'menu';
+  G.player = null; G.enemy = null;
+  G.particles = []; G.projectiles = []; G.hazards = []; G.powerups = [];
+  G.ending = false; G.endTimer = 0;
+  G.slowmo = 0; G.timeScale = 1;
+  G.shake = 0; G.flash = 0;
+  document.getElementById('hud').classList.add('hidden');
+  showScreen('menu');
+}
+
+/* ============================================================
+   20. BALL GRIDS
    ============================================================ */
 function makeBallCard(def){
   const card = document.createElement('div');
@@ -2051,7 +2022,7 @@ function updatePicked(def){
 }
 
 /* ============================================================
-   20. GAME OVER
+   21. GAME OVER
    ============================================================ */
 function showGameOver(){
   G.mode = 'over';
@@ -2090,11 +2061,11 @@ function showGameOver(){
   }
   document.getElementById('bestInfo').textContent = 'BEST SCORE: ' + best;
 
-  showScreen('scr-over');
+  showScreen('over');
 }
 
 /* ============================================================
-   21. UI EVENTS
+   22. UI EVENTS
    ============================================================ */
 document.querySelectorAll('[data-act]').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -2109,19 +2080,8 @@ document.querySelectorAll('[data-act]').forEach(btn => {
     if (act === 'balls'){ renderAllBallsGrid(); showScreen('balls'); }
     if (act === 'back')  showScreen('menu');
     if (act === 'resume') resumeGame();
-    if (act === 'restart'){
-      const pDef = G.playerDef || BALL_MAP[selectedBallId];
-      const eDef = G.enemyDef  || pickRandomEnemy(pDef);
-      G.playerDef = pDef; G.enemyDef = eDef;
-      startGame(pDef, eDef);
-    }
-    if (act === 'menu'){
-      G.mode = 'menu';
-      G.player = null; G.enemy = null;
-      G.projectiles = []; G.hazards = []; G.powerups = []; G.particles = [];
-      document.getElementById('hud').classList.add('hidden');
-      showScreen('menu');
-    }
+    if (act === 'restart') restartGame();
+    if (act === 'menu') goToMenu();
   });
 });
 
@@ -2139,7 +2099,7 @@ function pickRandomEnemy(playerDef){
 }
 
 /* ============================================================
-   22. INIT
+   23. INIT
    ============================================================ */
 resize();
 setupInput();
