@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
-<title>Ball vs Ball — 130 Unique Abilities</title>
+<title>Ball vs Ball — 130 Balls + Tournament</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{height:100%;overflow:hidden;background:#04020e;font-family:'Segoe UI',system-ui,sans-serif;color:#fff;-webkit-user-select:none;user-select:none;touch-action:none;}
@@ -37,7 +37,7 @@ canvas{position:fixed;inset:0;display:block;}
 .status-badge .cd{position:absolute;bottom:-9px;left:50%;transform:translateX(-50%);font-size:8px;font-weight:900;letter-spacing:.5px;color:#fff;background:rgba(0,0,0,.65);padding:1px 4px;border-radius:4px;font-variant-numeric:tabular-nums;white-space:nowrap;}
 #overlay{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 45%,rgba(30,10,70,.75),rgba(3,1,12,.94));backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);padding:14px;overflow-y:auto;}
 #overlay.hidden{display:none;}
-.screen{display:none;flex-direction:column;align-items:center;width:100%;max-width:760px;padding:8px 0;}
+.screen{display:none;flex-direction:column;align-items:center;width:100%;max-width:800px;padding:8px 0;}
 .screen.active{display:flex;animation:fadeUp .3s ease-out;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
 h1.logo{font-size:clamp(30px,8vw,52px);font-weight:900;letter-spacing:4px;line-height:1;text-align:center;margin-bottom:6px;background:linear-gradient(90deg,#5fe6ff,#a25bff,#ff5f9e,#ffd93d);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 22px rgba(162,91,255,.85));}
@@ -47,18 +47,21 @@ h2.title{font-size:clamp(22px,5.5vw,30px);font-weight:900;letter-spacing:3px;mar
 .btn{width:100%;padding:13px 20px;margin-bottom:10px;border-radius:13px;cursor:pointer;font-size:14px;font-weight:800;letter-spacing:2.5px;color:#dff6ff;background:rgba(255,255,255,.055);border:1.5px solid rgba(120,200,255,.35);transition:all .16s;font-family:inherit;text-transform:uppercase;}
 .btn:hover,.btn:active{background:rgba(95,230,255,.16);border-color:#5fe6ff;color:#fff;box-shadow:0 0 26px rgba(95,230,255,.55);transform:translateY(-2px);}
 .btn.primary{background:linear-gradient(100deg,rgba(162,91,255,.85),rgba(255,95,158,.85));border-color:rgba(255,255,255,.5);color:#fff;box-shadow:0 0 30px rgba(200,80,220,.6);font-size:16px;padding:16px;}
+.btn.primary:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none;}
 .btn.ghost{opacity:.75;font-size:12px;padding:10px;}
 .card{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:16px 18px;width:100%;margin-bottom:12px;font-size:13px;line-height:1.75;}
 .card b{color:#5fe6ff;text-shadow:0 0 10px rgba(95,230,255,.7);}
 .card ul{list-style:none;}
 .card li{margin-bottom:5px;}
 .card .k{display:inline-block;padding:1px 7px;border-radius:5px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);font-weight:700;font-size:11px;margin:0 2px;}
-.ball-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:6px;width:100%;max-height:58vh;overflow-y:auto;padding:4px;margin-bottom:14px;}
+.ball-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:6px;width:100%;max-height:50vh;overflow-y:auto;padding:4px;margin-bottom:14px;position:relative;}
 .ball-grid::-webkit-scrollbar{width:6px;}
 .ball-grid::-webkit-scrollbar-thumb{background:rgba(162,91,255,.5);border-radius:3px;}
-.ball-card{border-radius:11px;padding:6px 4px 5px;cursor:pointer;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.13);transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.ball-card{border-radius:11px;padding:6px 4px 5px;cursor:pointer;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.13);transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative;}
 .ball-card:hover{transform:translateY(-2px);border-color:rgba(162,91,255,.7);}
 .ball-card.sel{border-color:#ffd93d;background:rgba(255,217,61,.12);box-shadow:0 0 22px rgba(255,217,61,.5);}
+.ball-card.picked-tourney{border-color:#4dff9e;background:rgba(77,255,158,0.15);box-shadow:0 0 16px rgba(77,255,158,.5);}
+.ball-card.picked-tourney::after{content:'✓';position:absolute;top:2px;right:6px;font-size:13px;color:#4dff9e;font-weight:900;text-shadow:0 0 6px #4dff9e;}
 .ball-card .orb{width:30px;height:30px;border-radius:50%;position:relative;}
 .ball-card .nm{font-size:8.5px;letter-spacing:.3px;font-weight:800;text-align:center;line-height:1.15;}
 .ball-card .ab{font-size:7.5px;letter-spacing:.5px;opacity:.8;font-weight:700;text-align:center;}
@@ -88,6 +91,38 @@ h2.title{font-size:clamp(22px,5.5vw,30px);font-weight:900;letter-spacing:3px;mar
 .lose{color:#ff5f7e !important;text-shadow:0 0 26px #ff5f7e !important;}
 .key-hint{font-size:10px;letter-spacing:1.5px;opacity:.55;margin-top:2px;margin-bottom:10px;text-align:center;}
 .key-hint b{display:inline-block;padding:2px 7px;border-radius:5px;margin:0 3px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);font-size:10px;color:#5fe6ff;}
+
+/* === Tournament === */
+.tourney-slots{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%;margin-bottom:12px;padding:8px;background:rgba(255,255,255,0.04);border-radius:12px;border:1px dashed rgba(255,255,255,0.15);}
+.tourney-slot{aspect-ratio:1;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px;background:rgba(255,255,255,0.04);border:2px solid rgba(255,255,255,0.1);cursor:pointer;transition:all .15s;gap:3px;font-size:8px;text-align:center;position:relative;overflow:hidden;}
+.tourney-slot.empty::before{content:'+';font-size:22px;opacity:0.2;font-weight:900;}
+.tourney-slot.empty{cursor:default;}
+.tourney-slot.filled{border-color:rgba(77,255,158,0.6);background:rgba(77,255,158,0.08);}
+.tourney-slot.filled:hover{border-color:#ff5f7e;background:rgba(255,95,126,0.12);}
+.tourney-slot.filled:hover .ts-name::after{content:' ✕';color:#ff5f7e;}
+.tourney-slot .ts-orb{width:26px;height:26px;border-radius:50%;}
+.tourney-slot .ts-name{font-weight:800;letter-spacing:.5px;font-size:8px;}
+.bracket-wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;margin-bottom:14px;}
+.bracket-col{display:flex;flex-direction:column;gap:6px;}
+.bracket-label{text-align:center;font-size:10px;letter-spacing:2px;opacity:.6;font-weight:800;margin-bottom:4px;}
+.bracket-match{display:flex;flex-direction:column;gap:3px;padding:6px;border-radius:10px;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);transition:all .2s;}
+.bracket-match.current{border-color:#5fe6ff;box-shadow:0 0 16px rgba(95,230,255,.5);animation:bracketPulse 1s infinite alternate;}
+@keyframes bracketPulse{from{box-shadow:0 0 12px rgba(95,230,255,.4);}to{box-shadow:0 0 24px rgba(95,230,255,.9);}}
+.bracket-match.done{opacity:.6;}
+.bm-slot{display:flex;align-items:center;gap:6px;padding:3px 5px;border-radius:6px;font-size:10px;background:rgba(0,0,0,0.25);transition:all .2s;}
+.bm-slot .bm-orb{width:14px;height:14px;border-radius:50%;flex-shrink:0;}
+.bm-slot .bm-name{font-weight:800;letter-spacing:.5px;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;}
+.bm-slot.winner{background:rgba(77,255,158,0.22);box-shadow:0 0 10px rgba(77,255,158,.5);}
+.bm-slot.winner .bm-name{color:#4dff9e;}
+.bm-slot.loser{opacity:0.3;text-decoration:line-through;}
+.bm-slot.tbd{opacity:0.3;font-style:italic;}
+.next-match-info{text-align:center;margin:10px 0;padding:12px;border-radius:12px;background:rgba(95,230,255,0.08);border:1px solid rgba(95,230,255,0.3);}
+.next-match-label{font-size:10px;letter-spacing:3px;opacity:.7;font-weight:800;margin-bottom:6px;}
+.next-match-vs{font-size:16px;font-weight:900;}
+.champ-orb-big{width:120px;height:120px;border-radius:50%;margin:10px auto;animation:champSpin 3s linear infinite;}
+@keyframes champSpin{from{filter:hue-rotate(0deg);}to{filter:hue-rotate(360deg);}}
+.trophy-icon{font-size:60px;text-align:center;margin-bottom:6px;filter:drop-shadow(0 0 20px #ffd93d);animation:trophyBounce 1.2s ease-in-out infinite alternate;}
+@keyframes trophyBounce{from{transform:translateY(0);}to{transform:translateY(-10px);}}
 </style>
 </head>
 <body>
@@ -121,7 +156,8 @@ h2.title{font-size:clamp(22px,5.5vw,30px);font-weight:900;letter-spacing:3px;mar
   <div class="screen active" id="scr-menu">
     <h1 class="logo">BALL <span>VS</span> BALL</h1>
     <p class="sub">130 Bola · 130 Kemampuan Unik</p>
-    <button class="btn primary" data-act="play">▶ PILIH BOLA & TONTON</button>
+    <button class="btn primary" data-act="play">⚔ PERTARUNGAN 1v1</button>
+    <button class="btn primary" data-act="tournament" style="background:linear-gradient(100deg,rgba(255,180,0,.85),rgba(255,80,0,.85));box-shadow:0 0 30px rgba(255,180,0,.6);">🏆 TURNAMEN 8 BOLA</button>
     <button class="btn" data-act="howto">? CARA MAIN</button>
     <button class="btn" data-act="balls">📖 DAFTAR BOLA (130)</button>
     <div style="margin-top:10px;font-size:11px;letter-spacing:2px;opacity:.6" id="bestInfo">—</div>
@@ -132,11 +168,10 @@ h2.title{font-size:clamp(22px,5.5vw,30px);font-weight:900;letter-spacing:3px;mar
     <div class="card">
       <ul>
         <li>Bola bergerak <b>lurus</b> dan <b>memantul</b> di dinding arena.</li>
-        <li><b>Setiap bola punya kemampuan yang berbeda</b> — 130 bola, 130 kemampuan.</li>
+        <li>Setiap bola punya <b>kemampuan unik</b>. 130 bola = 130 kemampuan berbeda.</li>
         <li><b>ATK</b> = damage yang diberikan. <b>DEF</b> = damage yang dikurangi.</li>
         <li><b>Hanya yang menabrak yang memberi damage!</b></li>
-        <li>Badge status di bawah HP menunjukkan efek aktif dengan timer detik.</li>
-        <li>Dash = 1.8x damage. HP 0 = kalah.</li>
+        <li><b>TURNAMEN:</b> Pilih 8 bola, lalu tonton bracket sampai tersisa 1 juara. 🏆</li>
         <li>Tekan <span class="k">ESC</span> untuk pause.</li>
       </ul>
     </div>
@@ -164,6 +199,40 @@ h2.title{font-size:clamp(22px,5.5vw,30px);font-weight:900;letter-spacing:3px;mar
     <div class="ball-grid" id="selectGrid"></div>
     <button class="btn primary" id="fightBtn">⚔ TONTON PERTARUNGAN</button>
     <button class="btn ghost" data-act="back">← KEMBALI</button>
+  </div>
+
+  <!-- === TOURNAMENT: SELECT 8 === -->
+  <div class="screen" id="scr-tourney-select">
+    <h2 class="title">🏆 PILIH 8 PESERTA</h2>
+    <p class="sub" style="margin-bottom:12px;" id="tourneyCount">0 / 8 terpilih</p>
+    <div class="tourney-slots" id="tourneySlots"></div>
+    <input type="text" class="search-bar" id="tourneySearch" placeholder="🔍 Cari bola untuk ditambahkan..."/>
+    <div class="ball-grid" id="tourneyGrid"></div>
+    <button class="btn" id="tourneyRandomBtn">🎲 ACAK 8 BOLA</button>
+    <button class="btn ghost" id="tourneyClearBtn">✖ KOSONGKAN</button>
+    <button class="btn primary" id="tourneyStartBtn" disabled>🏆 MULAI TURNAMEN</button>
+    <button class="btn ghost" data-act="back">← KEMBALI</button>
+  </div>
+
+  <!-- === TOURNAMENT: BRACKET === -->
+  <div class="screen" id="scr-bracket">
+    <h2 class="title">🏆 TURNAMEN</h2>
+    <div class="bracket-wrap" id="bracketWrap"></div>
+    <div class="next-match-info" id="nextMatchInfo"></div>
+    <button class="btn primary" id="nextMatchBtn">▶ MAIN PERTANDINGAN</button>
+    <button class="btn ghost" data-act="menu">⌂ MENU UTAMA</button>
+  </div>
+
+  <!-- === TOURNAMENT: CHAMPION === -->
+  <div class="screen" id="scr-champion">
+    <div class="trophy-icon">🏆</div>
+    <h2 class="title win">JUARA TURNAMEN</h2>
+    <div class="champ-orb-big" id="championOrb"></div>
+    <h3 id="championName" style="text-align:center;font-size:26px;letter-spacing:3px;margin:10px 0;"></h3>
+    <p id="championDesc" class="result-sub"></p>
+    <div class="result-stats" id="championStats" style="width:100%;max-width:360px;"></div>
+    <button class="btn primary" data-act="tournament">🏆 TURNAMEN BARU</button>
+    <button class="btn ghost" data-act="menu">⌂ MENU UTAMA</button>
   </div>
 
   <div class="screen" id="scr-pause">
@@ -215,9 +284,7 @@ function resize(){
   arena.r = Math.max(120, Math.min(W,H)*0.36);
   SCALE = Math.max(0.55, Math.min(W,H)/800);
   bgGrad = ctx.createLinearGradient(0,0,W,H);
-  bgGrad.addColorStop(0,'#050318');
-  bgGrad.addColorStop(0.45,'#0d0530');
-  bgGrad.addColorStop(1,'#03010f');
+  bgGrad.addColorStop(0,'#050318'); bgGrad.addColorStop(0.45,'#0d0530'); bgGrad.addColorStop(1,'#03010f');
 }
 window.addEventListener('resize', resize);
 window.addEventListener('orientationchange', ()=>setTimeout(resize,120));
@@ -232,8 +299,7 @@ const Sound = {
     try{
       const AC = window.AudioContext || window.webkitAudioContext;
       this.ctx = new AC();
-      this.master = this.ctx.createGain();
-      this.master.gain.value = 0.22;
+      this.master = this.ctx.createGain(); this.master.gain.value = 0.22;
       this.master.connect(this.ctx.destination);
       const len = Math.floor(this.ctx.sampleRate*0.5);
       const buf = this.ctx.createBuffer(1,len,this.ctx.sampleRate);
@@ -266,332 +332,307 @@ const MAX_DAMAGE_NUMS = 60;
 const MAX_FLOATING_TEXTS = 40;
 
 /* ============================================================
-   4. 130 BOLA — SETIAP BOLA PUNYA KEMAMPUAN UNIK SENDIRI
-   Format: [id, name, color, hp, r, spd, atk, def, pwr, ability, desc]
+   4. BALLS (130 unique abilities)
    ============================================================ */
 const BALL_DEFS = [
-  /* --- TIER: BASIC / PHYSICAL (1-20) --- */
-  ['basic',      'BASIC',      '#7ec8ff', 100,22,1.00,1.00,1.00, 5,'basic',      'Tanpa kemampuan khusus.'],
-  ['sturdy',     'STURDY',     '#a8c0d8', 115,23,0.95,0.95,1.30, 5,'sturdy',     'DEF +30% permanen.'],
-  ['swift',      'SWIFT',      '#ffe066', 85, 20,1.35,0.90,0.85, 5,'swift',      'SPD +35% permanen.'],
-  ['heavy',      'HEAVY',      '#8888a0', 130,26,0.75,1.05,1.20, 5,'heavy',      'Massa +50%, lambat.'],
-  ['sharp',      'SHARP',      '#ff6b6b', 90, 22,1.00,1.30,0.85, 6,'sharp',      'ATK +30% permanen.'],
-  ['brawler',    'BRAWLER',    '#ff8866', 95, 22,1.05,1.15,0.95, 6,'brawler',    'Dash damage +120%.'],
-  ['puncher',    'PUNCHER',    '#ff7f50', 90, 22,1.00,1.10,1.00, 6,'puncher',    'Knockback musuh 2x.'],
-  ['crusher',    'CRUSHER',    '#c04040', 85, 24,0.95,1.20,1.10, 7,'crusher',    'Bonus damage ke musuh HP>70%.'],
-  ['slasher',    'SLASHER',    '#dc143c', 85, 22,1.05,1.15,0.90, 7,'slasher',    'Bleed 20 damage / 3 detik.'],
-  ['duelist',    'DUELIST',    '#b8860b', 95, 22,1.00,1.10,1.00, 7,'duelist',    'Bonus 20% saat 1v1.'],
-  ['gladiator',  'GLADIATOR',  '#8b4513', 90, 23,1.00,1.05,1.00, 7,'gladiator',  'Damage naik +8% tiap tabrakan.'],
-  ['berserker',  'BERSERKER',  '#ff1a4a', 90, 22,1.00,1.10,0.90, 7,'berserker',  'Damage naik saat HP rendah.'],
-  ['assassin',   'ASSASSIN',   '#6a0dad', 55, 21,1.25,1.60,0.60, 9,'assassin',   'Crit 40% (2x damage).'],
-  ['reaper',     'REAPER',     '#1a1a1a', 65, 22,1.05,1.35,0.85, 9,'reaper',     '1.8x damage ke musuh HP<40%.'],
-  ['marauder',   'MARAUDER',   '#8b0000', 75, 22,1.05,1.15,0.95, 8,'marauder',   'Lifesteal 30% + rage.'],
-  ['brute',      'BRUTE',      '#654321', 100,25,0.85,1.15,1.10, 6,'brute',      'Knockback sangat besar.'],
-  ['ram',        'RAM',        '#a0522d', 95, 23,1.05,1.15,1.00, 7,'ram',        'Bonus dmg saat bounce ke musuh.'],
-  ['spiker',     'SPIKER',     '#b22222', 85, 22,1.00,0.95,1.15, 7,'spiker',     'Damage aura kontak 5/s.'],
-  ['hammer',     'HAMMER',     '#708090', 100,24,0.90,1.20,1.05, 7,'hammer',     'Shockwave AoE saat hit.'],
-  ['drill',      'DRILL',      '#808080', 80, 21,1.15,1.25,0.85, 8,'drill',      'Menembus shield musuh.'],
-
-  /* --- TIER: DEFENSIVE (21-40) --- */
-  ['tank',       'TANK',       '#9b9b9b', 180,28,0.70,0.70,1.55, 5,'tank',       'HP & DEF tinggi, lambat.'],
-  ['wall',       'WALL',       '#666680', 140,25,0.85,0.85,1.40, 5,'wall',       'Kena damage → speed boost.'],
-  ['fortress',   'FORTRESS',   '#505060', 200,30,0.55,0.60,1.80, 5,'fortress',   'DEF sangat tinggi, hampir tak bergerak.'],
-  ['paladin',    'PALADIN',    '#e8e0c8', 120,24,0.90,0.95,1.60, 6,'paladin',    'Shield regen tiap 7 detik.'],
-  ['guardian',   'GUARDIAN',   '#b0c4de', 130,25,0.85,0.85,1.50, 6,'guardian',   'Damage dikurangi 20% flat.'],
-  ['juggernaut', 'JUGGERNAUT', '#556b2f', 110,24,0.95,1.00,1.30, 6,'juggernaut', 'Kebal slow/freeze.'],
-  ['bastion',    'BASTION',    '#8fbc8f', 130,25,0.80,0.85,1.55, 6,'bastion',    'Damage per hit max 12.'],
-  ['aegis',      'AEGIS',      '#00bfff', 100,23,0.95,0.90,1.35, 7,'aegis',      'Shield +50% lebih kuat.'],
-  ['barrier',    'BARRIER',    '#4682b4', 100,24,0.90,0.85,1.35, 7,'barrier',    'Shield otomatis tiap 5 detik.'],
-  ['turtle',     'TURTLE',     '#2e8b57', 160,27,0.65,0.75,1.65, 5,'turtle',     'Armor tebal, sangat lambat.'],
-  ['shell',      'SHELL',      '#556b2f', 140,25,0.80,0.85,1.50, 6,'shell',      'Stack shield tiap tabrakan.'],
-  ['ironhide',   'IRONHIDE',   '#404040', 140,25,0.85,0.90,1.50, 6,'ironhide',   'DEF +50% saat HP<50%.'],
-  ['plated',     'PLATED',     '#6b6b6b', 120,24,0.95,1.00,1.40, 6,'plated',     'Crit damage dikurangi 50%.'],
-  ['resilient',  'RESILIENT',  '#20b2aa', 110,23,1.00,0.95,1.30, 7,'resilient',  'Regen shield kecil tiap detik.'],
-  ['immortal',   'IMMORTAL',   '#ffd700', 90, 23,1.00,1.00,1.10, 8,'immortal',   'Bertahan 1x dari kematian.'],
-  ['adamant',    'ADAMANT',    '#b8860b', 150,26,0.75,0.80,1.60, 5,'adamant',    'Kebal knockback.'],
-  ['sturdy2',    'BULWARK',    '#a9a9a9', 145,26,0.80,0.85,1.55, 6,'bulwark',    'Shield menyerap 60% damage.'],
-  ['fortitude',  'FORTITUDE',  '#66cdaa', 125,24,0.90,0.90,1.45, 6,'fortitude',  'Setiap 5 detik heal 10 HP.'],
-  ['warden',     'WARDEN',     '#3cb371', 115,24,0.95,1.00,1.35, 7,'warden',     'Shield otomatis saat HP<40%.'],
-  ['aegis2',     'BULWARK II', '#00ced1', 105,24,1.00,0.95,1.40, 7,'aegis2',     'Shield beregenerasi cepat.'],
-
-  /* --- TIER: ELEMENTAL (41-60) --- */
-  ['fire',       'FIRE',       '#ff4400', 85, 22,1.05,1.00,0.90, 6,'fire',       'Jejak api 12 dmg/s.'],
-  ['ice',        'ICE',        '#80ffff', 80, 22,1.00,0.90,1.00, 6,'ice',        'Freeze musuh 1.5 detik.'],
-  ['freezer',    'FREEZER',    '#a8e8ff', 80, 22,1.00,0.90,1.00, 7,'freezer',    'Slow 55% selama 2.5 detik.'],
-  ['poison',     'POISON',     '#9dff4d', 80, 22,1.00,0.90,1.00, 7,'poison',     'Racun 25 damage/4 detik.'],
-  ['lightning',  'LIGHTNING',  '#ffff44', 70, 22,1.05,1.15,0.90, 8,'lightning',  'Zap tambahan 6 damage.'],
-  ['shaman',     'SHAMAN',     '#40e0d0', 75, 22,1.00,1.15,0.95, 8,'shaman',     'Chain shock otomatis.'],
-  ['dragon',     'DRAGON',     '#8b0000', 60, 24,1.05,1.40,0.85, 9,'dragon',     'Napas api + burn 2.5s.'],
-  ['frost',      'FROST',      '#b0e0e6', 80, 22,1.00,0.95,1.05, 7,'frost',      'Ice spike burst saat hit.'],
-  ['magma',      'MAGMA',      '#ff4500', 80, 23,1.00,1.10,0.90, 7,'magma',      'Lava trail 18 dmg/s.'],
-  ['storm',      'STORM',      '#9370db', 70, 22,1.05,1.05,1.00, 8,'storm',      'Lightning aura otomatis.'],
-  ['toxic',      'TOXIC',      '#32cd32', 80, 22,1.00,0.95,1.00, 7,'toxic',      'Poison cloud di area.'],
-  ['blaze',      'BLAZE',      '#ff6347', 80, 23,1.05,1.15,0.90, 8,'blaze',      'Fire nova saat menabrak.'],
-  ['thunder',    'THUNDER',    '#ffd700', 70, 22,1.05,1.20,0.90, 8,'thunder',    'Chain lightning ke 3 target.'],
-  ['glacier',    'GLACIER',    '#afeeee', 85, 23,0.95,0.90,1.15, 7,'glacier',    'Freeze aura di sekitar.'],
-  ['inferno',    'INFERNO',    '#ff2400', 65, 24,1.00,1.35,0.85, 9,'inferno',    'Fire lebih besar + burn.'],
-  ['blizzard',   'BLIZZARD',   '#e0ffff', 75, 23,1.00,0.90,1.10, 7,'blizzard',   'Slow aura luas.'],
-  ['plague',     'PLAGUE',     '#808000', 75, 22,1.00,0.95,1.00, 8,'plague',     'Poison menyebar ke sekitar.'],
-  ['venom',      'VENOM',      '#6b8e23', 75, 22,1.00,1.00,1.00, 8,'venom',      'Racun lebih kuat 40 dmg.'],
-  ['static',     'STATIC',     '#fffacd', 75, 22,1.05,1.10,0.95, 7,'static',     'Zap saat kontak.'],
-  ['plasma',     'PLASMA',     '#da70d6', 70, 23,1.05,1.20,0.95, 8,'plasma',     'Burn + slow sekaligus.'],
-
-  /* --- TIER: MOVEMENT (61-75) --- */
-  ['speedy',     'SPEEDY',     '#ffd93d', 80, 19,1.60,0.85,0.70, 5,'speedy',     'Sangat cepat, DEF rendah.'],
-  ['dasher',     'DASHER',     '#ff8c00', 85, 22,1.10,1.00,0.95, 7,'dasher',     '4 dash tersimpan.'],
-  ['teleport',   'TELEPORT',   '#7b68ee', 70, 22,1.00,1.00,1.00, 8,'teleport',   'Berkedip tiap 5 detik.'],
-  ['phantom',    'PHANTOM',    '#9370db', 75, 22,1.05,1.00,1.05, 8,'phantom',    'Bisa tembus musuh.'],
-  ['sprinter',   'SPRINTER',   '#32cd32', 85, 21,1.45,0.90,0.85, 6,'sprinter',   'Speed boost konstan.'],
-  ['warp',       'WARP',       '#483d8b', 70, 22,1.05,1.00,1.00, 8,'warp',       'Teleport lebih sering.'],
-  ['ghost',      'GHOST',      '#c0c0ff', 70, 22,1.05,1.00,1.15, 8,'ghost',      '28% peluang menghindar.'],
-  ['shadow',     'SHADOW',     '#2f2f2f', 75, 22,1.05,1.10,1.00, 8,'shadow',     'Menghilang tiap 6 detik.'],
-  ['cyclone',    'CYCLONE',    '#87ceeb', 80, 22,1.20,0.95,0.90, 7,'cyclone',    'Spin cepat + AoE.'],
-  ['jitter',     'JITTER',     '#ff69b4', 80, 22,1.15,0.95,0.95, 7,'jitter',     'Gerak tidak terduga.'],
-  ['blink',      'BLINK',      '#6a5acd', 75, 22,1.10,1.00,1.00, 8,'blink',      'Short range teleport.'],
-  ['dashmaster', 'DASH MASTER', '#ffa500', 80, 22,1.15,1.05,0.90, 8,'dashmaster', 'Cooldown dash pendek.'],
-  ['ghostwalk',  'GHOSTWALK',  '#b0c4de', 70, 22,1.10,0.95,1.10, 8,'ghostwalk',  'Damage dikurangi 30% saat low HP.'],
-  ['turbo',      'TURBO',      '#ff4500', 75, 21,1.40,1.00,0.80, 7,'turbo',      'Speed tinggi, rawan.'],
-  ['ninja',      'NINJA',      '#333340', 65, 22,1.15,1.20,0.80, 8,'ninja',      '30% crit + invis.'], 
-
-  /* --- TIER: SUPPORT (76-90) --- */
-  ['healer',     'HEALER',     '#4dff88', 85, 22,1.00,0.85,1.00, 6,'healer',     'Regen 6 HP/detik.'],
-  ['druid',      'DRUID',      '#6b8e23', 90, 23,1.00,0.95,1.10, 6,'druid',      'Regen 8 HP/detik.'],
-  ['shield',     'SHIELD',     '#4fc3ff', 85, 22,0.95,0.85,1.20, 6,'shield',     'Shield regen tiap 9 detik.'],
-  ['magnet',     'MAGNET',     '#ff69b4', 110,24,0.95,0.90,1.10, 4,'magnet',     'Menarik power-up.'],
-  ['lucky',      'LUCKY',      '#ffd700', 105,22,1.00,0.95,1.00, 4,'lucky',      'Power-up lebih sering.'],
-  ['oracle',     'ORACLE',     '#ffd700', 70, 22,1.00,1.00,1.20, 8,'oracle',     '40% dodge.'],
-  ['medic',      'MEDIC',      '#00ff7f', 90, 22,1.00,0.90,1.05, 6,'medic',      'Heal berlebih 20 HP.'],
-  ['priest',     'PRIEST',     '#f0e68c', 85, 22,1.00,0.95,1.10, 7,'priest',     'Heal burst saat menabrak.'],
-  ['sage',       'SAGE',       '#dda0dd', 90, 22,1.00,0.95,1.05, 6,'sage',       'Bonus score +50%.'],
-  ['monk',       'MONK',       '#ffdead', 100,23,1.00,1.00,1.15, 6,'monk',       'Balanced stats.'],
-  ['shaman2',    'MYSTIC',     '#40e0d0', 85, 22,1.00,1.05,1.10, 7,'mystic',     'Heal + shock.'],
-  ['cleric',     'CLERIC',     '#fffacd', 80, 22,1.00,0.95,1.10, 7,'cleric',     'Heal 5 HP saat hit.'],
-  ['acolyte',    'ACOLYTE',    '#e6e6fa', 85, 22,1.00,0.90,1.05, 6,'acolyte',    'Regen kecil 3/detik.'],
-  ['prophet',    'PROPHET',    '#dc143c', 80, 22,1.00,1.00,1.05, 7,'prophet',    'Lihat HP musuh (bonus info).'],
-  ['trickster',  'TRICKSTER',  '#ff00ff', 80, 22,1.05,1.00,1.00, 7,'trickster',  'Random buff tiap 5 detik.'],
-  ['mender',     'MENDER',     '#98fb98', 85, 22,1.00,0.90,1.10, 6,'mender',     'Heal setelah kena hit.'],
-  ['lifebinder', 'LIFEBINDER', '#9370db', 80, 22,1.00,0.95,1.10, 7,'lifebinder', 'Regen + shield.'], 
-  ['reviver',    'REVIVER',    '#32cd32', 75, 22,1.00,0.95,1.10, 8,'reviver',    'Bangkit 1x dengan 25 HP.'],
-  ['eternal',    'ETERNAL',    '#ffd700', 75, 22,1.00,1.00,1.10, 8,'eternal',    'Regen konstan tiap detik.'],
-  ['grace',      'GRACE',      '#f0f8ff', 80, 22,1.00,0.95,1.10, 7,'grace',      'Heal besar setelah kill.'],
-
-  /* --- TIER: UTILITY (91-105) --- */
-  ['reflector',  'REFLECTOR',  '#ff77ff', 70, 22,1.00,0.85,1.30, 8,'reflector',  'Reflect 55% damage.'],
-  ['vampire',    'VAMPIRE',    '#b0004d', 70, 22,1.05,1.10,0.90, 8,'vampire',    'Lifesteal 45%.'],
-  ['mirror',     'MIRROR',     '#e0e0e0', 70, 22,1.00,1.00,1.00, 8,'mirror',     'Meniru kemampuan musuh.'],
-  ['absorber',   'ABSORBER',   '#8a2be2', 80, 22,1.00,1.00,1.10, 8,'absorber',   'Mencuri HP saat hit.'],
-  ['puller',     'PULLER',     '#20b2aa', 85, 22,1.00,1.00,1.10, 7,'puller',     'Menarik musuh mendekat.'],
-  ['leech',      'LEECH',      '#556b2f', 75, 22,1.00,1.00,1.05, 8,'leech',      'Lifesteal + slow.'],
-  ['shrinker',   'SHRINKER',   '#32cd32', 80, 22,1.00,0.90,1.00, 7,'shrinker',   'Mengecilkan musuh.'],
-  ['sticky',     'STICKY',     '#88aa00', 80, 22,1.00,0.90,1.00, 7,'sticky',     'Menempelkan musuh 1s.'],
-  ['boxer',      'BOXER',      '#ff6347', 75, 22,1.05,1.30,0.85, 7,'boxer',      'Knockback kuat.'],
-  ['grabber',    'GRABBER',    '#b0e0e6', 85, 22,1.00,1.05,1.05, 7,'grabber',    'Menarik musuh lebih kuat.'],
-  ['repulsor',   'REPULSOR',   '#00ced1', 80, 22,1.00,1.10,1.05, 7,'repulsor',   'Mendorong musuh menjauh.'],
-  ['vacuum',     'VACUUM',     '#696969', 80, 22,1.00,1.00,1.05, 8,'vacuum',     'Tarik power-up + musuh.'],
-  ['jammer',     'JAMMER',     '#444444', 75, 22,1.00,1.05,1.00, 8,'jammer',     'Disable ability musuh 3s.'],
-  ['antimagic',  'ANTI-MAGIC', '#2f4f4f', 80, 22,1.00,1.00,1.10, 8,'antimagic',  'Blok ability musuh.'],
-  ['nullify',    'NULLIFY',    '#808080', 75, 22,1.00,1.05,1.05, 8,'nullify',    'Reset cooldown musuh.'], 
-
-  /* --- TIER: SPECIAL / AoE (106-120) --- */
-  ['aura',       'AURA',       '#dda0dd', 90, 24,1.00,0.85,1.05, 6,'aura',       'Damage pasif 9/s.'],
-  ['spinner',    'SPINNER',    '#00ced1', 80, 24,0.95,1.00,1.00, 7,'spinner',    'Spin AoE 12 dmg.'],
-  ['nova',       'NOVA',       '#ff1493', 70, 23,1.05,1.15,0.90, 8,'nova',       'Nova explosion saat hit.'],
-  ['blaster',    'BLASTER',    '#9400d3', 75, 22,1.00,1.10,1.00, 8,'blaster',    'Tembak proyektil.'],
-  ['bomber',     'BOMBER',     '#ff5b2e', 52, 22,1.05,1.45,0.65, 9,'bomber',     'Ledakan AoE saat nabrak.'],
-  ['exploder',   'EXPLODER',   '#ffa500', 80, 22,1.00,1.00,0.90, 7,'exploder',   'Ledakan besar saat mati.'],
-  ['sniper',     'SNIPER',     '#ffcc00', 55, 20,1.00,1.30,0.65, 9,'sniper',     'Auto shoot tiap 2 detik.'],
-  ['trapper',    'TRAPPER',    '#2e8b57', 80, 22,1.00,0.95,1.10, 7,'trapper',    'Tinggalkan jebakan.'],
-  ['cluster',    'CLUSTER',    '#daa520', 75, 22,1.00,1.10,1.00, 8,'cluster',    'Multi-projectile.'],
-  ['mirage',     'MIRAGE',     '#dda0dd', 80, 22,1.00,0.95,1.10, 8,'mirage',     'Buat decoy.'],
-  ['shatter',    'SHATTER',    '#b0c4de', 85, 22,1.00,1.10,1.05, 8,'shatter',    'Hancurkan shield musuh.'],
-  ['quake',      'QUAKE',      '#8b4513', 90, 24,0.90,1.05,1.15, 7,'quake',      'Shockwave tiap 3s.'],
-  ['vortex',     'VORTEX',     '#4b0082', 75, 22,1.00,1.00,1.05, 8,'vortex',     'Vortex menarik musuh.'],
-  ['implode',    'IMPLODE',    '#191970', 70, 22,1.05,1.20,0.95, 8,'implode',    'Damage burst pada HP rendah.'],
-  ['singularity','SINGULARITY','#000080', 70, 23,1.00,1.15,1.05, 9,'singularity','Tarik + damage berkelanjutan.'],
-
-  /* --- TIER: BEAST / ANIMAL (121-130) --- */
-  ['wolf',       'WOLF',       '#696969', 95, 22,1.05,1.10,1.00, 7,'wolf',       'Bonus damage saat HP musuh rendah.'],
-  ['bear',       'BEAR',       '#8b4513', 150,27,0.80,1.05,1.40, 6,'bear',       'HP raksasa + kuat.'],
-  ['lion',       'LION',       '#daa520', 100,24,1.00,1.15,1.10, 7,'lion',       'Bonus damage ke musuh lebih lemah.'],
-  ['tiger',      'TIGER',      '#ff8c00', 90, 22,1.15,1.20,0.95, 8,'tiger',      'Speed burst tiap 5s.'],
-  ['eagle',      'EAGLE',      '#8b0000', 85, 22,1.10,1.15,1.00, 8,'eagle',      'Crit + vision.'],
-  ['snake',      'SNAKE',      '#228b22', 80, 22,1.05,1.00,1.00, 7,'snake',      'Poison + strike.'],
-  ['spider',     'SPIDER',     '#2f4f4f', 80, 22,1.00,0.95,1.05, 7,'spider',     'Web trap musuh.'],
-  ['shark',      'SHARK',      '#4682b4', 85, 23,1.05,1.20,0.95, 8,'shark',      'Execute damage ke HP<35%.'],
-  ['rhino',      'RHINO',      '#778899', 130,26,0.85,1.10,1.30, 6,'rhino',      'Charge attack bonus.'],
-  ['fox',        'FOX',        '#ff6347', 80, 22,1.10,1.00,1.05, 7,'fox',        'Smart dodge 35%.'],
-  ['panther',    'PANTHER',    '#1a1a1a', 75, 22,1.15,1.15,0.95, 8,'panther',    'Stealth + ambush.'],
-  ['cheetah',    'CHEETAH',    '#ffcc00', 75, 21,1.55,1.00,0.80, 7,'cheetah',    'Burst speed tercepat.'],
-  ['cobra',      'COBRA',      '#4b0082', 80, 22,1.05,1.10,1.00, 8,'cobra',      'Poison + venom strike.'],
-  ['falcon',     'FALCON',     '#cd853f', 80, 22,1.15,1.15,0.95, 8,'falcon',     'Fast strike + vision.'],
-  ['phoenix',    'PHOENIX',    '#ff5500', 65, 22,1.05,1.20,0.95, 9,'phoenix',    'Reborn + fire nova.']
+  ['basic','BASIC','#7ec8ff',100,22,1.00,1.00,1.00,5,'basic','Tanpa kemampuan khusus.'],
+  ['sturdy','STURDY','#a8c0d8',115,23,0.95,0.95,1.30,5,'sturdy','DEF +30% permanen.'],
+  ['swift','SWIFT','#ffe066',85,20,1.35,0.90,0.85,5,'swift','SPD +35% permanen.'],
+  ['heavy','HEAVY','#8888a0',130,26,0.75,1.05,1.20,5,'heavy','Massa +50%, lambat.'],
+  ['sharp','SHARP','#ff6b6b',90,22,1.00,1.30,0.85,6,'sharp','ATK +30% permanen.'],
+  ['brawler','BRAWLER','#ff8866',95,22,1.05,1.15,0.95,6,'brawler','Dash damage +120%.'],
+  ['puncher','PUNCHER','#ff7f50',90,22,1.00,1.10,1.00,6,'puncher','Knockback musuh 2x.'],
+  ['crusher','CRUSHER','#c04040',85,24,0.95,1.20,1.10,7,'crusher','Bonus damage ke musuh HP>70%.'],
+  ['slasher','SLASHER','#dc143c',85,22,1.05,1.15,0.90,7,'slasher','Bleed 20 damage / 3 detik.'],
+  ['duelist','DUELIST','#b8860b',95,22,1.00,1.10,1.00,7,'duelist','Bonus 20% saat 1v1.'],
+  ['gladiator','GLADIATOR','#8b4513',90,23,1.00,1.05,1.00,7,'gladiator','Damage naik +8% tiap tabrakan.'],
+  ['berserker','BERSERKER','#ff1a4a',90,22,1.00,1.10,0.90,7,'berserker','Damage naik saat HP rendah.'],
+  ['assassin','ASSASSIN','#6a0dad',55,21,1.25,1.60,0.60,9,'assassin','Crit 40% (2x damage).'],
+  ['reaper','REAPER','#1a1a1a',65,22,1.05,1.35,0.85,9,'reaper','1.8x damage ke musuh HP<40%.'],
+  ['marauder','MARAUDER','#8b0000',75,22,1.05,1.15,0.95,8,'marauder','Lifesteal 30% + rage.'],
+  ['brute','BRUTE','#654321',100,25,0.85,1.15,1.10,6,'brute','Knockback sangat besar.'],
+  ['ram','RAM','#a0522d',95,23,1.05,1.15,1.00,7,'ram','Bonus dmg saat bounce ke musuh.'],
+  ['spiker','SPIKER','#b22222',85,22,1.00,0.95,1.15,7,'spiker','Damage aura kontak 5/s.'],
+  ['hammer','HAMMER','#708090',100,24,0.90,1.20,1.05,7,'hammer','Shockwave AoE saat hit.'],
+  ['drill','DRILL','#808080',80,21,1.15,1.25,0.85,8,'drill','Menembus shield musuh.'],
+  ['tank','TANK','#9b9b9b',180,28,0.70,0.70,1.55,5,'tank','HP & DEF tinggi, lambat.'],
+  ['wall','WALL','#666680',140,25,0.85,0.85,1.40,5,'wall','Kena damage → speed boost.'],
+  ['fortress','FORTRESS','#505060',200,30,0.55,0.60,1.80,5,'fortress','DEF sangat tinggi, hampir tak bergerak.'],
+  ['paladin','PALADIN','#e8e0c8',120,24,0.90,0.95,1.60,6,'paladin','Shield regen tiap 7 detik.'],
+  ['guardian','GUARDIAN','#b0c4de',130,25,0.85,0.85,1.50,6,'guardian','Damage dikurangi 20% flat.'],
+  ['juggernaut','JUGGERNAUT','#556b2f',110,24,0.95,1.00,1.30,6,'juggernaut','Kebal slow/freeze.'],
+  ['bastion','BASTION','#8fbc8f',130,25,0.80,0.85,1.55,6,'bastion','Damage per hit max 12.'],
+  ['aegis','AEGIS','#00bfff',100,23,0.95,0.90,1.35,7,'aegis','Shield +50% lebih kuat.'],
+  ['barrier','BARRIER','#4682b4',100,24,0.90,0.85,1.35,7,'barrier','Shield otomatis tiap 5 detik.'],
+  ['turtle','TURTLE','#2e8b57',160,27,0.65,0.75,1.65,5,'turtle','Armor tebal, sangat lambat.'],
+  ['shell','SHELL','#556b2f',140,25,0.80,0.85,1.50,6,'shell','Stack shield tiap tabrakan.'],
+  ['ironhide','IRONHIDE','#404040',140,25,0.85,0.90,1.50,6,'ironhide','DEF +50% saat HP<50%.'],
+  ['plated','PLATED','#6b6b6b',120,24,0.95,1.00,1.40,6,'plated','Crit damage dikurangi 50%.'],
+  ['resilient','RESILIENT','#20b2aa',110,23,1.00,0.95,1.30,7,'resilient','Regen shield kecil tiap detik.'],
+  ['immortal','IMMORTAL','#ffd700',90,23,1.00,1.00,1.10,8,'immortal','Bertahan 1x dari kematian.'],
+  ['adamant','ADAMANT','#b8860b',150,26,0.75,0.80,1.60,5,'adamant','Kebal knockback.'],
+  ['bulwark','BULWARK','#a9a9a9',145,26,0.80,0.85,1.55,6,'bulwark','Shield menyerap 60% damage.'],
+  ['fortitude','FORTITUDE','#66cdaa',125,24,0.90,0.90,1.45,6,'fortitude','Setiap 5 detik heal 10 HP.'],
+  ['warden','WARDEN','#3cb371',115,24,0.95,1.00,1.35,7,'warden','Shield otomatis saat HP<40%.'],
+  ['aegis2','BULWARK II','#00ced1',105,24,1.00,0.95,1.40,7,'aegis2','Shield beregenerasi cepat.'],
+  ['fire','FIRE','#ff4400',85,22,1.05,1.00,0.90,6,'fire','Jejak api 12 dmg/s.'],
+  ['ice','ICE','#80ffff',80,22,1.00,0.90,1.00,6,'ice','Freeze musuh 1.5 detik.'],
+  ['freezer','FREEZER','#a8e8ff',80,22,1.00,0.90,1.00,7,'freezer','Slow 55% selama 2.5 detik.'],
+  ['poison','POISON','#9dff4d',80,22,1.00,0.90,1.00,7,'poison','Racun 25 damage/4 detik.'],
+  ['lightning','LIGHTNING','#ffff44',70,22,1.05,1.15,0.90,8,'lightning','Zap tambahan 6 damage.'],
+  ['shaman','SHAMAN','#40e0d0',75,22,1.00,1.15,0.95,8,'shaman','Chain shock otomatis.'],
+  ['dragon','DRAGON','#8b0000',60,24,1.05,1.40,0.85,9,'dragon','Napas api + burn 2.5s.'],
+  ['frost','FROST','#b0e0e6',80,22,1.00,0.95,1.05,7,'frost','Ice spike burst saat hit.'],
+  ['magma','MAGMA','#ff4500',80,23,1.00,1.10,0.90,7,'magma','Lava trail 18 dmg/s.'],
+  ['storm','STORM','#9370db',70,22,1.05,1.05,1.00,8,'storm','Lightning aura otomatis.'],
+  ['toxic','TOXIC','#32cd32',80,22,1.00,0.95,1.00,7,'toxic','Poison cloud di area.'],
+  ['blaze','BLAZE','#ff6347',80,23,1.05,1.15,0.90,8,'blaze','Fire nova saat menabrak.'],
+  ['thunder','THUNDER','#ffd700',70,22,1.05,1.20,0.90,8,'thunder','Chain lightning ke 3 target.'],
+  ['glacier','GLACIER','#afeeee',85,23,0.95,0.90,1.15,7,'glacier','Freeze aura di sekitar.'],
+  ['inferno','INFERNO','#ff2400',65,24,1.00,1.35,0.85,9,'inferno','Fire lebih besar + burn.'],
+  ['blizzard','BLIZZARD','#e0ffff',75,23,1.00,0.90,1.10,7,'blizzard','Slow aura luas.'],
+  ['plague','PLAGUE','#808000',75,22,1.00,0.95,1.00,8,'plague','Poison menyebar ke sekitar.'],
+  ['venom','VENOM','#6b8e23',75,22,1.00,1.00,1.00,8,'venom','Racun lebih kuat 40 dmg.'],
+  ['static','STATIC','#fffacd',75,22,1.05,1.10,0.95,7,'static','Zap saat kontak.'],
+  ['plasma','PLASMA','#da70d6',70,23,1.05,1.20,0.95,8,'plasma','Burn + slow sekaligus.'],
+  ['speedy','SPEEDY','#ffd93d',80,19,1.60,0.85,0.70,5,'speedy','Sangat cepat, DEF rendah.'],
+  ['dasher','DASHER','#ff8c00',85,22,1.10,1.00,0.95,7,'dasher','4 dash tersimpan.'],
+  ['teleport','TELEPORT','#7b68ee',70,22,1.00,1.00,1.00,8,'teleport','Berkedip tiap 5 detik.'],
+  ['phantom','PHANTOM','#9370db',75,22,1.05,1.00,1.05,8,'phantom','Bisa tembus musuh.'],
+  ['sprinter','SPRINTER','#32cd32',85,21,1.45,0.90,0.85,6,'sprinter','Speed boost konstan.'],
+  ['warp','WARP','#483d8b',70,22,1.05,1.00,1.00,8,'warp','Teleport lebih sering.'],
+  ['ghost','GHOST','#c0c0ff',70,22,1.05,1.00,1.15,8,'ghost','28% peluang menghindar.'],
+  ['shadow','SHADOW','#2f2f2f',75,22,1.05,1.10,1.00,8,'shadow','Menghilang tiap 6 detik.'],
+  ['cyclone','CYCLONE','#87ceeb',80,22,1.20,0.95,0.90,7,'cyclone','Spin cepat + AoE.'],
+  ['jitter','JITTER','#ff69b4',80,22,1.15,0.95,0.95,7,'jitter','Gerak tidak terduga.'],
+  ['blink','BLINK','#6a5acd',75,22,1.10,1.00,1.00,8,'blink','Short range teleport.'],
+  ['dashmaster','DASH MASTER','#ffa500',80,22,1.15,1.05,0.90,8,'dashmaster','Cooldown dash pendek.'],
+  ['ghostwalk','GHOSTWALK','#b0c4de',70,22,1.10,0.95,1.10,8,'ghostwalk','Damage dikurangi 30% saat low HP.'],
+  ['turbo','TURBO','#ff4500',75,21,1.40,1.00,0.80,7,'turbo','Speed tinggi, rawan.'],
+  ['ninja','NINJA','#333340',65,22,1.15,1.20,0.80,8,'ninja','30% crit + invis.'],
+  ['healer','HEALER','#4dff88',85,22,1.00,0.85,1.00,6,'healer','Regen 6 HP/detik.'],
+  ['druid','DRUID','#6b8e23',90,23,1.00,0.95,1.10,6,'druid','Regen 8 HP/detik.'],
+  ['shield','SHIELD','#4fc3ff',85,22,0.95,0.85,1.20,6,'shield','Shield regen tiap 9 detik.'],
+  ['magnet','MAGNET','#ff69b4',110,24,0.95,0.90,1.10,4,'magnet','Menarik power-up.'],
+  ['lucky','LUCKY','#ffd700',105,22,1.00,0.95,1.00,4,'lucky','Power-up lebih sering.'],
+  ['oracle','ORACLE','#ffd700',70,22,1.00,1.00,1.20,8,'oracle','40% dodge.'],
+  ['medic','MEDIC','#00ff7f',90,22,1.00,0.90,1.05,6,'medic','Heal berlebih 20 HP.'],
+  ['priest','PRIEST','#f0e68c',85,22,1.00,0.95,1.10,7,'priest','Heal burst saat menabrak.'],
+  ['sage','SAGE','#dda0dd',90,22,1.00,0.95,1.05,6,'sage','Bonus score +50%.'],
+  ['monk','MONK','#ffdead',100,23,1.00,1.00,1.15,6,'monk','Balanced stats.'],
+  ['mystic','MYSTIC','#40e0d0',85,22,1.00,1.05,1.10,7,'mystic','Heal + shock.'],
+  ['cleric','CLERIC','#fffacd',80,22,1.00,0.95,1.10,7,'cleric','Heal 5 HP saat hit.'],
+  ['acolyte','ACOLYTE','#e6e6fa',85,22,1.00,0.90,1.05,6,'acolyte','Regen kecil 3/detik.'],
+  ['prophet','PROPHET','#dc143c',80,22,1.00,1.00,1.05,7,'prophet','Lihat HP musuh (bonus info).'],
+  ['trickster','TRICKSTER','#ff00ff',80,22,1.05,1.00,1.00,7,'trickster','Random buff tiap 5 detik.'],
+  ['mender','MENDER','#98fb98',85,22,1.00,0.90,1.10,6,'mender','Heal setelah kena hit.'],
+  ['lifebinder','LIFEBINDER','#9370db',80,22,1.00,0.95,1.10,7,'lifebinder','Regen + shield.'],
+  ['reviver','REVIVER','#32cd32',75,22,1.00,0.95,1.10,8,'reviver','Bangkit 1x dengan 25 HP.'],
+  ['eternal','ETERNAL','#ffd700',75,22,1.00,1.00,1.10,8,'eternal','Regen konstan tiap detik.'],
+  ['grace','GRACE','#f0f8ff',80,22,1.00,0.95,1.10,7,'grace','Heal besar setelah kill.'],
+  ['reflector','REFLECTOR','#ff77ff',70,22,1.00,0.85,1.30,8,'reflector','Reflect 55% damage.'],
+  ['vampire','VAMPIRE','#b0004d',70,22,1.05,1.10,0.90,8,'vampire','Lifesteal 45%.'],
+  ['mirror','MIRROR','#e0e0e0',70,22,1.00,1.00,1.00,8,'mirror','Meniru kemampuan musuh.'],
+  ['absorber','ABSORBER','#8a2be2',80,22,1.00,1.00,1.10,8,'absorber','Mencuri HP saat hit.'],
+  ['puller','PULLER','#20b2aa',85,22,1.00,1.00,1.10,7,'puller','Menarik musuh mendekat.'],
+  ['leech','LEECH','#556b2f',75,22,1.00,1.00,1.05,8,'leech','Lifesteal + slow.'],
+  ['shrinker','SHRINKER','#32cd32',80,22,1.00,0.90,1.00,7,'shrinker','Mengecilkan musuh.'],
+  ['sticky','STICKY','#88aa00',80,22,1.00,0.90,1.00,7,'sticky','Menempelkan musuh 1s.'],
+  ['boxer','BOXER','#ff6347',75,22,1.05,1.30,0.85,7,'boxer','Knockback kuat.'],
+  ['grabber','GRABBER','#b0e0e6',85,22,1.00,1.05,1.05,7,'grabber','Menarik musuh lebih kuat.'],
+  ['repulsor','REPULSOR','#00ced1',80,22,1.00,1.10,1.05,7,'repulsor','Mendorong musuh menjauh.'],
+  ['vacuum','VACUUM','#696969',80,22,1.00,1.00,1.05,8,'vacuum','Tarik power-up + musuh.'],
+  ['jammer','JAMMER','#444444',75,22,1.00,1.05,1.00,8,'jammer','Disable ability musuh 3s.'],
+  ['antimagic','ANTI-MAGIC','#2f4f4f',80,22,1.00,1.00,1.10,8,'antimagic','Blok ability musuh.'],
+  ['nullify','NULLIFY','#808080',75,22,1.00,1.05,1.05,8,'nullify','Reset cooldown musuh.'],
+  ['aura','AURA','#dda0dd',90,24,1.00,0.85,1.05,6,'aura','Damage pasif 9/s.'],
+  ['spinner','SPINNER','#00ced1',80,24,0.95,1.00,1.00,7,'spinner','Spin AoE 12 dmg.'],
+  ['nova','NOVA','#ff1493',70,23,1.05,1.15,0.90,8,'nova','Nova explosion saat hit.'],
+  ['blaster','BLASTER','#9400d3',75,22,1.00,1.10,1.00,8,'blaster','Tembak proyektil.'],
+  ['bomber','BOMBER','#ff5b2e',52,22,1.05,1.45,0.65,9,'bomber','Ledakan AoE saat nabrak.'],
+  ['exploder','EXPLODER','#ffa500',80,22,1.00,1.00,0.90,7,'exploder','Ledakan besar saat mati.'],
+  ['sniper','SNIPER','#ffcc00',55,20,1.00,1.30,0.65,9,'sniper','Auto shoot tiap 2 detik.'],
+  ['trapper','TRAPPER','#2e8b57',80,22,1.00,0.95,1.10,7,'trapper','Tinggalkan jebakan.'],
+  ['cluster','CLUSTER','#daa520',75,22,1.00,1.10,1.00,8,'cluster','Multi-projectile.'],
+  ['mirage','MIRAGE','#dda0dd',80,22,1.00,0.95,1.10,8,'mirage','Buat decoy.'],
+  ['shatter','SHATTER','#b0c4de',85,22,1.00,1.10,1.05,8,'shatter','Hancurkan shield musuh.'],
+  ['quake','QUAKE','#8b4513',90,24,0.90,1.05,1.15,7,'quake','Shockwave tiap 3s.'],
+  ['vortex','VORTEX','#4b0082',75,22,1.00,1.00,1.05,8,'vortex','Vortex menarik musuh.'],
+  ['implode','IMPLODE','#191970',70,22,1.05,1.20,0.95,8,'implode','Damage burst pada HP rendah.'],
+  ['singularity','SINGULARITY','#000080',70,23,1.00,1.15,1.05,9,'singularity','Tarik + damage berkelanjutan.'],
+  ['wolf','WOLF','#696969',95,22,1.05,1.10,1.00,7,'wolf','Bonus damage saat HP musuh rendah.'],
+  ['bear','BEAR','#8b4513',150,27,0.80,1.05,1.40,6,'bear','HP raksasa + kuat.'],
+  ['lion','LION','#daa520',100,24,1.00,1.15,1.10,7,'lion','Bonus damage ke musuh lebih lemah.'],
+  ['tiger','TIGER','#ff8c00',90,22,1.15,1.20,0.95,8,'tiger','Speed burst tiap 5s.'],
+  ['eagle','EAGLE','#8b0000',85,22,1.10,1.15,1.00,8,'eagle','Crit + vision.'],
+  ['snake','SNAKE','#228b22',80,22,1.05,1.00,1.00,7,'snake','Poison + strike.'],
+  ['spider','SPIDER','#2f4f4f',80,22,1.00,0.95,1.05,7,'spider','Web trap musuh.'],
+  ['shark','SHARK','#4682b4',85,23,1.05,1.20,0.95,8,'shark','Execute damage ke HP<35%.'],
+  ['rhino','RHINO','#778899',130,26,0.85,1.10,1.30,6,'rhino','Charge attack bonus.'],
+  ['fox','FOX','#ff6347',80,22,1.10,1.00,1.05,7,'fox','Smart dodge 35%.'],
+  ['panther','PANTHER','#1a1a1a',75,22,1.15,1.15,0.95,8,'panther','Stealth + ambush.'],
+  ['cheetah','CHEETAH','#ffcc00',75,21,1.55,1.00,0.80,7,'cheetah','Burst speed tercepat.'],
+  ['cobra','COBRA','#4b0082',80,22,1.05,1.10,1.00,8,'cobra','Poison + venom strike.'],
+  ['falcon','FALCON','#cd853f',80,22,1.15,1.15,0.95,8,'falcon','Fast strike + vision.'],
+  ['phoenix','PHOENIX','#ff5500',65,22,1.05,1.20,0.95,9,'phoenix','Reborn + fire nova.']
 ];
-
-/* Validate: exactly 130 */
-if (BALL_DEFS.length !== 130) console.warn('Ball count:', BALL_DEFS.length);
-
-const BALLS = BALL_DEFS.map((d, i) => ({
-  id: d[0], name: d[1], color: d[2],
-  hp: d[3], r: d[4], spd: d[5], atk: d[6], def: d[7], pwr: d[8],
-  ability: d[9], desc: d[10],
-  light: lighten(d[2])
+const BALLS = BALL_DEFS.map(d => ({
+  id:d[0], name:d[1], color:d[2],
+  hp:d[3], r:d[4], spd:d[5], atk:d[6], def:d[7], pwr:d[8],
+  ability:d[9], desc:d[10], light: lighten(d[2])
 }));
-
 function lighten(hex){
-  const n = parseInt(hex.slice(1), 16);
-  const r = Math.min(255, (n>>16) + 100);
-  const g = Math.min(255, ((n>>8)&255) + 100);
-  const b = Math.min(255, (n&255) + 100);
-  return '#' + ((1<<24) + (r<<16) + (g<<8) + b).toString(16).slice(1);
+  const n = parseInt(hex.slice(1),16);
+  const r = Math.min(255,(n>>16)+100), g = Math.min(255,((n>>8)&255)+100), b = Math.min(255,(n&255)+100);
+  return '#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);
 }
-
 const BALL_MAP = {};
-BALLS.forEach(b => BALL_MAP[b.id] = b);
+BALLS.forEach(b => BALL_MAP[b.id]=b);
 
 /* ============================================================
-   5. ABILITY META — 130 entri unik
+   5. ABILITY META
    ============================================================ */
 const ABILITY_META = {
-  basic:      { label:'NONE',        icon:'·',  color:'#888888' },
-  sturdy:     { label:'DEF +30%',    icon:'▣',  color:'#a8c0d8' },
-  swift:      { label:'SPD +35%',    icon:'≫',  color:'#ffe066' },
-  heavy:      { label:'HEAVY',       icon:'⬛', color:'#8888a0' },
-  sharp:      { label:'ATK +30%',    icon:'▲',  color:'#ff6b6b' },
-  brawler:    { label:'DASH DMG',    icon:'⚔',  color:'#ff8866' },
-  puncher:    { label:'KNOCKBACK',   icon:'✊', color:'#ff7f50' },
-  crusher:    { label:'CRUSH',       icon:'✹',  color:'#c04040' },
-  slasher:    { label:'BLEED',       icon:'✂',  color:'#dc143c' },
-  duelist:    { label:'DUEL 1v1',    icon:'†',  color:'#b8860b' },
-  gladiator:  { label:'STACK+8%',    icon:'⚔',  color:'#8b4513' },
-  berserker:  { label:'RAGE',        icon:'⚡', color:'#ff1a4a' },
-  assassin:   { label:'CRIT 40%',    icon:'†',  color:'#6a0dad' },
-  reaper:     { label:'EXECUTE',     icon:'☠',  color:'#1a1a1a' },
-  marauder:   { label:'LIFESTEAL',   icon:'Ψ',  color:'#8b0000' },
-  brute:      { label:'BIG PUSH',    icon:'►',  color:'#654321' },
-  ram:        { label:'BOUNCE DMG',  icon:'↹',  color:'#a0522d' },
-  spiker:     { label:'CONTACT DMG', icon:'✳',  color:'#b22222' },
-  hammer:     { label:'SHOCKWAVE',   icon:'⚒',  color:'#708090' },
-  drill:      { label:'PIERCE',      icon:'▽',  color:'#808080' },
-  tank:       { label:'TANK',        icon:'▣',  color:'#9b9b9b' },
-  wall:       { label:'WALL',        icon:'▦',  color:'#666680' },
-  fortress:   { label:'FORTRESS',    icon:'⬛', color:'#505060' },
-  paladin:    { label:'SHIELD 7s',   icon:'✟',  color:'#e8e0c8', active:true },
-  guardian:   { label:'DMG -20%',    icon:'◈',  color:'#b0c4de' },
-  juggernaut: { label:'IMMUNE CC',   icon:'⛨',  color:'#556b2f' },
-  bastion:    { label:'DMG CAP',     icon:'◆',  color:'#8fbc8f' },
-  aegis:      { label:'SHIELD+',     icon:'◈',  color:'#00bfff', active:true },
-  barrier:    { label:'AUTO SHIELD', icon:'◈',  color:'#4682b4', active:true },
-  turtle:     { label:'ARMOR',       icon:'⬢',  color:'#2e8b57' },
-  shell:      { label:'STACK SHIELD',icon:'⬣',  color:'#556b2f' },
-  ironhide:   { label:'LOW HP DEF',  icon:'▣',  color:'#404040' },
-  plated:     { label:'ANTI-CRIT',   icon:'⛨',  color:'#6b6b6b' },
-  resilient:  { label:'SHIELD REGEN',icon:'◈',  color:'#20b2aa' },
-  immortal:   { label:'SURVIVE 1',   icon:'★',  color:'#ffd700' },
-  adamant:    { label:'NO KNOCK',    icon:'⛨',  color:'#b8860b' },
-  bulwark:    { label:'ABSORB',      icon:'◈',  color:'#a9a9a9' },
-  fortitude:  { label:'HEAL 5s',     icon:'✚',  color:'#66cdaa', active:true },
-  warden:     { label:'PANIC SHIELD',icon:'◈',  color:'#3cb371' },
-  aegis2:     { label:'FAST SHIELD', icon:'◈',  color:'#00ced1', active:true },
-  fire:       { label:'FIRE TRAIL',  icon:'🔥', color:'#ff4400', active:true },
-  ice:        { label:'FREEZE',      icon:'❄',  color:'#80ffff' },
-  freezer:    { label:'SLOW',        icon:'❆',  color:'#a8e8ff' },
-  poison:     { label:'POISON',      icon:'☠',  color:'#9dff4d' },
-  lightning:  { label:'ZAP',         icon:'⚡', color:'#ffff44' },
-  shaman:     { label:'CHAIN',       icon:'⚡', color:'#40e0d0', active:true },
-  dragon:     { label:'FIRE BREATH', icon:'🐉', color:'#8b0000', active:true },
-  frost:      { label:'ICE BURST',   icon:'❄',  color:'#b0e0e6' },
-  magma:      { label:'LAVA',        icon:'🔥', color:'#ff4500', active:true },
-  storm:      { label:'STORM AURA',  icon:'⚡', color:'#9370db', active:true },
-  toxic:      { label:'TOXIC CLOUD', icon:'☠',  color:'#32cd32', active:true },
-  blaze:      { label:'FIRE NOVA',   icon:'✹',  color:'#ff6347' },
-  thunder:    { label:'CHAIN x3',    icon:'⚡', color:'#ffd700' },
-  glacier:    { label:'FREEZE AURA', icon:'❄',  color:'#afeeee', active:true },
-  inferno:    { label:'INFERNO',     icon:'🔥', color:'#ff2400', active:true },
-  blizzard:   { label:'SLOW AURA',   icon:'❆',  color:'#e0ffff', active:true },
-  plague:     { label:'PLAGUE',      icon:'☠',  color:'#808000' },
-  venom:      { label:'VENOM 40',    icon:'☠',  color:'#6b8e23' },
-  static:     { label:'STATIC',      icon:'⚡', color:'#fffacd' },
-  plasma:     { label:'PLASMA',      icon:'✦',  color:'#da70d6' },
-  speedy:     { label:'FAST',        icon:'≫',  color:'#ffd93d' },
-  dasher:     { label:'4 DASH',      icon:'⚔',  color:'#ff8c00' },
-  teleport:   { label:'BLINK 5s',    icon:'✧',  color:'#7b68ee', active:true },
-  phantom:    { label:'PHASE',       icon:'◌',  color:'#9370db' },
-  sprinter:   { label:'SPRINT',      icon:'≫',  color:'#32cd32' },
-  warp:       { label:'WARP',        icon:'✧',  color:'#483d8b', active:true },
-  ghost:      { label:'DODGE 28%',   icon:'☁',  color:'#c0c0ff' },
-  shadow:     { label:'INVIS',       icon:'◌',  color:'#2f2f2f', active:true },
-  cyclone:    { label:'SPIN',        icon:'✺',  color:'#87ceeb' },
-  jitter:     { label:'JITTER',      icon:'~',  color:'#ff69b4' },
-  blink:      { label:'SHORT BLINK', icon:'✧',  color:'#6a5acd', active:true },
-  dashmaster: { label:'DASH CD-',    icon:'⚔',  color:'#ffa500' },
-  ghostwalk:  { label:'GHOST DEF',   icon:'◌',  color:'#b0c4de' },
-  turbo:      { label:'TURBO',       icon:'≫',  color:'#ff4500' },
-  ninja:      { label:'CRIT+INVIS',  icon:'忍',  color:'#333340' },
-  healer:     { label:'HEAL 6/s',    icon:'✚',  color:'#4dff88' },
-  druid:      { label:'HEAL 8/s',    icon:'✚',  color:'#6b8e23' },
-  shield:     { label:'SHIELD 9s',   icon:'◈',  color:'#4fc3ff', active:true },
-  magnet:     { label:'MAGNET',      icon:'∪',  color:'#ff69b4', active:true },
-  lucky:      { label:'LUCKY',       icon:'★',  color:'#ffd700' },
-  oracle:     { label:'DODGE 40%',   icon:'◯',  color:'#ffd700' },
-  medic:      { label:'OVERHEAL',    icon:'✚',  color:'#00ff7f' },
-  priest:     { label:'HEAL HIT',    icon:'✟',  color:'#f0e68c' },
-  sage:       { label:'SCORE+',      icon:'◯',  color:'#dda0dd' },
-  monk:       { label:'MONK',        icon:'◉',  color:'#ffdead' },
-  mystic:     { label:'HEAL+SHOCK',  icon:'⚡', color:'#40e0d0' },
-  cleric:     { label:'HEAL 5 HIT',  icon:'✟',  color:'#fffacd' },
-  acolyte:    { label:'REGEN 3/s',   icon:'✚',  color:'#e6e6fa' },
-  prophet:    { label:'SIGHT',       icon:'◉',  color:'#dc143c' },
-  trickster:  { label:'RANDOM BUFF', icon:'✦',  color:'#ff00ff', active:true },
-  mender:     { label:'HEAL HIT',    icon:'✚',  color:'#98fb98' },
-  lifebinder: { label:'LIFE LINK',   icon:'♡',  color:'#9370db' },
-  reviver:    { label:'REVIVE',      icon:'☥',  color:'#32cd32' },
-  eternal:    { label:'ETERNAL',     icon:'∞',  color:'#ffd700' },
-  grace:      { label:'GRACE',       icon:'✟',  color:'#f0f8ff' },
-  reflector:  { label:'REFLECT 55%', icon:'⟲',  color:'#ff77ff' },
-  vampire:    { label:'LIFESTEAL',   icon:'Ψ',  color:'#b0004d' },
-  mirror:     { label:'MIRROR',      icon:'◐',  color:'#e0e0e0' },
-  absorber:   { label:'ABSORB HP',   icon:'Ψ',  color:'#8a2be2' },
-  puller:     { label:'PULL',        icon:'↙',  color:'#20b2aa' },
-  leech:      { label:'LEECH',       icon:'Ψ',  color:'#556b2f' },
-  shrinker:   { label:'SHRINK',      icon:'⊖',  color:'#32cd32' },
-  sticky:     { label:'STICK',       icon:'◉',  color:'#88aa00' },
-  boxer:      { label:'KNOCKBACK',   icon:'✊', color:'#ff6347' },
-  grabber:    { label:'GRAB',        icon:'✋', color:'#b0e0e6' },
-  repulsor:   { label:'PUSH',        icon:'↗',  color:'#00ced1' },
-  vacuum:     { label:'VACUUM',      icon:'◎',  color:'#696969' },
-  jammer:     { label:'JAMMER',      icon:'⊗',  color:'#444444' },
-  antimagic:  { label:'ANTI-MAGIC',  icon:'⊗',  color:'#2f4f4f' },
-  nullify:    { label:'NULLIFY',     icon:'⊗',  color:'#808080' },
-  aura:       { label:'AURA 9/s',    icon:'◎',  color:'#dda0dd', active:true },
-  spinner:    { label:'SPIN AoE',    icon:'✺',  color:'#00ced1', active:true },
-  nova:       { label:'NOVA',        icon:'✹',  color:'#ff1493' },
-  blaster:    { label:'SHOOT',       icon:'⊕',  color:'#9400d3', active:true },
-  bomber:     { label:'EXPLODE',     icon:'✹',  color:'#ff5b2e' },
-  exploder:   { label:'DEATH BOOM',  icon:'✹',  color:'#ffa500' },
-  sniper:     { label:'SNIPE 2s',    icon:'⊕',  color:'#ffcc00', active:true },
-  trapper:    { label:'TRAP',        icon:'◉',  color:'#2e8b57' },
-  cluster:    { label:'CLUSTER',     icon:'✳',  color:'#daa520' },
-  mirage:     { label:'DECOY',       icon:'◐',  color:'#dda0dd' },
-  shatter:    { label:'SHATTER',     icon:'✹',  color:'#b0c4de' },
-  quake:      { label:'QUAKE 3s',    icon:'◉',  color:'#8b4513', active:true },
-  vortex:     { label:'VORTEX',      icon:'◉',  color:'#4b0082', active:true },
-  implode:    { label:'IMPLODE',     icon:'✹',  color:'#191970' },
-  singularity:{ label:'SINGULARITY', icon:'●',  color:'#000080', active:true },
-  wolf:       { label:'WOLF',        icon:'✦',  color:'#696969' },
-  bear:       { label:'BEAR',        icon:'⬢',  color:'#8b4513' },
-  lion:       { label:'LION',        icon:'☀',  color:'#daa520' },
-  tiger:      { label:'TIGER BURST', icon:'⚡', color:'#ff8c00', active:true },
-  eagle:      { label:'EAGLE EYE',   icon:'◉',  color:'#8b0000' },
-  snake:      { label:'SNAKE',       icon:'§',  color:'#228b22' },
-  spider:     { label:'WEB',         icon:'✳',  color:'#2f4f4f' },
-  shark:      { label:'EXECUTE',     icon:'☠',  color:'#4682b4' },
-  rhino:      { label:'CHARGE',      icon:'►',  color:'#778899' },
-  fox:        { label:'FOX DODGE',   icon:'◈',  color:'#ff6347' },
-  panther:    { label:'AMBUSH',      icon:'◌',  color:'#1a1a1a' },
-  cheetah:    { label:'CHEETAH',     icon:'≫',  color:'#ffcc00' },
-  cobra:      { label:'COBRA',       icon:'☠',  color:'#4b0082' },
-  falcon:     { label:'FALCON',      icon:'⊕',  color:'#cd853f' },
-  phoenix:    { label:'REBORN',      icon:'✵',  color:'#ff5500' }
+  basic:{label:'NONE',icon:'·',color:'#888'},
+  sturdy:{label:'DEF+30%',icon:'▣',color:'#a8c0d8'},
+  swift:{label:'SPD+35%',icon:'≫',color:'#ffe066'},
+  heavy:{label:'HEAVY',icon:'⬛',color:'#8888a0'},
+  sharp:{label:'ATK+30%',icon:'▲',color:'#ff6b6b'},
+  brawler:{label:'DASH DMG',icon:'⚔',color:'#ff8866'},
+  puncher:{label:'KNOCKBACK',icon:'✊',color:'#ff7f50'},
+  crusher:{label:'CRUSH',icon:'✹',color:'#c04040'},
+  slasher:{label:'BLEED',icon:'✂',color:'#dc143c'},
+  duelist:{label:'DUEL',icon:'†',color:'#b8860b'},
+  gladiator:{label:'STACK+8%',icon:'⚔',color:'#8b4513'},
+  berserker:{label:'RAGE',icon:'⚡',color:'#ff1a4a'},
+  assassin:{label:'CRIT 40%',icon:'†',color:'#6a0dad'},
+  reaper:{label:'EXECUTE',icon:'☠',color:'#1a1a1a'},
+  marauder:{label:'LIFESTEAL',icon:'Ψ',color:'#8b0000'},
+  brute:{label:'BIG PUSH',icon:'►',color:'#654321'},
+  ram:{label:'BOUNCE DMG',icon:'↹',color:'#a0522d'},
+  spiker:{label:'CONTACT',icon:'✳',color:'#b22222'},
+  hammer:{label:'SHOCKWAVE',icon:'⚒',color:'#708090'},
+  drill:{label:'PIERCE',icon:'▽',color:'#808080'},
+  tank:{label:'TANK',icon:'▣',color:'#9b9b9b'},
+  wall:{label:'WALL',icon:'▦',color:'#666680'},
+  fortress:{label:'FORTRESS',icon:'⬛',color:'#505060'},
+  paladin:{label:'SHIELD',icon:'✟',color:'#e8e0c8',active:true},
+  guardian:{label:'DMG-20%',icon:'◈',color:'#b0c4de'},
+  juggernaut:{label:'IMMUNE CC',icon:'⛨',color:'#556b2f'},
+  bastion:{label:'DMG CAP',icon:'◆',color:'#8fbc8f'},
+  aegis:{label:'SHIELD+',icon:'◈',color:'#00bfff',active:true},
+  barrier:{label:'AUTO SHIELD',icon:'◈',color:'#4682b4',active:true},
+  turtle:{label:'ARMOR',icon:'⬢',color:'#2e8b57'},
+  shell:{label:'STACK SHLD',icon:'⬣',color:'#556b2f'},
+  ironhide:{label:'LOWHP DEF',icon:'▣',color:'#404040'},
+  plated:{label:'ANTI-CRIT',icon:'⛨',color:'#6b6b6b'},
+  resilient:{label:'SHIELD REG',icon:'◈',color:'#20b2aa'},
+  immortal:{label:'SURVIVE 1',icon:'★',color:'#ffd700'},
+  adamant:{label:'NO KNOCK',icon:'⛨',color:'#b8860b'},
+  bulwark:{label:'ABSORB',icon:'◈',color:'#a9a9a9'},
+  fortitude:{label:'HEAL 5s',icon:'✚',color:'#66cdaa',active:true},
+  warden:{label:'PANIC SHLD',icon:'◈',color:'#3cb371'},
+  aegis2:{label:'FAST SHLD',icon:'◈',color:'#00ced1',active:true},
+  fire:{label:'FIRE TRAIL',icon:'🔥',color:'#ff4400',active:true},
+  ice:{label:'FREEZE',icon:'❄',color:'#80ffff'},
+  freezer:{label:'SLOW',icon:'❆',color:'#a8e8ff'},
+  poison:{label:'POISON',icon:'☠',color:'#9dff4d'},
+  lightning:{label:'ZAP',icon:'⚡',color:'#ffff44'},
+  shaman:{label:'CHAIN',icon:'⚡',color:'#40e0d0',active:true},
+  dragon:{label:'FIRE BRTH',icon:'🐉',color:'#8b0000',active:true},
+  frost:{label:'ICE BURST',icon:'❄',color:'#b0e0e6'},
+  magma:{label:'LAVA',icon:'🔥',color:'#ff4500',active:true},
+  storm:{label:'STORM',icon:'⚡',color:'#9370db',active:true},
+  toxic:{label:'TOXIC',icon:'☠',color:'#32cd32',active:true},
+  blaze:{label:'FIRE NOVA',icon:'✹',color:'#ff6347'},
+  thunder:{label:'CHAIN x3',icon:'⚡',color:'#ffd700'},
+  glacier:{label:'FREEZE AU',icon:'❄',color:'#afeeee',active:true},
+  inferno:{label:'INFERNO',icon:'🔥',color:'#ff2400',active:true},
+  blizzard:{label:'SLOW AURA',icon:'❆',color:'#e0ffff',active:true},
+  plague:{label:'PLAGUE',icon:'☠',color:'#808000'},
+  venom:{label:'VENOM',icon:'☠',color:'#6b8e23'},
+  static:{label:'STATIC',icon:'⚡',color:'#fffacd'},
+  plasma:{label:'PLASMA',icon:'✦',color:'#da70d6'},
+  speedy:{label:'FAST',icon:'≫',color:'#ffd93d'},
+  dasher:{label:'4 DASH',icon:'⚔',color:'#ff8c00'},
+  teleport:{label:'BLINK',icon:'✧',color:'#7b68ee',active:true},
+  phantom:{label:'PHASE',icon:'◌',color:'#9370db'},
+  sprinter:{label:'SPRINT',icon:'≫',color:'#32cd32'},
+  warp:{label:'WARP',icon:'✧',color:'#483d8b',active:true},
+  ghost:{label:'DODGE 28%',icon:'☁',color:'#c0c0ff'},
+  shadow:{label:'INVIS',icon:'◌',color:'#2f2f2f',active:true},
+  cyclone:{label:'SPIN',icon:'✺',color:'#87ceeb'},
+  jitter:{label:'JITTER',icon:'~',color:'#ff69b4'},
+  blink:{label:'BLINK',icon:'✧',color:'#6a5acd',active:true},
+  dashmaster:{label:'DASH CD-',icon:'⚔',color:'#ffa500'},
+  ghostwalk:{label:'GHOST DEF',icon:'◌',color:'#b0c4de'},
+  turbo:{label:'TURBO',icon:'≫',color:'#ff4500'},
+  ninja:{label:'CRIT+INVIS',icon:'忍',color:'#333340'},
+  healer:{label:'HEAL 6/s',icon:'✚',color:'#4dff88'},
+  druid:{label:'HEAL 8/s',icon:'✚',color:'#6b8e23'},
+  shield:{label:'SHIELD 9s',icon:'◈',color:'#4fc3ff',active:true},
+  magnet:{label:'MAGNET',icon:'∪',color:'#ff69b4',active:true},
+  lucky:{label:'LUCKY',icon:'★',color:'#ffd700'},
+  oracle:{label:'DODGE 40%',icon:'◯',color:'#ffd700'},
+  medic:{label:'OVERHEAL',icon:'✚',color:'#00ff7f'},
+  priest:{label:'HEAL HIT',icon:'✟',color:'#f0e68c'},
+  sage:{label:'SCORE+',icon:'◯',color:'#dda0dd'},
+  monk:{label:'MONK',icon:'◉',color:'#ffdead'},
+  mystic:{label:'HEAL+SHK',icon:'⚡',color:'#40e0d0'},
+  cleric:{label:'HEAL 5',icon:'✟',color:'#fffacd'},
+  acolyte:{label:'REGEN 3/s',icon:'✚',color:'#e6e6fa'},
+  prophet:{label:'SIGHT',icon:'◉',color:'#dc143c'},
+  trickster:{label:'RNDM BUFF',icon:'✦',color:'#ff00ff',active:true},
+  mender:{label:'HEAL HIT',icon:'✚',color:'#98fb98'},
+  lifebinder:{label:'LIFE LINK',icon:'♡',color:'#9370db'},
+  reviver:{label:'REVIVE',icon:'☥',color:'#32cd32'},
+  eternal:{label:'ETERNAL',icon:'∞',color:'#ffd700'},
+  grace:{label:'GRACE',icon:'✟',color:'#f0f8ff'},
+  reflector:{label:'REFLECT',icon:'⟲',color:'#ff77ff'},
+  vampire:{label:'LIFESTEAL',icon:'Ψ',color:'#b0004d'},
+  mirror:{label:'MIRROR',icon:'◐',color:'#e0e0e0'},
+  absorber:{label:'ABSORB HP',icon:'Ψ',color:'#8a2be2'},
+  puller:{label:'PULL',icon:'↙',color:'#20b2aa'},
+  leech:{label:'LEECH',icon:'Ψ',color:'#556b2f'},
+  shrinker:{label:'SHRINK',icon:'⊖',color:'#32cd32'},
+  sticky:{label:'STICK',icon:'◉',color:'#88aa00'},
+  boxer:{label:'KNOCKBACK',icon:'✊',color:'#ff6347'},
+  grabber:{label:'GRAB',icon:'✋',color:'#b0e0e6'},
+  repulsor:{label:'PUSH',icon:'↗',color:'#00ced1'},
+  vacuum:{label:'VACUUM',icon:'◎',color:'#696969'},
+  jammer:{label:'JAMMER',icon:'⊗',color:'#444444'},
+  antimagic:{label:'ANTI-MAGIC',icon:'⊗',color:'#2f4f4f'},
+  nullify:{label:'NULLIFY',icon:'⊗',color:'#808080'},
+  aura:{label:'AURA 9/s',icon:'◎',color:'#dda0dd',active:true},
+  spinner:{label:'SPIN AoE',icon:'✺',color:'#00ced1',active:true},
+  nova:{label:'NOVA',icon:'✹',color:'#ff1493'},
+  blaster:{label:'SHOOT',icon:'⊕',color:'#9400d3',active:true},
+  bomber:{label:'EXPLODE',icon:'✹',color:'#ff5b2e'},
+  exploder:{label:'DEATH BOOM',icon:'✹',color:'#ffa500'},
+  sniper:{label:'SNIPE 2s',icon:'⊕',color:'#ffcc00',active:true},
+  trapper:{label:'TRAP',icon:'◉',color:'#2e8b57'},
+  cluster:{label:'CLUSTER',icon:'✳',color:'#daa520'},
+  mirage:{label:'DECOY',icon:'◐',color:'#dda0dd'},
+  shatter:{label:'SHATTER',icon:'✹',color:'#b0c4de'},
+  quake:{label:'QUAKE 3s',icon:'◉',color:'#8b4513',active:true},
+  vortex:{label:'VORTEX',icon:'◉',color:'#4b0082',active:true},
+  implode:{label:'IMPLODE',icon:'✹',color:'#191970'},
+  singularity:{label:'SINGULRTY',icon:'●',color:'#000080',active:true},
+  wolf:{label:'WOLF',icon:'✦',color:'#696969'},
+  bear:{label:'BEAR',icon:'⬢',color:'#8b4513'},
+  lion:{label:'LION',icon:'☀',color:'#daa520'},
+  tiger:{label:'TIGER',icon:'⚡',color:'#ff8c00',active:true},
+  eagle:{label:'EAGLE EYE',icon:'◉',color:'#8b0000'},
+  snake:{label:'SNAKE',icon:'§',color:'#228b22'},
+  spider:{label:'WEB',icon:'✳',color:'#2f4f4f'},
+  shark:{label:'EXECUTE',icon:'☠',color:'#4682b4'},
+  rhino:{label:'CHARGE',icon:'►',color:'#778899'},
+  fox:{label:'FOX DODGE',icon:'◈',color:'#ff6347'},
+  panther:{label:'AMBUSH',icon:'◌',color:'#1a1a1a'},
+  cheetah:{label:'CHEETAH',icon:'≫',color:'#ffcc00'},
+  cobra:{label:'COBRA',icon:'☠',color:'#4b0082'},
+  falcon:{label:'FALCON',icon:'⊕',color:'#cd853f'},
+  phoenix:{label:'REBORN',icon:'✵',color:'#ff5500',active:true}
 };
 
 /* ============================================================
@@ -607,6 +648,19 @@ const G = {
   spawnTimer:3.0, playerDmgDealt:0
 };
 
+/* Tournament state */
+const T = {
+  active: false,
+  phase: 'select', // select | bracket | match | champion | result
+  participants: [],
+  rounds: [],
+  currentRound: 0,
+  currentMatch: 0,
+  results: [],
+  lastResult: null,
+  champion: null
+};
+
 /* ============================================================
    7. INPUT
    ============================================================ */
@@ -617,10 +671,10 @@ function setupInput(){
       e.preventDefault();
       if (G.mode === 'playing') pauseGame();
       else if (G.mode === 'paused') resumeGame();
-      else if (G.mode === 'over') goToMenu();
+      else if (G.mode === 'over' && !T.active) goToMenu();
       return;
     }
-    if (G.mode === 'over'){
+    if (G.mode === 'over' && !T.active){
       if (k === 'r' || k === 'enter'){ e.preventDefault(); restartGame(); }
       else if (k === 'm'){ e.preventDefault(); goToMenu(); }
     }
@@ -632,7 +686,7 @@ function setupInput(){
 }
 
 /* ============================================================
-   8. PARTICLES / PROJECTILES / HAZARDS / TEXTS
+   8. ENTITIES
    ============================================================ */
 class Particle {
   constructor(x,y,vx,vy,life,size,color){ this.x=x;this.y=y;this.vx=vx;this.vy=vy;this.life=life;this.maxLife=life;this.size=size;this.color=color; }
@@ -658,11 +712,9 @@ class Hazard {
   draw(){
     const a=clamp(this.life/this.maxLife,0,1);
     const pulse = 1 + Math.sin(this.tick*10)*0.1;
-    ctx.globalAlpha=a*0.55;
-    ctx.fillStyle=this.color;
+    ctx.globalAlpha=a*0.55; ctx.fillStyle=this.color;
     ctx.beginPath(); ctx.arc(this.x,this.y,this.r*(0.6+(1-a)*0.4)*pulse,0,Math.PI*2); ctx.fill();
-    ctx.globalAlpha=a*0.9;
-    ctx.strokeStyle=this.color; ctx.lineWidth=2;
+    ctx.globalAlpha=a*0.9; ctx.strokeStyle=this.color; ctx.lineWidth=2;
     ctx.beginPath(); ctx.arc(this.x,this.y,this.r*(0.6+(1-a)*0.4)*pulse,0,Math.PI*2); ctx.stroke();
     ctx.globalAlpha=1;
   }
@@ -707,7 +759,7 @@ function addDamageNum(x,y,value,color){ if(value<1)return; if(G.damageNums.lengt
 function addFloatText(x,y,text,color){ if(G.floatTexts.length>=MAX_FLOATING_TEXTS)G.floatTexts.shift(); G.floatTexts.push(new FloatText(x,y,text,color)); }
 
 /* ============================================================
-   9. SYMBOL — digambar berdasarkan ability ID (grouped)
+   9. SYMBOLS
    ============================================================ */
 function drawBallSymbol(ab, r, t){
   const S = r*0.62;
@@ -716,73 +768,65 @@ function drawBallSymbol(ab, r, t){
   ctx.strokeStyle='rgba(255,255,255,0.92)';
   ctx.fillStyle='rgba(255,255,255,0.92)';
 
-  // Physical
-  if (ab==='basic'||ab==='sturdy'||ab==='heavy'||ab==='tank'||ab==='golem'||ab==='bear'||ab==='adamant'||ab==='fortress'||ab==='ironhide'||ab==='turtle'||ab==='rhino'||ab==='bulwark'){
+  if (['basic','sturdy','heavy','tank','golem','bear','adamant','fortress','ironhide','turtle','rhino','bulwark'].includes(ab)){
     ctx.beginPath();
     for(let i=0;i<6;i++){const a=i/6*Math.PI*2-Math.PI/2;const x=Math.cos(a)*S,y=Math.sin(a)*S; if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
     ctx.closePath(); ctx.stroke();
     if(ab==='bear'||ab==='golem'){ctx.beginPath();ctx.arc(0,0,S*0.35,0,Math.PI*2);ctx.stroke();}
     return;
   }
-  if (ab==='speedy'||ab==='swift'||ab==='sprinter'||ab==='turbo'||ab==='cheetah'||ab==='dashmaster'){
+  if (['speedy','swift','sprinter','turbo','cheetah','dashmaster'].includes(ab)){
     for(let i=-1;i<=1;i++){ctx.beginPath();ctx.moveTo(-S*0.85,i*S*0.42);ctx.lineTo(S*0.6,i*S*0.42);ctx.stroke();}
     return;
   }
-  if (ab==='sharp'||ab==='brawler'||ab==='slasher'||ab==='boxer'||ab==='brute'||ab==='puncher'){
-    ctx.beginPath();
-    ctx.moveTo(-S*0.7,-S*0.4); ctx.lineTo(S*0.7,S*0.4);
-    ctx.moveTo(-S*0.7,S*0.4);  ctx.lineTo(S*0.7,-S*0.4);
-    ctx.stroke();
+  if (['sharp','brawler','slasher','boxer','brute','puncher'].includes(ab)){
+    ctx.beginPath(); ctx.moveTo(-S*0.7,-S*0.4); ctx.lineTo(S*0.7,S*0.4);
+    ctx.moveTo(-S*0.7,S*0.4); ctx.lineTo(S*0.7,-S*0.4); ctx.stroke();
     return;
   }
-  if (ab==='crusher'||ab==='drill'||ab==='hammer'||ab==='implode'||ab==='shark'||ab==='reaper'||ab==='assassin'||ab==='ninja'||ab==='panther'||ab==='falcon'||ab==='eagle'){
+  if (['crusher','drill','hammer','implode','shark','reaper','assassin','ninja','panther','falcon','eagle'].includes(ab)){
     ctx.beginPath();
     ctx.moveTo(-S,-S); ctx.lineTo(0,0); ctx.lineTo(S,-S);
-    ctx.moveTo(-S,S);  ctx.lineTo(0,0); ctx.lineTo(S,S);
+    ctx.moveTo(-S,S); ctx.lineTo(0,0); ctx.lineTo(S,S);
     ctx.stroke();
     if(ab==='shark'||ab==='reaper'){ctx.beginPath();ctx.arc(0,0,S*0.25,0,Math.PI*2);ctx.fill();}
     return;
   }
-  if (ab==='duelist'||ab==='gladiator'||ab==='warrior'||ab==='ram'||ab==='spiker'||ab==='marauder'||ab==='berserker'||ab==='lion'||ab==='wolf'||ab==='tiger'||ab==='fox'||ab==='cobra'||ab==='snake'||ab==='spider'||ab==='venom'||ab==='toxic'||ab==='plague'){
+  if (['duelist','gladiator','warrior','ram','spiker','marauder','berserker','lion','wolf','tiger','fox','cobra','snake','spider','venom','toxic','plague'].includes(ab)){
     ctx.beginPath();
     ctx.moveTo(-S*0.5,-S*0.5); ctx.lineTo(S*0.5,S*0.5);
-    ctx.moveTo(-S*0.5,S*0.5);  ctx.lineTo(S*0.5,-S*0.5);
-    ctx.moveTo(0,-S*0.7);      ctx.lineTo(0,S*0.7);
-    ctx.stroke();
+    ctx.moveTo(-S*0.5,S*0.5); ctx.lineTo(S*0.5,-S*0.5);
+    ctx.moveTo(0,-S*0.7); ctx.lineTo(0,S*0.7); ctx.stroke();
     return;
   }
-  // Defensive
-  if (ab==='wall'||ab==='bastion'||ab==='plated'||ab==='guardian'){
+  if (['wall','bastion','plated','guardian'].includes(ab)){
     const bw=S*0.7,bh=S*0.38;
     ctx.strokeRect(-S,-S*0.75,bw,bh); ctx.strokeRect(-S+bw,-S*0.75,bw,bh);
     ctx.strokeRect(-S-bw/2,-S*0.38,bw,bh); ctx.strokeRect(-S+bw/2,-S*0.38,bw,bh);
     ctx.strokeRect(-S,0,bw,bh); ctx.strokeRect(-S+bw,0,bw,bh);
     return;
   }
-  if (ab==='shield'||ab==='paladin'||ab==='aegis'||ab==='aegis2'||ab==='barrier'||ab==='shell'||ab==='resilient'||ab==='warden'||ab==='bulwark2'){
+  if (['shield','paladin','aegis','aegis2','barrier','shell','resilient','warden'].includes(ab)){
     ctx.beginPath();
-    ctx.moveTo(0,-S); ctx.lineTo(S*0.8,-S*0.45);
-    ctx.lineTo(S*0.8,S*0.2); ctx.lineTo(0,S);
-    ctx.lineTo(-S*0.8,S*0.2); ctx.lineTo(-S*0.8,-S*0.45);
+    ctx.moveTo(0,-S); ctx.lineTo(S*0.8,-S*0.45); ctx.lineTo(S*0.8,S*0.2);
+    ctx.lineTo(0,S); ctx.lineTo(-S*0.8,S*0.2); ctx.lineTo(-S*0.8,-S*0.45);
     ctx.closePath(); ctx.stroke();
     return;
   }
-  if (ab==='juggernaut'||ab==='immortal'||ab==='reviver'||ab==='phoenix'||ab==='eternal'){
+  if (['juggernaut','immortal','reviver','phoenix','eternal'].includes(ab)){
     ctx.beginPath();
     for(let i=0;i<5;i++){const a=i/5*Math.PI*2-Math.PI/2;const rr=i%2===0?S:S*0.5;const x=Math.cos(a)*rr,y=Math.sin(a)*rr; if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
     ctx.closePath(); ctx.stroke();
     return;
   }
-  // Elemental
-  if (ab==='fire'||ab==='blaze'||ab==='inferno'||ab==='magma'||ab==='dragon'||ab==='plasma'){
-    ctx.beginPath();
-    ctx.moveTo(0,S);
+  if (['fire','blaze','inferno','magma','dragon','plasma'].includes(ab)){
+    ctx.beginPath(); ctx.moveTo(0,S);
     ctx.bezierCurveTo(-S*0.7,S*0.5,-S*0.6,-S*0.2,0,-S);
     ctx.bezierCurveTo(S*0.6,-S*0.2,S*0.7,S*0.5,0,S);
     ctx.closePath(); ctx.stroke();
     return;
   }
-  if (ab==='ice'||ab==='freezer'||ab==='frost'||ab==='glacier'||ab==='blizzard'){
+  if (['ice','freezer','frost','glacier','blizzard'].includes(ab)){
     for(let i=0;i<6;i++){
       const a=i/6*Math.PI*2;
       ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(Math.cos(a)*S,Math.sin(a)*S); ctx.stroke();
@@ -791,44 +835,39 @@ function drawBallSymbol(ab, r, t){
     }
     return;
   }
-  if (ab==='poison'||ab==='venom'){
+  if (['poison','venom'].includes(ab)){
     const dr=S*0.2;
     ctx.beginPath(); ctx.arc(-S*0.4,-S*0.15,dr,0,Math.PI*2); ctx.fill();
     ctx.beginPath(); ctx.arc(S*0.4,-S*0.15,dr,0,Math.PI*2); ctx.fill();
     ctx.beginPath(); ctx.arc(0,S*0.45,dr,0,Math.PI*2); ctx.fill();
     return;
   }
-  if (ab==='lightning'||ab==='thunder'||ab==='storm'||ab==='shaman'||ab==='static'||ab==='mystic'){
+  if (['lightning','thunder','storm','shaman','static','mystic'].includes(ab)){
     ctx.beginPath();
     ctx.moveTo(S*0.2,-S); ctx.lineTo(-S*0.3,0); ctx.lineTo(S*0.1,0);
     ctx.lineTo(-S*0.2,S); ctx.lineTo(S*0.3,-S*0.1); ctx.lineTo(-S*0.1,-S*0.1);
     ctx.closePath(); ctx.fill();
     return;
   }
-  // Movement
-  if (ab==='teleport'||ab==='warp'||ab==='blink'||ab==='phantom'||ab==='ghostwalk'||ab==='shadow'){
+  if (['teleport','warp','blink','phantom','ghostwalk','shadow'].includes(ab)){
     ctx.setLineDash([3,3]);
-    ctx.beginPath();
-    ctx.moveTo(-S,0); ctx.lineTo(S,0);
-    ctx.moveTo(0,-S); ctx.lineTo(0,S);
-    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-S,0); ctx.lineTo(S,0); ctx.moveTo(0,-S); ctx.lineTo(0,S); ctx.stroke();
     ctx.setLineDash([]);
     return;
   }
-  if (ab==='ghost'||ab==='oracle'||ab==='mirage'||ab==='decoy'){
+  if (['ghost','oracle','mirage'].includes(ab)){
     ctx.beginPath();
     for(let x=-S;x<=S;x+=2){const y=S*0.55+Math.sin(x/S*Math.PI*3)*S*0.16; if(x===-S)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
     ctx.stroke();
     return;
   }
-  if (ab==='cyclone'||ab==='jitter'||ab==='vortex'||ab==='singularity'){
+  if (['cyclone','jitter','vortex','singularity'].includes(ab)){
     ctx.beginPath();
     for(let a=0;a<Math.PI*4;a+=0.15){const rr=a/(Math.PI*4)*S; const x=Math.cos(a+t*2)*rr,y=Math.sin(a+t*2)*rr; if(a===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
     ctx.stroke();
     return;
   }
-  // Support
-  if (ab==='healer'||ab==='druid'||ab==='medic'||ab==='priest'||ab==='acolyte'||ab==='mender'||ab==='lifebinder'||ab==='grace'||ab==='fortitude'||ab==='cleric'){
+  if (['healer','druid','medic','priest','acolyte','mender','lifebinder','grace','fortitude','cleric'].includes(ab)){
     const th=S*0.34;
     ctx.beginPath();
     ctx.moveTo(-th,-S);ctx.lineTo(th,-S);ctx.lineTo(th,-th);
@@ -838,20 +877,18 @@ function drawBallSymbol(ab, r, t){
     ctx.closePath(); ctx.stroke();
     return;
   }
-  if (ab==='aura'||ab==='spinner'||ab==='quake'||ab==='spiker'){
+  if (['aura','spinner','quake','spiker'].includes(ab)){
     for(let i=1;i<=3;i++){ctx.beginPath();ctx.arc(0,0,S*i/3,0,Math.PI*2);ctx.stroke();}
     return;
   }
-  // Utility
-  if (ab==='magnet'||ab==='vacuum'||ab==='puller'||ab==='grabber'||ab==='absorber'||ab==='vampire'||ab==='leech'){
+  if (['magnet','vacuum','puller','grabber','absorber','vampire','leech'].includes(ab)){
     ctx.beginPath();
     ctx.arc(0,-S*0.15,S*0.7,Math.PI,0);
     ctx.moveTo(-S*0.7,-S*0.15);ctx.lineTo(-S*0.7,S*0.55);
-    ctx.moveTo(S*0.7,-S*0.15);ctx.lineTo(S*0.7,S*0.55);
-    ctx.stroke();
+    ctx.moveTo(S*0.7,-S*0.15);ctx.lineTo(S*0.7,S*0.55); ctx.stroke();
     return;
   }
-  if (ab==='reflector'||ab==='mirror'){
+  if (['reflector','mirror'].includes(ab)){
     ctx.beginPath();
     ctx.moveTo(0,-S);ctx.lineTo(S,0);ctx.lineTo(0,S);ctx.lineTo(-S,0);
     ctx.closePath(); ctx.stroke();
@@ -861,21 +898,20 @@ function drawBallSymbol(ab, r, t){
     for(let i=1;i<=3;i++){ctx.beginPath();ctx.arc(0,0,S*i/3,0,Math.PI*2);ctx.stroke();}
     return;
   }
-  if (ab==='sticky'||ab==='trapper'||ab==='spider'){
+  if (['sticky','trapper','spider'].includes(ab)){
     for(let i=0;i<4;i++){
       const a=i/4*Math.PI*2;
       ctx.beginPath(); ctx.arc(Math.cos(a)*S*0.5,Math.sin(a)*S*0.5,S*0.22,0,Math.PI*2); ctx.stroke();
     }
     return;
   }
-  if (ab==='jammer'||ab==='antimagic'||ab==='nullify'||ab==='shatter'){
+  if (['jammer','antimagic','nullify','shatter'].includes(ab)){
     ctx.beginPath();
     ctx.moveTo(-S*0.7,-S*0.7); ctx.lineTo(S*0.7,S*0.7);
-    ctx.moveTo(S*0.7,-S*0.7);  ctx.lineTo(-S*0.7,S*0.7);
-    ctx.stroke();
+    ctx.moveTo(S*0.7,-S*0.7); ctx.lineTo(-S*0.7,S*0.7); ctx.stroke();
     return;
   }
-  if (ab==='repulsor'||ab==='nova'||ab==='implode'||ab==='blaze'||ab==='quake'){
+  if (['repulsor','nova','implode','blaze','quake'].includes(ab)){
     ctx.beginPath(); ctx.arc(0,0,S*0.4,0,Math.PI*2); ctx.fill();
     for(let i=0;i<8;i++){
       const a=i/8*Math.PI*2;
@@ -883,7 +919,7 @@ function drawBallSymbol(ab, r, t){
     }
     return;
   }
-  if (ab==='blaster'||ab==='sniper'||ab==='falcon'||ab==='cluster'||ab==='shaman2'){
+  if (['blaster','sniper','falcon','cluster','shaman2'].includes(ab)){
     ctx.beginPath(); ctx.arc(0,0,S*0.7,0,Math.PI*2); ctx.stroke();
     ctx.beginPath(); ctx.arc(0,0,S*0.2,0,Math.PI*2); ctx.fill();
     for(let i=0;i<4;i++){
@@ -892,7 +928,7 @@ function drawBallSymbol(ab, r, t){
     }
     return;
   }
-  if (ab==='giant'||ab==='titan'){
+  if (['giant','titan'].includes(ab)){
     ctx.beginPath();
     ctx.moveTo(-S*0.8,S*0.3); ctx.lineTo(-S*0.8,-S*0.35);
     ctx.lineTo(-S*0.35,S*0); ctx.lineTo(0,-S*0.55);
@@ -901,7 +937,6 @@ function drawBallSymbol(ab, r, t){
     ctx.closePath(); ctx.stroke();
     return;
   }
-  // Default fallback
   ctx.beginPath(); ctx.arc(0,0,S*0.4,0,Math.PI*2); ctx.fill();
 }
 
@@ -912,43 +947,27 @@ let ballIdSeq = 0;
 class Ball {
   constructor(def, x, y, isPlayer){
     this.id = ++ballIdSeq;
-    this.def = def;
-    this.name = def.name;
-    this.color = def.color;
-    this.light = def.light;
+    this.def = def; this.name = def.name; this.color = def.color; this.light = def.light;
     this.ability = def.ability;
     this.x=x; this.y=y; this.vx=0; this.vy=0;
-    this.baseR = def.r*SCALE;
-    this.r = this.baseR;
-    this.maxHp = def.hp;
-    this.hp = def.hp;
-    this.baseMass = this.r*this.r*0.012;
-    this.mass = this.baseMass;
+    this.baseR = def.r*SCALE; this.r = this.baseR;
+    this.maxHp = def.hp; this.hp = def.hp;
+    this.baseMass = this.r*this.r*0.012; this.mass = this.baseMass;
     this.speedMul = def.spd;
-    this.attackStat = def.atk;
-    this.defenseStat = def.def;
+    this.attackStat = def.atk; this.defenseStat = def.def;
     this.isPlayer = isPlayer;
-    this.trail = [];
-    this.angle = 0;
+    this.trail = []; this.angle = 0;
     this.dashCd=0; this.dashMax=2.0; this.dashTime=0;
     this.maxDashCharges=1; this.dashCharges=1;
     this.invuln=0.7; this.hitFlash=0; this.hitCd=0;
     this.shield=0; this.slow=0; this.freeze=0; this.sticky=0;
-    this.poisonTimer=0; this.burnTimer=0; this.invisible=0;
-    this.bleedTimer=0;
-    this.slowAura=0;
+    this.poisonTimer=0; this.burnTimer=0; this.invisible=0; this.bleedTimer=0;
     this.abilityCd=0; this.abilityCdMax=0;
-    this.growth=0; this.revived=false;
-    this.shieldStacks=0;
-    this.killCount=0;
-    this.stacks=0; // gladiator
-    this.hitCount=0;
-    this.abilityDisabled=0;
-    this.decoy=null;
+    this.growth=0; this.revived=false; this.shieldStacks=0;
+    this.stacks=0; this.hitCount=0; this.abilityDisabled=0;
     this.alive=true; this.outside=false; this.deathTime=0;
     this.lastBounceTime=0;
-
-    // Apply passive stat modifiers from ability at creation
+    // Passive stat mods
     if (this.ability === 'sturdy') this.defenseStat *= 1.30;
     if (this.ability === 'swift')  this.speedMul *= 1.35;
     if (this.ability === 'sharp')  this.attackStat *= 1.30;
@@ -959,27 +978,16 @@ class Ball {
     if (this.ability === 'aegis') this.shieldBonus = 1.5;
     if (this.ability === 'adamant') this.noKnockback = true;
     if (this.ability === 'juggernaut') this.ccImmune = true;
-
     const a = Math.random()*Math.PI*2;
     const sp = 340*SCALE*this.speedMul;
-    this.vx = Math.cos(a)*sp;
-    this.vy = Math.sin(a)*sp;
+    this.vx = Math.cos(a)*sp; this.vy = Math.sin(a)*sp;
   }
-
-  get speedMax(){
-    return 340*SCALE*this.speedMul
-      *(this.slow>0?0.45:1)
-      *(this.freeze>0?0:1);
-  }
-
+  get speedMax(){ return 340*SCALE*this.speedMul*(this.slow>0?0.45:1)*(this.freeze>0?0:1); }
   triggerAbility(cd){ this.abilityCd = cd; this.abilityCdMax = cd; }
   showFloatText(text, color){ addFloatText(this.x, this.y - this.r - 12*SCALE, text, color); }
-  hasStack(){ return false; }
 
   update(dt, enemy){
     if (!this.alive){ if (this.trail.length>0) this.trail.shift(); return; }
-
-    // Timers
     if (this.dashCd>0){ this.dashCd -= dt; if (this.dashCd<=0){ this.dashCd=0; this.dashCharges = Math.min(this.maxDashCharges, this.dashCharges+1); if (this.dashCharges < this.maxDashCharges) this.dashCd = this.dashMax; } }
     if (this.dashTime>0) this.dashTime -= dt;
     if (this.invuln>0) this.invuln -= dt;
@@ -992,28 +1000,12 @@ class Ball {
     if (this.invisible>0) this.invisible -= dt;
     if (this.abilityCd>0) this.abilityCd -= dt;
     if (this.abilityDisabled>0) this.abilityDisabled -= dt;
+    if (this.poisonTimer>0){ this.poisonTimer -= dt; this.hp -= 25*dt/4; if (Math.random()<0.4) burst(this.x,this.y,1,'#9dff4d',60,2.5); if (this.hp<=0){ this.die(); return; } }
+    if (this.burnTimer>0){ this.burnTimer -= dt; this.hp -= 16*dt; if (Math.random()<0.5) burst(this.x,this.y,1,'#ff4400',80,3); if (this.hp<=0){ this.die(); return; } }
+    if (this.bleedTimer>0){ this.bleedTimer -= dt; this.hp -= 20*dt/3; if (Math.random()<0.4) burst(this.x,this.y,1,'#dc143c',70,2.5); if (this.hp<=0){ this.die(); return; } }
 
-    // Status DoTs
-    if (this.poisonTimer>0){
-      this.poisonTimer -= dt; this.hp -= 25*dt/4;
-      if (Math.random()<0.4) burst(this.x,this.y,1,'#9dff4d',60,2.5);
-      if (this.hp<=0){ this.die(); return; }
-    }
-    if (this.burnTimer>0){
-      this.burnTimer -= dt; this.hp -= 16*dt;
-      if (Math.random()<0.5) burst(this.x,this.y,1,'#ff4400',80,3);
-      if (this.hp<=0){ this.die(); return; }
-    }
-    if (this.bleedTimer>0){
-      this.bleedTimer -= dt; this.hp -= 20*dt/3;
-      if (Math.random()<0.4) burst(this.x,this.y,1,'#dc143c',70,2.5);
-      if (this.hp<=0){ this.die(); return; }
-    }
-
-    // Ability passive (only if not disabled)
     if (this.abilityDisabled <= 0) this.applyAbilityPassive(dt, enemy);
 
-    // Movement
     const frozen = this.freeze>0 || this.sticky>0;
     if (!frozen){
       const sp = Math.hypot(this.vx,this.vy);
@@ -1022,14 +1014,10 @@ class Ball {
         const k = Math.min(1, dt*4);
         this.vx += ((this.vx/sp)*targetSp - this.vx)*k;
         this.vy += ((this.vy/sp)*targetSp - this.vy)*k;
-      } else {
-        const a = Math.random()*Math.PI*2;
-        this.vx = Math.cos(a)*targetSp; this.vy = Math.sin(a)*targetSp;
-      }
+      } else { const a = Math.random()*Math.PI*2; this.vx = Math.cos(a)*targetSp; this.vy = Math.sin(a)*targetSp; }
       this.x += this.vx*dt; this.y += this.vy*dt;
     }
 
-    // Dynamic radius
     let targetR = this.baseR;
     if (this.growth>0) targetR *= (1+this.growth*0.55);
     this.r += (targetR-this.r)*Math.min(1, dt*6);
@@ -1038,13 +1026,9 @@ class Ball {
 
     this.handleWallBounce();
 
-    // Trail
     const sp2 = Math.hypot(this.vx,this.vy);
-    if (sp2>40*SCALE){
-      this.trail.push({x:this.x,y:this.y,r:this.r});
-      if (this.trail.length>12) this.trail.shift();
-    } else if (this.trail.length>0 && Math.random()<0.5) this.trail.shift();
-
+    if (sp2>40*SCALE){ this.trail.push({x:this.x,y:this.y,r:this.r}); if (this.trail.length>12) this.trail.shift(); }
+    else if (this.trail.length>0 && Math.random()<0.5) this.trail.shift();
     this.angle += sp2*dt*0.012;
   }
 
@@ -1060,12 +1044,9 @@ class Ball {
       if (dot>0){
         let rest = 0.96;
         if (this.ability==='bouncer' || this.ability==='ram') rest = 1.05;
-        this.vx -= (1+rest)*dot*nx;
-        this.vy -= (1+rest)*dot*ny;
-
-        // Ram ability: bounce toward enemy
+        this.vx -= (1+rest)*dot*nx; this.vy -= (1+rest)*dot*ny;
         const enemy = (this === G.player) ? G.enemy : G.player;
-        const smartChance = (this.ability==='ram' || this.ability==='hunter') ? 0.85 : 0.50;
+        const smartChance = (this.ability==='ram') ? 0.85 : 0.50;
         if (enemy && enemy.alive && Math.random() < smartChance){
           const edx = enemy.x + enemy.vx*0.2 - this.x;
           const edy = enemy.y + enemy.vy*0.2 - this.y;
@@ -1076,7 +1057,6 @@ class Ball {
           burst(this.x, this.y, 4, this.light, 100, 2.5);
         }
         this.lastBounceTime = performance.now();
-
         const impact = Math.abs(dot);
         if (impact > 150*SCALE){
           if (this.ability==='bouncer') burst(this.x,this.y,10,'#ff00ff',200,3.5);
@@ -1086,226 +1066,92 @@ class Ball {
     }
   }
 
-  /* ========================================================================
-     ABILITY PASSIVE — dipanggil tiap frame
-     ======================================================================== */
   applyAbilityPassive(dt, enemy){
     const ab = this.ability;
     const enemies = enemy ? [enemy] : [];
-    const meta = ABILITY_META[ab] || {};
-    const cooldown = meta.cd || 0;
-
-    /* --- Regen abilities --- */
     if (ab==='healer' && this.hp<this.maxHp) this.hp = Math.min(this.maxHp, this.hp+6*dt);
     if (ab==='druid' && this.hp<this.maxHp) this.hp = Math.min(this.maxHp, this.hp+8*dt);
     if (ab==='acolyte' && this.hp<this.maxHp) this.hp = Math.min(this.maxHp, this.hp+3*dt);
     if (ab==='eternal' && this.hp<this.maxHp) this.hp = Math.min(this.maxHp, this.hp+4*dt);
-
-    /* --- Periodic heal --- */
-    if (ab==='fortitude' && this.abilityCd<=0){
-      this.hp = Math.min(this.maxHp, this.hp+10);
-      this.showFloatText('+10', '#66cdaa');
-      burst(this.x,this.y,8,'#66cdaa',120,3);
-      this.triggerAbility(5);
-    }
-
-    /* --- Shield regen --- */
-    if (ab==='shield' && this.shield<=0 && this.abilityCd<=0){
-      this.shield = 4.5; this.triggerAbility(9);
-      this.showFloatText('SHIELD!', '#4fc3ff');
-      Sound.ability(); burst(this.x,this.y,18,'#4fc3ff',220,4);
-    }
-    if (ab==='paladin' && this.shield<=0 && this.abilityCd<=0){
-      this.shield = 5.5; this.triggerAbility(7);
-      this.showFloatText('HOLY SHIELD!', '#e8e0c8');
-      Sound.ability(); burst(this.x,this.y,18,'#e8e0c8',220,4);
-    }
-    if (ab==='barrier' && this.shield<=0 && this.abilityCd<=0){
-      this.shield = 3.5; this.triggerAbility(5);
-      this.showFloatText('BARRIER!', '#4682b4');
-      Sound.ability(); burst(this.x,this.y,14,'#4682b4',200,3.5);
-    }
-    if (ab==='aegis2' && this.shield<=0 && this.abilityCd<=0){
-      this.shield = 5; this.triggerAbility(6);
-      this.showFloatText('REGEN!', '#00ced1');
-      burst(this.x,this.y,14,'#00ced1',200,3.5);
-    }
-    if (ab==='resilient' && this.shield<3){
-      this.shield = Math.min(3, this.shield + dt*1.2);
-    }
-
-    /* --- Grow --- */
+    if (ab==='fortitude' && this.abilityCd<=0){ this.hp = Math.min(this.maxHp, this.hp+10); this.showFloatText('+10', '#66cdaa'); burst(this.x,this.y,8,'#66cdaa',120,3); this.triggerAbility(5); }
+    if (ab==='shield' && this.shield<=0 && this.abilityCd<=0){ this.shield = 4.5; this.triggerAbility(9); this.showFloatText('SHIELD!', '#4fc3ff'); Sound.ability(); burst(this.x,this.y,18,'#4fc3ff',220,4); }
+    if (ab==='paladin' && this.shield<=0 && this.abilityCd<=0){ this.shield = 5.5; this.triggerAbility(7); this.showFloatText('HOLY SHIELD!', '#e8e0c8'); Sound.ability(); burst(this.x,this.y,18,'#e8e0c8',220,4); }
+    if (ab==='barrier' && this.shield<=0 && this.abilityCd<=0){ this.shield = 3.5; this.triggerAbility(5); this.showFloatText('BARRIER!', '#4682b4'); Sound.ability(); burst(this.x,this.y,14,'#4682b4',200,3.5); }
+    if (ab==='aegis2' && this.shield<=0 && this.abilityCd<=0){ this.shield = 5; this.triggerAbility(6); this.showFloatText('REGEN!', '#00ced1'); burst(this.x,this.y,14,'#00ced1',200,3.5); }
+    if (ab==='resilient' && this.shield<3) this.shield = Math.min(3, this.shield + dt*1.2);
     if (ab==='giant' && this.growth<1) this.growth = Math.min(1, this.growth+dt/10);
-
-    /* --- Magnet / Vacuum --- */
-    if (ab==='magnet'){
-      for (const pu of G.powerups){
-        const ddx = this.x-pu.x, ddy = this.y-pu.y, d = Math.hypot(ddx,ddy)||1;
-        if (d<240*SCALE){ pu.x += (ddx/d)*280*SCALE*dt; pu.y += (ddy/d)*280*SCALE*dt; }
-      }
-    }
+    if (ab==='magnet'){ for (const pu of G.powerups){ const ddx=this.x-pu.x, ddy=this.y-pu.y, d=Math.hypot(ddx,ddy)||1; if(d<240*SCALE){ pu.x += (ddx/d)*280*SCALE*dt; pu.y += (ddy/d)*280*SCALE*dt; } } }
     if (ab==='vacuum'){
-      for (const pu of G.powerups){
-        const ddx = this.x-pu.x, ddy = this.y-pu.y, d = Math.hypot(ddx,ddy)||1;
-        if (d<260*SCALE){ pu.x += (ddx/d)*300*SCALE*dt; pu.y += (ddy/d)*300*SCALE*dt; }
-      }
-      if (enemy && enemy.alive){
-        const ddx = this.x-enemy.x, ddy = this.y-enemy.y, d = Math.hypot(ddx,ddy)||1;
-        if (d<200*SCALE){ enemy.vx += (ddx/d)*200*SCALE*dt; enemy.vy += (ddy/d)*200*SCALE*dt; }
-      }
+      for (const pu of G.powerups){ const ddx=this.x-pu.x, ddy=this.y-pu.y, d=Math.hypot(ddx,ddy)||1; if(d<260*SCALE){ pu.x += (ddx/d)*300*SCALE*dt; pu.y += (ddy/d)*300*SCALE*dt; } }
+      if (enemy && enemy.alive){ const ddx=this.x-enemy.x, ddy=this.y-enemy.y, d=Math.hypot(ddx,ddy)||1; if(d<200*SCALE){ enemy.vx += (ddx/d)*200*SCALE*dt; enemy.vy += (ddy/d)*200*SCALE*dt; } }
     }
-
-    /* --- Teleport / Blink / Warp --- */
     if ((ab==='teleport' || ab==='warp') && this.abilityCd<=0){
       const a = Math.random()*Math.PI*2, dist = Math.random()*arena.r*0.65;
       burst(this.x,this.y,20,'#7b68ee',260,4.5);
-      this.x = arena.cx + Math.cos(a)*dist;
-      this.y = arena.cy + Math.sin(a)*dist;
+      this.x = arena.cx + Math.cos(a)*dist; this.y = arena.cy + Math.sin(a)*dist;
       const sp = this.speedMax, na = Math.random()*Math.PI*2;
       this.vx = Math.cos(na)*sp; this.vy = Math.sin(na)*sp;
       burst(this.x,this.y,20,'#7b68ee',260,4.5);
       this.showFloatText(ab==='warp'?'WARP!':'BLINK!', '#7b68ee');
-      this.triggerAbility(ab==='warp'?3.5:5);
-      Sound.ability();
+      this.triggerAbility(ab==='warp'?3.5:5); Sound.ability();
     }
     if (ab==='blink' && this.abilityCd<=0){
       const a = Math.random()*Math.PI*2, dist = 80*SCALE;
       burst(this.x,this.y,12,'#6a5acd',180,3);
       this.x += Math.cos(a)*dist; this.y += Math.sin(a)*dist;
       burst(this.x,this.y,12,'#6a5acd',180,3);
-      this.showFloatText('BLINK!', '#6a5acd');
-      this.triggerAbility(2.5);
+      this.showFloatText('BLINK!', '#6a5acd'); this.triggerAbility(2.5);
     }
-
-    /* --- Shadow invisibility --- */
     if (ab==='shadow' && this.invisible<=0 && this.abilityCd<=0){
-      this.invisible = 1.5;
-      this.showFloatText('INVISIBLE!', '#2f2f2f');
-      burst(this.x,this.y,14,'#2f2f2f',200,4);
-      this.triggerAbility(6);
+      this.invisible = 1.5; this.showFloatText('INVISIBLE!', '#2f2f2f');
+      burst(this.x,this.y,14,'#2f2f2f',200,4); this.triggerAbility(6);
     }
-
-    /* --- Tiger speed burst --- */
     if (ab==='tiger' && this.abilityCd<=0){
-      this.speedMul *= 1.5;
-      this.showFloatText('SPEED!', '#ff8c00');
-      burst(this.x,this.y,14,'#ff8c00',240,4);
-      this.triggerAbility(5);
-      setTimeout(()=>{ if (this.alive) this.speedMul /= 1.5; }, 1500);
+      this.speedMul *= 1.5; this.showFloatText('SPEED!', '#ff8c00');
+      burst(this.x,this.y,14,'#ff8c00',240,4); this.triggerAbility(5);
+      const self = this;
+      setTimeout(()=>{ if (self.alive) self.speedMul /= 1.5; }, 1500);
     }
-
-    /* --- Spinner AoE --- */
     if (ab==='spinner' && this.abilityCd<=0){
       let hitAny = false;
-      for (const e of enemies){
-        if (!e.alive) continue;
-        const d = Math.hypot(e.x-this.x, e.y-this.y);
-        if (d < this.r*2.4){ this.dealDamageTo(e, 12, true); hitAny = true; }
-      }
+      for (const e of enemies){ if (!e.alive) continue; const d = Math.hypot(e.x-this.x, e.y-this.y); if (d < this.r*2.4){ this.dealDamageTo(e, 12, true); hitAny = true; } }
       if (hitAny){ this.showFloatText('SPIN!', '#00ced1'); burst(this.x,this.y,10,'#00ced1',180,3); }
       this.triggerAbility(0.5);
     }
-
-    /* --- Cyclone constant AoE --- */
     if (ab==='cyclone' && this.abilityCd<=0){
-      for (const e of enemies){
-        if (!e.alive) continue;
-        const d = Math.hypot(e.x-this.x, e.y-this.y);
-        if (d < this.r*2.2) this.dealDamageTo(e, 7, true);
-      }
+      for (const e of enemies){ if (!e.alive) continue; const d = Math.hypot(e.x-this.x, e.y-this.y); if (d < this.r*2.2) this.dealDamageTo(e, 7, true); }
       this.triggerAbility(0.6);
     }
-
-    /* --- Aura passive damage --- */
     if (ab==='aura' && this.abilityCd<=0){
-      for (const e of enemies){
-        if (!e.alive) continue;
-        const d = Math.hypot(e.x-this.x, e.y-this.y);
-        if (d < this.r*2.0) this.dealDamageTo(e, 9, true);
-      }
+      for (const e of enemies){ if (!e.alive) continue; const d = Math.hypot(e.x-this.x, e.y-this.y); if (d < this.r*2.0) this.dealDamageTo(e, 9, true); }
       this.triggerAbility(0.4);
     }
-    /* --- Spiker contact damage --- */
     if (ab==='spiker' && this.abilityCd<=0){
-      for (const e of enemies){
-        if (!e.alive) continue;
-        const d = Math.hypot(e.x-this.x, e.y-this.y);
-        if (d < this.r+e.r) this.dealDamageTo(e, 5, true);
-      }
+      for (const e of enemies){ if (!e.alive) continue; const d = Math.hypot(e.x-this.x, e.y-this.y); if (d < this.r+e.r) this.dealDamageTo(e, 5, true); }
       this.triggerAbility(1);
     }
-    /* --- Glacier freeze aura --- */
-    if (ab==='glacier'){
-      for (const e of enemies){
-        if (!e.alive) continue;
-        const d = Math.hypot(e.x-this.x, e.y-this.y);
-        if (d < this.r*2.5 && Math.random() < 0.02) e.slow = Math.max(e.slow, 0.6);
-      }
-    }
-    /* --- Blizzard slow aura --- */
-    if (ab==='blizzard'){
-      for (const e of enemies){
-        if (!e.alive) continue;
-        const d = Math.hypot(e.x-this.x, e.y-this.y);
-        if (d < this.r*3.5) e.slow = Math.max(e.slow, 0.3);
-      }
-    }
-    /* --- Time slow aura --- */
-    if (ab==='time'){
-      for (const e of enemies){
-        if (!e.alive) continue;
-        const d = Math.hypot(e.x-this.x, e.y-this.y);
-        if (d < this.r*4) e.slow = Math.max(e.slow, 0.15);
-      }
-    }
-
-    /* --- Storm lightning aura --- */
+    if (ab==='glacier'){ for (const e of enemies){ if (!e.alive) continue; const d = Math.hypot(e.x-this.x, e.y-this.y); if (d < this.r*2.5 && Math.random() < 0.02) e.slow = Math.max(e.slow, 0.6); } }
+    if (ab==='blizzard'){ for (const e of enemies){ if (!e.alive) continue; const d = Math.hypot(e.x-this.x, e.y-this.y); if (d < this.r*3.5) e.slow = Math.max(e.slow, 0.3); } }
     if (ab==='storm' && this.abilityCd<=0){
       for (const e of enemies){
         if (!e.alive) continue;
         const d = Math.hypot(e.x-this.x, e.y-this.y);
-        if (d < this.r*3.5){
-          this.dealDamageTo(e, 8, true);
-          burst(e.x, e.y, 6, '#9370db', 200, 3);
-          this.triggerAbility(1.2);
-          break;
-        }
+        if (d < this.r*3.5){ this.dealDamageTo(e, 8, true); burst(e.x, e.y, 6, '#9370db', 200, 3); this.triggerAbility(1.2); break; }
       }
       if (this.abilityCd<=0) this.triggerAbility(0.5);
     }
-
-    /* --- Shaman chain shock --- */
     if (ab==='shaman' && this.abilityCd<=0 && enemy && enemy.alive){
       const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
-      if (d < 340*SCALE){
-        this.dealDamageTo(enemy, 10, true);
-        burst(enemy.x,enemy.y,10,'#40e0d0',240,4);
-        this.showFloatText('CHAIN!', '#40e0d0');
-        this.triggerAbility(1.5);
-      }
+      if (d < 340*SCALE){ this.dealDamageTo(enemy, 10, true); burst(enemy.x,enemy.y,10,'#40e0d0',240,4); this.showFloatText('CHAIN!', '#40e0d0'); this.triggerAbility(1.5); }
     }
-    /* --- Mystic: heal + shock --- */
     if (ab==='mystic' && this.abilityCd<=0 && enemy && enemy.alive){
       const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
-      if (d < 300*SCALE){
-        this.dealDamageTo(enemy, 8, true);
-        this.hp = Math.min(this.maxHp, this.hp + 4);
-        burst(enemy.x,enemy.y,10,'#40e0d0',200,3);
-        this.triggerAbility(2);
-      }
+      if (d < 300*SCALE){ this.dealDamageTo(enemy, 8, true); this.hp = Math.min(this.maxHp, this.hp + 4); burst(enemy.x,enemy.y,10,'#40e0d0',200,3); this.triggerAbility(2); }
     }
-    /* --- Thunder chain x3 --- */
     if (ab==='thunder' && this.abilityCd<=0 && enemy && enemy.alive){
       const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
-      if (d < 320*SCALE){
-        for (let i=0;i<3;i++) this.dealDamageTo(enemy, 5, true);
-        burst(enemy.x,enemy.y,14,'#ffd700',260,4);
-        this.showFloatText('THUNDER!', '#ffd700');
-        this.triggerAbility(2.5);
-      }
+      if (d < 320*SCALE){ for (let i=0;i<3;i++) this.dealDamageTo(enemy, 5, true); burst(enemy.x,enemy.y,14,'#ffd700',260,4); this.showFloatText('THUNDER!', '#ffd700'); this.triggerAbility(2.5); }
     }
-
-    /* --- Fire trail --- */
     if ((ab==='fire' || ab==='magma' || ab==='dragon' || ab==='inferno' || ab==='plasma') && this.abilityCd<=0){
       let dmg = 12, life = 2.5, col = '#ff4400';
       if (ab==='magma'){ dmg = 18; life = 2.8; col = '#ff4500'; }
@@ -1315,225 +1161,91 @@ class Ball {
       G.hazards.push(new Hazard(this.x, this.y, this, dmg, life, col, this.r*0.85));
       this.triggerAbility(ab==='dragon'?0.18:0.22);
     }
-    /* --- Toxic cloud --- */
-    if (ab==='toxic' && this.abilityCd<=0){
-      G.hazards.push(new Hazard(this.x, this.y, this, 10, 3, '#32cd32', this.r*1.1));
-      this.triggerAbility(0.4);
-    }
-    /* --- Plague --- */
-    if (ab==='plague' && this.abilityCd<=0){
-      G.hazards.push(new Hazard(this.x, this.y, this, 12, 3.5, '#808000', this.r*1.2));
-      this.triggerAbility(0.5);
-    }
-
-    /* --- Sniper --- */
+    if (ab==='toxic' && this.abilityCd<=0){ G.hazards.push(new Hazard(this.x, this.y, this, 10, 3, '#32cd32', this.r*1.1)); this.triggerAbility(0.4); }
+    if (ab==='plague' && this.abilityCd<=0){ G.hazards.push(new Hazard(this.x, this.y, this, 12, 3.5, '#808000', this.r*1.2)); this.triggerAbility(0.5); }
     if (ab==='sniper' && this.abilityCd<=0 && enemy && enemy.alive){
       const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
-      if (d < 400*SCALE){
-        const dx = enemy.x-this.x, dy = enemy.y-this.y, l = Math.hypot(dx,dy)||1;
-        const v = 520*SCALE;
-        G.projectiles.push(new Projectile(this.x, this.y, (dx/l)*v, (dy/l)*v, this, 14, '#ffcc00', true));
-        this.showFloatText('SHOOT!', '#ffcc00');
-        Sound.ability();
-      }
+      if (d < 400*SCALE){ const dx=enemy.x-this.x, dy=enemy.y-this.y, l=Math.hypot(dx,dy)||1; const v = 520*SCALE; G.projectiles.push(new Projectile(this.x, this.y, (dx/l)*v, (dy/l)*v, this, 14, '#ffcc00', true)); this.showFloatText('SHOOT!', '#ffcc00'); Sound.ability(); }
       this.triggerAbility(2.0);
     }
-    /* --- Blaster --- */
     if (ab==='blaster' && this.abilityCd<=0 && enemy && enemy.alive){
       const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
-      if (d < 450*SCALE){
-        const dx = enemy.x-this.x, dy = enemy.y-this.y, l = Math.hypot(dx,dy)||1;
-        const v = 480*SCALE;
-        G.projectiles.push(new Projectile(this.x, this.y, (dx/l)*v, (dy/l)*v, this, 12, '#9400d3', true));
-        this.showFloatText('BLAST!', '#9400d3');
-      }
+      if (d < 450*SCALE){ const dx=enemy.x-this.x, dy=enemy.y-this.y, l=Math.hypot(dx,dy)||1; const v = 480*SCALE; G.projectiles.push(new Projectile(this.x, this.y, (dx/l)*v, (dy/l)*v, this, 12, '#9400d3', true)); this.showFloatText('BLAST!', '#9400d3'); }
       this.triggerAbility(1.6);
     }
-    /* --- Cluster --- */
     if (ab==='cluster' && this.abilityCd<=0 && enemy && enemy.alive){
       const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
-      if (d < 400*SCALE){
-        for (let i=0;i<4;i++){
-          const angle = Math.atan2(enemy.y-this.y, enemy.x-this.x) + (i-1.5)*0.25;
-          const v = 480*SCALE;
-          G.projectiles.push(new Projectile(this.x, this.y, Math.cos(angle)*v, Math.sin(angle)*v, this, 8, '#daa520', false));
-        }
-        this.showFloatText('CLUSTER!', '#daa520');
-      }
+      if (d < 400*SCALE){ for (let i=0;i<4;i++){ const angle = Math.atan2(enemy.y-this.y, enemy.x-this.x) + (i-1.5)*0.25; const v = 480*SCALE; G.projectiles.push(new Projectile(this.x, this.y, Math.cos(angle)*v, Math.sin(angle)*v, this, 8, '#daa520', false)); } this.showFloatText('CLUSTER!', '#daa520'); }
       this.triggerAbility(2.5);
     }
-    /* --- Trapper --- */
-    if (ab==='trapper' && this.abilityCd<=0){
-      G.hazards.push(new Hazard(this.x, this.y, this, 15, 4, '#2e8b57', this.r*0.9));
-      this.triggerAbility(1.8);
-    }
-    /* --- Spider web --- */
-    if (ab==='spider' && this.abilityCd<=0){
-      G.hazards.push(new Hazard(this.x, this.y, this, 8, 3, '#2f4f4f', this.r*1.0));
-      this.triggerAbility(2.2);
-    }
-
-    /* --- Quake --- */
+    if (ab==='trapper' && this.abilityCd<=0){ G.hazards.push(new Hazard(this.x, this.y, this, 15, 4, '#2e8b57', this.r*0.9)); this.triggerAbility(1.8); }
+    if (ab==='spider' && this.abilityCd<=0){ G.hazards.push(new Hazard(this.x, this.y, this, 8, 3, '#2f4f4f', this.r*1.0)); this.triggerAbility(2.2); }
     if (ab==='quake' && this.abilityCd<=0){
-      for (const e of enemies){
-        if (!e.alive) continue;
-        const d = Math.hypot(e.x-this.x, e.y-this.y);
-        if (d < this.r*4) this.dealDamageTo(e, 15, true);
-      }
-      burst(this.x, this.y, 20, '#8b4513', 300, 4);
-      this.showFloatText('QUAKE!', '#8b4513');
-      this.triggerAbility(3);
+      for (const e of enemies){ if (!e.alive) continue; const d = Math.hypot(e.x-this.x, e.y-this.y); if (d < this.r*4) this.dealDamageTo(e, 15, true); }
+      burst(this.x, this.y, 20, '#8b4513', 300, 4); this.showFloatText('QUAKE!', '#8b4513'); this.triggerAbility(3);
     }
-
-    /* --- Vortex pull --- */
-    if (ab==='vortex'){
-      for (const e of enemies){
-        if (!e.alive) continue;
-        const ddx = this.x-e.x, ddy = this.y-e.y, d = Math.hypot(ddx,ddy)||1;
-        if (d<250*SCALE){
-          e.vx += (ddx/d)*180*SCALE*dt;
-          e.vy += (ddy/d)*180*SCALE*dt;
-        }
-      }
-    }
-    /* --- Singularity pull + dmg --- */
+    if (ab==='vortex'){ for (const e of enemies){ if (!e.alive) continue; const ddx=this.x-e.x, ddy=this.y-e.y, d=Math.hypot(ddx,ddy)||1; if(d<250*SCALE){ e.vx += (ddx/d)*180*SCALE*dt; e.vy += (ddy/d)*180*SCALE*dt; } } }
     if (ab==='singularity'){
-      for (const e of enemies){
-        if (!e.alive) continue;
-        const ddx = this.x-e.x, ddy = this.y-e.y, d = Math.hypot(ddx,ddy)||1;
-        if (d<280*SCALE){
-          e.vx += (ddx/d)*240*SCALE*dt;
-          e.vy += (ddy/d)*240*SCALE*dt;
-          if (this.abilityCd<=0) this.dealDamageTo(e, 4, true);
-        }
-      }
+      for (const e of enemies){ if (!e.alive) continue; const ddx=this.x-e.x, ddy=this.y-e.y, d=Math.hypot(ddx,ddy)||1; if(d<280*SCALE){ e.vx += (ddx/d)*240*SCALE*dt; e.vy += (ddy/d)*240*SCALE*dt; if (this.abilityCd<=0) this.dealDamageTo(e, 4, true); } }
       if (this.abilityCd<=0) this.triggerAbility(0.8);
     }
-
-    /* --- Repulsor push --- */
     if (ab==='repulsor' && this.abilityCd<=0){
-      for (const e of enemies){
-        if (!e.alive) continue;
-        const ddx = e.x-this.x, ddy = e.y-this.y, d = Math.hypot(ddx,ddy)||1;
-        if (d<200*SCALE){
-          e.vx += (ddx/d)*400*SCALE;
-          e.vy += (ddy/d)*400*SCALE;
-        }
-      }
+      for (const e of enemies){ if (!e.alive) continue; const ddx=e.x-this.x, ddy=e.y-this.y, d=Math.hypot(ddx,ddy)||1; if(d<200*SCALE){ e.vx += (ddx/d)*400*SCALE; e.vy += (ddy/d)*400*SCALE; } }
       this.triggerAbility(1.2);
     }
-    /* --- Puller pull --- */
     if (ab==='puller' && this.abilityCd<=0 && enemy && enemy.alive){
-      const ddx = this.x-enemy.x, ddy = this.y-enemy.y, d = Math.hypot(ddx,ddy)||1;
-      if (d<220*SCALE){
-        enemy.vx += (ddx/d)*280*SCALE;
-        enemy.vy += (ddy/d)*280*SCALE;
-        this.showFloatText('PULL!', '#20b2aa');
-        burst(enemy.x, enemy.y, 10, '#20b2aa', 200, 3);
-      }
+      const ddx=this.x-enemy.x, ddy=this.y-enemy.y, d=Math.hypot(ddx,ddy)||1;
+      if (d<220*SCALE){ enemy.vx += (ddx/d)*280*SCALE; enemy.vy += (ddy/d)*280*SCALE; this.showFloatText('PULL!', '#20b2aa'); burst(enemy.x, enemy.y, 10, '#20b2aa', 200, 3); }
       this.triggerAbility(2);
     }
-    /* --- Grabber --- */
     if (ab==='grabber' && this.abilityCd<=0 && enemy && enemy.alive){
-      const ddx = this.x-enemy.x, ddy = this.y-enemy.y, d = Math.hypot(ddx,ddy)||1;
-      if (d<250*SCALE){
-        enemy.vx += (ddx/d)*350*SCALE;
-        enemy.vy += (ddy/d)*350*SCALE;
-        this.showFloatText('GRAB!', '#b0e0e6');
-      }
+      const ddx=this.x-enemy.x, ddy=this.y-enemy.y, d=Math.hypot(ddx,ddy)||1;
+      if (d<250*SCALE){ enemy.vx += (ddx/d)*350*SCALE; enemy.vy += (ddy/d)*350*SCALE; this.showFloatText('GRAB!', '#b0e0e6'); }
       this.triggerAbility(2.2);
     }
-
-    /* --- Jitter erratic --- */
     if (ab==='jitter' && this.abilityCd<=0){
-      const a = Math.random()*Math.PI*2;
-      const sp = this.speedMax;
+      const a = Math.random()*Math.PI*2; const sp = this.speedMax;
       this.vx = Math.cos(a)*sp; this.vy = Math.sin(a)*sp;
       burst(this.x, this.y, 6, this.light, 100, 3);
       this.triggerAbility(0.8);
     }
-
-    /* --- Trickster random buff --- */
     if (ab==='trickster' && this.abilityCd<=0){
       const r = Math.random();
       if (r < 0.33){ this.hp = Math.min(this.maxHp, this.hp+15); this.showFloatText('HEAL!', '#4dff88'); }
       else if (r < 0.66){ this.shield = 4; this.showFloatText('SHIELD!', '#4fc3ff'); }
       else { this.hp = Math.min(this.maxHp, this.hp+10); this.showFloatText('LUCKY!', '#ffd700'); }
-      burst(this.x, this.y, 12, '#ff00ff', 200, 4);
-      this.triggerAbility(5);
+      burst(this.x, this.y, 12, '#ff00ff', 200, 4); this.triggerAbility(5);
     }
-
-    /* --- Jammer: disable enemy ability --- */
     if (ab==='jammer' && this.abilityCd<=0 && enemy && enemy.alive){
       const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
-      if (d < 200*SCALE){
-        enemy.abilityDisabled = Math.max(enemy.abilityDisabled, 3);
-        this.showFloatText('JAMMED!', '#444444');
-        burst(enemy.x, enemy.y, 12, '#444444', 200, 3);
-        this.triggerAbility(4);
-      }
+      if (d < 200*SCALE){ enemy.abilityDisabled = Math.max(enemy.abilityDisabled, 3); this.showFloatText('JAMMED!', '#444444'); burst(enemy.x, enemy.y, 12, '#444444', 200, 3); this.triggerAbility(4); }
     }
-    /* --- Anti-magic --- */
     if (ab==='antimagic' && this.abilityCd<=0 && enemy && enemy.alive){
       const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
-      if (d < 180*SCALE){
-        enemy.abilityDisabled = Math.max(enemy.abilityDisabled, 2);
-        this.showFloatText('NULL!', '#2f4f4f');
-        this.triggerAbility(3);
-      }
+      if (d < 180*SCALE){ enemy.abilityDisabled = Math.max(enemy.abilityDisabled, 2); this.showFloatText('NULL!', '#2f4f4f'); this.triggerAbility(3); }
     }
-    /* --- Nullify: reset enemy cooldown --- */
     if (ab==='nullify' && this.abilityCd<=0 && enemy && enemy.alive){
       const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
-      if (d < 180*SCALE){
-        enemy.abilityCd = 0;
-        this.showFloatText('RESET!', '#808080');
-        this.triggerAbility(5);
-      }
+      if (d < 180*SCALE){ enemy.abilityCd = 0; this.showFloatText('RESET!', '#808080'); this.triggerAbility(5); }
     }
-
-    /* --- Regeneration shield stacked --- */
-    if (ab==='shell' && this.abilityCd<=0 && this.shield < 6){
-      this.shield = Math.min(6, this.shield + 1);
-      this.triggerAbility(1.5);
-    }
-
-    /* --- Warden panic shield --- */
+    if (ab==='shell' && this.abilityCd<=0 && this.shield < 6){ this.shield = Math.min(6, this.shield + 1); this.triggerAbility(1.5); }
     if (ab==='warden' && this.hp < this.maxHp*0.4 && this.shield<=0 && this.abilityCd<=0){
-      this.shield = 6;
-      this.showFloatText('PANIC!', '#3cb371');
+      this.shield = 6; this.showFloatText('PANIC!', '#3cb371');
       Sound.ability(); burst(this.x,this.y,18,'#3cb371',220,4);
       this.triggerAbility(8);
     }
-
-    /* --- Ironhide DEF boost when low --- */
     if (ab==='ironhide'){
-      // Dynamic DEF handled in onTakeDamage or here as flag
-      this.defenseStat = (this.hp < this.maxHp*0.5) ? this.def.def*1.5 : this.def.def;
-      if (this.def.def === undefined) this.defenseStat = (this.hp < this.maxHp*0.5) ? 1.95 : 1.30;
+      if (this.hp < this.maxHp*0.5) this.defenseStat = this.def.def*1.5;
+      else this.defenseStat = this.def.def*1.20;
     }
-
-    /* --- Lifebinder: shield + regen --- */
     if (ab==='lifebinder'){
       if (this.hp<this.maxHp) this.hp = Math.min(this.maxHp, this.hp+3*dt);
       if (this.shield<=0 && this.abilityCd<=0){ this.shield = 3; this.triggerAbility(6); }
     }
-
-    /* --- Reviver/immortal flag (handled in die) --- */
-
-    /* --- Random passive burn from dragon contact --- */
-    // (handled in onHit)
-
-    /* --- Speed high but low HP already handled as stats --- */
   }
 
-  /* ========================================================================
-     ON HIT — efek saat berhasil memberi damage
-     ======================================================================== */
   onHit(target, damage){
     const ab = this.ability;
-
-    // Vampire/lifesteal family
     if (ab==='vampire' || ab==='marauder' || ab==='leech' || ab==='absorber'){
       const rate = ab==='vampire'?0.45:(ab==='marauder'?0.30:0.25);
       const heal = damage * rate;
@@ -1542,350 +1254,183 @@ class Ball {
       this.showFloatText('+' + Math.round(heal), '#ff3d7f');
       if (ab==='leech'){ target.slow = Math.max(target.slow, 1.5); }
     }
-
-    // Bomber explosion
     if (ab==='bomber'){
       const bx = (this.x+target.x)/2, by = (this.y+target.y)/2;
       this.dealDamageTo(target, 14, true);
       burst(bx,by,36,'#ff5b2e',400,6);
       burst(bx,by,20,'#ffffff',300,5);
       this.showFloatText('BOOM!', '#ff5b2e');
-      G.shake = Math.min(30, G.shake+14);
-      G.flash = Math.min(0.45, G.flash+0.25);
-      G.flashColor = '#ff5b2e';
+      G.shake = Math.min(30, G.shake+14); G.flash = Math.min(0.45, G.flash+0.25); G.flashColor = '#ff5b2e';
       Sound.hit(1);
     }
-
-    // Nova explosion
     if (ab==='nova'){
-      for (const o of [G.player, G.enemy]){
-        if (!o || o===this || !o.alive) continue;
-        const d = Math.hypot(o.x-this.x, o.y-this.y);
-        if (d < 100*SCALE) this.dealDamageTo(o, 10, true);
-      }
-      burst(this.x,this.y,30,'#ff1493',380,5);
-      this.showFloatText('NOVA!', '#ff1493');
+      for (const o of [G.player, G.enemy]){ if (!o || o===this || !o.alive) continue; const d = Math.hypot(o.x-this.x, o.y-this.y); if (d < 100*SCALE) this.dealDamageTo(o, 10, true); }
+      burst(this.x,this.y,30,'#ff1493',380,5); this.showFloatText('NOVA!', '#ff1493');
     }
-
-    // Blaze nova
     if (ab==='blaze'){
-      for (const o of [G.player, G.enemy]){
-        if (!o || o===this || !o.alive) continue;
-        const d = Math.hypot(o.x-this.x, o.y-this.y);
-        if (d < 120*SCALE) this.dealDamageTo(o, 12, true);
-      }
-      burst(this.x,this.y,28,'#ff6347',380,5);
-      this.showFloatText('BLAZE!', '#ff6347');
+      for (const o of [G.player, G.enemy]){ if (!o || o===this || !o.alive) continue; const d = Math.hypot(o.x-this.x, o.y-this.y); if (d < 120*SCALE) this.dealDamageTo(o, 12, true); }
+      burst(this.x,this.y,28,'#ff6347',380,5); this.showFloatText('BLAZE!', '#ff6347');
     }
-
-    // Status effects
-    if (ab==='freezer' || ab==='freezer') target.slow = Math.max(target.slow, 2.5);
+    if (ab==='freezer') target.slow = Math.max(target.slow, 2.5);
     if (ab==='ice'){ target.freeze = Math.max(target.freeze, 1.5); burst(target.x,target.y,16,'#80ffff',220,4); this.showFloatText('FREEZE!', '#80ffff'); }
     if (ab==='frost'){ target.freeze = Math.max(target.freeze, 1.0); burst(target.x,target.y,20,'#b0e0e6',260,4); this.showFloatText('FROST!', '#b0e0e6'); }
     if (ab==='glacier'){ target.freeze = Math.max(target.freeze, 0.8); }
     if (ab==='blizzard'){ target.freeze = Math.max(target.freeze, 0.5); }
     if (ab==='static'){ target.freeze = Math.max(target.freeze, 0.6); burst(target.x,target.y,12,'#fffacd',220,3.5); this.showFloatText('ZAP!', '#fffacd'); }
     if (ab==='plasma'){ target.burnTimer = Math.max(target.burnTimer, 1.5); target.slow = Math.max(target.slow, 1.5); this.showFloatText('PLASMA!', '#da70d6'); }
-
     if (ab==='poison'){ target.poisonTimer = Math.max(target.poisonTimer, 4); burst(target.x,target.y,10,'#9dff4d',150,3); this.showFloatText('POISON!', '#9dff4d'); }
     if (ab==='venom'){ target.poisonTimer = Math.max(target.poisonTimer, 6); burst(target.x,target.y,14,'#6b8e23',180,4); this.showFloatText('VENOM!', '#6b8e23'); }
     if (ab==='toxic'){ target.poisonTimer = Math.max(target.poisonTimer, 5); }
     if (ab==='plague'){ target.poisonTimer = Math.max(target.poisonTimer, 7); this.showFloatText('PLAGUE!', '#808000'); }
     if (ab==='snake'){ target.poisonTimer = Math.max(target.poisonTimer, 3); this.showFloatText('STRIKE!', '#228b22'); }
     if (ab==='cobra'){ target.poisonTimer = Math.max(target.poisonTimer, 6); this.showFloatText('COBRA!', '#4b0082'); }
-
     if (ab==='lightning'){ this.dealDamageTo(target, 6, true); burst(target.x,target.y,12,'#ffff44',260,4); this.showFloatText('ZAP!', '#ffff44'); }
     if (ab==='thunder'){ this.dealDamageTo(target, 5, true); this.dealDamageTo(target, 5, true); burst(target.x,target.y,14,'#ffd700',280,4); }
     if (ab==='shaman'){ this.dealDamageTo(target, 5, true); this.showFloatText('SHOCK!', '#40e0d0'); }
     if (ab==='storm'){ this.dealDamageTo(target, 6, true); }
-
-    // Boxer knockback
     if (ab==='boxer' || ab==='brute' || ab==='puncher'){
       const power = ab==='brute'?500:(ab==='boxer'?320:220);
       if (!target.noKnockback){
         const dx = target.x-this.x, dy = target.y-this.y, l = Math.hypot(dx,dy)||1;
-        target.vx += (dx/l)*power*SCALE;
-        target.vy += (dy/l)*power*SCALE;
+        target.vx += (dx/l)*power*SCALE; target.vy += (dy/l)*power*SCALE;
       }
-      burst(target.x,target.y,10,'#ff6347',220,3.5);
-      this.showFloatText('PUNCH!', '#ff6347');
+      burst(target.x,target.y,10,'#ff6347',220,3.5); this.showFloatText('PUNCH!', '#ff6347');
     }
-
-    // Sticky
     if (ab==='sticky'){ target.sticky = Math.max(target.sticky, 1.0); this.showFloatText('STUCK!', '#88aa00'); burst(target.x,target.y,8,'#88aa00',140,3); }
     if (ab==='spider'){ target.sticky = Math.max(target.sticky, 1.5); this.showFloatText('WEB!', '#2f4f4f'); }
-
-    // Shrinker
     if (ab==='shrinker'){
       if (!target.shrinkStacks) target.shrinkStacks = 0;
       target.shrinkStacks = Math.min(3, target.shrinkStacks+1);
       target.baseR = Math.max(target.def.r*SCALE*0.5, target.def.r*SCALE*(1-0.2*target.shrinkStacks));
-      this.showFloatText('SHRINK!', '#32cd32');
-      burst(target.x,target.y,10,'#32cd32',200,3);
+      this.showFloatText('SHRINK!', '#32cd32'); burst(target.x,target.y,10,'#32cd32',200,3);
     }
-
-    // Bleed
     if (ab==='slasher'){ target.bleedTimer = Math.max(target.bleedTimer, 3); this.showFloatText('BLEED!', '#dc143c'); }
-    if (ab==='drill'){
-      // Drill pierces shield — handled in dealDamageTo? Actually just additional shield break
-      target.shield = 0;
-      this.showFloatText('PIERCE!', '#808080');
-    }
+    if (ab==='drill'){ target.shield = 0; this.showFloatText('PIERCE!', '#808080'); }
     if (ab==='shatter'){ target.shield = 0; this.showFloatText('SHATTER!', '#b0c4de'); burst(target.x,target.y,14,'#b0c4de',220,4); }
-
-    // Heal on hit
     if (ab==='priest'){ this.hp = Math.min(this.maxHp, this.hp+8); this.showFloatText('+8', '#f0e68c'); }
     if (ab==='cleric'){ this.hp = Math.min(this.maxHp, this.hp+5); this.showFloatText('+5', '#fffacd'); }
     if (ab==='mender'){ this.hp = Math.min(this.maxHp, this.hp+6); this.showFloatText('+6', '#98fb98'); }
-
-    // Fire effects
     if (ab==='fire' || ab==='magma' || ab==='dragon' || ab==='inferno' || ab==='blaze'){
       target.burnTimer = Math.max(target.burnTimer, ab==='dragon'?2.5:(ab==='inferno'?3:2));
       this.showFloatText('BURN!', '#ff4400');
     }
-
-    // Gladiator: stacking damage
     if (ab==='gladiator'){
       this.stacks = Math.min(10, this.stacks+1);
       this.attackStat = this.def.atk * (1 + this.stacks*0.08);
       this.showFloatText('+' + (this.stacks*8) + '%', '#8b4513');
     }
-
-    // Ram bonus
     if (ab==='ram' && performance.now() - this.lastBounceTime < 400){
-      this.dealDamageTo(target, 8, true);
-      this.showFloatText('RAM!', '#a0522d');
+      this.dealDamageTo(target, 8, true); this.showFloatText('RAM!', '#a0522d');
     }
-
-    // Eagle/falcon: vision bonus
-    if (ab==='eagle' || ab==='falcon'){
-      this.dealDamageTo(target, 4, true);
-    }
-
-    // Prophet
+    if (ab==='eagle' || ab==='falcon'){ this.dealDamageTo(target, 4, true); }
     if (ab==='prophet'){ this.showFloatText('SEE!', '#dc143c'); }
-
-    // Shark execute
-    if (ab==='shark' && target.hp < target.maxHp*0.35){
-      this.dealDamageTo(target, 15, true);
-      this.showFloatText('CHOMP!', '#4682b4');
-    }
-
-    // Hunter bonus vs fleeing (target moving away)
-    if (ab==='hunter'){
-      const away = (target.vx * (target.x - this.x) + target.vy * (target.y - this.y)) > 0;
-      if (away) this.dealDamageTo(target, 10, true);
-    }
-
-    // Reaper/assassin/ninja crit handled in dealDamageTo
-
-    // Grace
+    if (ab==='shark' && target.hp < target.maxHp*0.35){ this.dealDamageTo(target, 15, true); this.showFloatText('CHOMP!', '#4682b4'); }
     if (ab==='grace' && !target.alive){ this.hp = Math.min(this.maxHp, this.hp+30); this.showFloatText('+30', '#f0f8ff'); }
-
-    // Dragon burn extra
     if (ab==='dragon'){ target.burnTimer = Math.max(target.burnTimer, 3); }
   }
 
-  /* ========================================================================
-     ON TAKE DAMAGE
-     ======================================================================== */
   onTakeDamage(amount, source){
     const ab = this.ability;
     let dmg = amount;
-
-    // Dodge abilities
     if (ab==='ghost' && Math.random()<0.28){ burst(this.x,this.y,12,'#c0c0ff',200,3); this.showFloatText('DODGE!', '#c0c0ff'); return { dodged:true, finalDamage:0 }; }
     if (ab==='oracle' && Math.random()<0.40){ burst(this.x,this.y,12,'#ffd700',200,3); this.showFloatText('FORESAW!', '#ffd700'); return { dodged:true, finalDamage:0 }; }
     if (ab==='fox' && Math.random()<0.35){ burst(this.x,this.y,12,'#ff6347',200,3); this.showFloatText('DODGE!', '#ff6347'); return { dodged:true, finalDamage:0 }; }
-
-    // Damage reduction
     if (ab==='guardian') dmg *= 0.80;
     if (ab==='bulwark' || ab==='bastion') dmg = Math.min(dmg, 12);
     if (ab==='ghostwalk' && this.hp < this.maxHp*0.4) dmg *= 0.70;
-
-    // Reflector
     if (ab==='reflector' && source && source.alive){
       const reflect = amount*0.55;
       this.dealDamageTo(source, reflect, true);
-      burst(this.x,this.y,10,'#ff77ff',240,4);
-      this.showFloatText('REFLECT!', '#ff77ff');
+      burst(this.x,this.y,10,'#ff77ff',240,4); this.showFloatText('REFLECT!', '#ff77ff');
     }
-
     return { dodged:false, finalDamage:dmg };
   }
 
-  /* ========================================================================
-     DEAL DAMAGE
-     ======================================================================== */
   dealDamageTo(target, amount, isAbility){
     if (amount<=0 || !target.alive) return;
     if (target.invuln>0 && !isAbility) return;
-
     let dmg = amount;
     if (target.shield>0){
       const shieldMult = target.shieldBonus ? (1 - 0.4/target.shieldBonus) : 0.4;
       dmg *= shieldMult;
     }
-
     const res = target.onTakeDamage(dmg, this);
     if (res.dodged) return;
     dmg = res.finalDamage;
-
-    // Crit abilities
     if ((this.ability==='ninja'||this.ability==='assassin') && Math.random()<(this.ability==='assassin'?0.40:0.30)){
-      dmg *= 2;
-      burst(target.x,target.y,14,'#a0a0b0',280,4.5);
-      this.showFloatText('CRIT!', '#ff3d7f');
+      dmg *= 2; burst(target.x,target.y,14,'#a0a0b0',280,4.5); this.showFloatText('CRIT!', '#ff3d7f');
     }
-    // Tiger bonus crit
-    if (this.ability==='tiger' && Math.random()<0.25){
-      dmg *= 1.8;
-      burst(target.x,target.y,12,'#ff8c00',260,4);
-      this.showFloatText('CRIT!', '#ff8c00');
-    }
-    // Eagle bonus
-    if (this.ability==='eagle' && Math.random()<0.30){
-      dmg *= 1.6;
-      burst(target.x,target.y,10,'#8b0000',240,4);
-      this.showFloatText('STRIKE!', '#8b0000');
-    }
-    // Cobra/venom
+    if (this.ability==='tiger' && Math.random()<0.25){ dmg *= 1.8; burst(target.x,target.y,12,'#ff8c00',260,4); this.showFloatText('CRIT!', '#ff8c00'); }
+    if (this.ability==='eagle' && Math.random()<0.30){ dmg *= 1.6; burst(target.x,target.y,10,'#8b0000',240,4); this.showFloatText('STRIKE!', '#8b0000'); }
     if (this.ability==='venom') dmg *= 1.15;
-
-    // Berserker
-    if (this.ability==='berserker'){
-      const missing = 1 - (this.hp/this.maxHp);
-      dmg *= (1 + missing);
-    }
-    // Marauder rage
-    if (this.ability==='marauder'){
-      const missing = 1 - (this.hp/this.maxHp);
-      dmg *= (1 + missing*0.7);
-    }
-
-    // Reaper execute
-    if (this.ability==='reaper' && target.hp < target.maxHp*0.4){
-      dmg *= 1.8;
-      burst(target.x,target.y,12,'#1a1a1a',220,4);
-      this.showFloatText('EXECUTE!', '#ff3d3d');
-    }
-    // Shark
-    if (this.ability==='shark' && target.hp < target.maxHp*0.35){
-      dmg *= 1.6;
-    }
-    // Crusher: bonus vs high HP
-    if (this.ability==='crusher' && target.hp > target.maxHp*0.7){
-      dmg *= 1.35;
-      this.showFloatText('CRUSH!', '#c04040');
-    }
-    // Duelist 1v1 bonus
+    if (this.ability==='berserker'){ const missing = 1-(this.hp/this.maxHp); dmg *= (1+missing); }
+    if (this.ability==='marauder'){ const missing = 1-(this.hp/this.maxHp); dmg *= (1+missing*0.7); }
+    if (this.ability==='reaper' && target.hp < target.maxHp*0.4){ dmg *= 1.8; burst(target.x,target.y,12,'#1a1a1a',220,4); this.showFloatText('EXECUTE!', '#ff3d3d'); }
+    if (this.ability==='shark' && target.hp < target.maxHp*0.35) dmg *= 1.6;
+    if (this.ability==='crusher' && target.hp > target.maxHp*0.7){ dmg *= 1.35; this.showFloatText('CRUSH!', '#c04040'); }
     if (this.ability==='duelist'){
       const enemies = [G.player, G.enemy].filter(b => b && b.alive && b !== this);
       if (enemies.length === 1) dmg *= 1.20;
     }
-    // Brawler dash bonus
     if (this.ability==='brawler' && this.dashTime > 0) dmg *= 2.20;
-    // Ram bonus after bounce
     if (this.ability==='ram' && performance.now() - this.lastBounceTime < 400) dmg *= 1.4;
-
-    // Sharp bonus already in stats
-    // Heavy bonus is in mass
-
-    // Lion: bonus vs weaker
     if (this.ability==='lion' && target.hp < this.hp) dmg *= 1.15;
-    // Wolf: bonus vs low HP
     if (this.ability==='wolf' && target.hp < target.maxHp*0.5) dmg *= 1.25;
-    // Prophet crit
     if (this.ability==='prophet' && Math.random()<0.20) dmg *= 1.5;
-
-    // Plated reduces crit received (defensive)
-    if (target.critResist && dmg > amount*1.5){
-      dmg = amount * (1 + (dmg/amount - 1) * (1 - target.critResist));
-    }
-
+    if (target.critResist && dmg > amount*1.5) dmg = amount * (1 + (dmg/amount - 1) * (1 - target.critResist));
     target.hp -= dmg;
     target.hitFlash = 0.25;
     if (!isAbility) target.invuln = 0.06;
-
     if (this.isPlayer) G.playerDmgDealt += dmg;
     if (this.isPlayer && !isAbility){
-      if (G.comboTimer>0) G.combo = Math.min(G.combo+1, 12);
-      else G.combo = 1;
+      if (G.comboTimer>0) G.combo = Math.min(G.combo+1, 12); else G.combo = 1;
       G.comboTimer = 2.3;
       if (G.combo>G.maxCombo) G.maxCombo = G.combo;
       G.score += dmg*(1+(G.combo-1)*0.3);
     }
-
     addDamageNum(target.x, target.y - target.r*0.5, dmg, this.isPlayer ? '#5fe6ff' : '#ff8080');
     burst(target.x,target.y, Math.min(14, 5+Math.floor(dmg)), target.color, 150+dmg*8, 3.4);
-
     if (target.hp<=0) target.die();
   }
 
-  /* ========================================================================
-     DIE
-     ======================================================================== */
   die(){
     if (!this.alive) return;
-
-    // Revive
     if ((this.ability==='zombie' || this.ability==='phoenix' || this.ability==='reviver') && !this.revived){
       this.revived = true;
       this.hp = this.ability==='reviver' ? 25 : 30;
       this.invuln = 1.5;
       const c = this.ability==='phoenix' ? '#ff5500' : '#32cd32';
-      burst(this.x,this.y,32,c,340,6);
-      burst(this.x,this.y,18,'#fff',240,5);
+      burst(this.x,this.y,32,c,340,6); burst(this.x,this.y,18,'#fff',240,5);
       this.showFloatText(this.ability==='phoenix'?'REBORN!':'REVIVE!', c);
       if (this.ability==='phoenix'){
-        for (const o of [G.player, G.enemy]){
-          if (!o || o===this || !o.alive) continue;
-          const d = Math.hypot(o.x-this.x, o.y-this.y);
-          if (d < 130*SCALE) this.dealDamageTo(o, 20, true);
-        }
+        for (const o of [G.player, G.enemy]){ if (!o || o===this || !o.alive) continue; const d = Math.hypot(o.x-this.x, o.y-this.y); if (d < 130*SCALE) this.dealDamageTo(o, 20, true); }
       }
-      Sound.ability();
-      G.flash = Math.min(0.45, G.flash+0.35);
-      G.flashColor = c;
+      Sound.ability(); G.flash = Math.min(0.45, G.flash+0.35); G.flashColor = c;
       return;
     }
-    // Immortal survive once
     if (this.ability==='immortal' && !this.revived){
-      this.revived = true;
-      this.hp = 20;
-      this.invuln = 2;
+      this.revived = true; this.hp = 20; this.invuln = 2;
       burst(this.x,this.y,28,'#ffd700',320,5);
       this.showFloatText('IMMORTAL!', '#ffd700');
       return;
     }
-
-    // Death explosions
     if (this.ability==='exploder'){
       const other = (this===G.player) ? G.enemy : G.player;
       if (other && other.alive){
         const d = Math.hypot(other.x-this.x, other.y-this.y);
         if (d<130*SCALE) this.dealDamageTo(other, 30, true);
       }
-      burst(this.x,this.y,60,'#ffa500',560,7);
-      burst(this.x,this.y,30,'#ffffff',420,6);
-      G.shake = Math.min(42, G.shake+28);
-      G.flash = 0.75; G.flashColor = '#ffa500';
+      burst(this.x,this.y,60,'#ffa500',560,7); burst(this.x,this.y,30,'#ffffff',420,6);
+      G.shake = Math.min(42, G.shake+28); G.flash = 0.75; G.flashColor = '#ffa500';
     } else {
-      burst(this.x,this.y,45,this.color,520,7);
-      burst(this.x,this.y,24,'#ffffff',340,5);
+      burst(this.x,this.y,45,this.color,520,7); burst(this.x,this.y,24,'#ffffff',340,5);
       G.shake = Math.min(34, G.shake+20);
-      G.flash = Math.min(0.6, G.flash+0.45);
-      G.flashColor = this.color;
+      G.flash = Math.min(0.6, G.flash+0.45); G.flashColor = this.color;
     }
     Sound.hit(1);
-    this.alive = false;
-    this.hp = 0;
-    this.deathTime = performance.now();
+    this.alive = false; this.hp = 0; this.deathTime = performance.now();
   }
 
-  /* ========================================================================
-     DRAW COOLDOWN RING
-     ======================================================================== */
   drawCooldownRing(){
     if (!this.alive) return;
     if (this.abilityCdMax <= 0) return;
@@ -1893,218 +1438,103 @@ class Ball {
     const pct = 1 - this.abilityCd / this.abilityCdMax;
     const meta = ABILITY_META[this.ability] || { color: '#888' };
     ctx.save();
-    ctx.translate(this.x, this.y);
-    ctx.rotate(-Math.PI/2);
-    ctx.strokeStyle = 'rgba(0,0,0,0.35)';
-    ctx.lineWidth = 4*SCALE;
-    ctx.beginPath();
-    ctx.arc(0, 0, this.r + 14*SCALE, 0, Math.PI*2);
-    ctx.stroke();
-    ctx.strokeStyle = meta.color;
-    ctx.shadowBlur = 14;
-    ctx.shadowColor = meta.color;
-    ctx.lineWidth = 4*SCALE;
-    ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.arc(0, 0, this.r + 14*SCALE, 0, Math.PI*2*pct);
-    ctx.stroke();
+    ctx.translate(this.x, this.y); ctx.rotate(-Math.PI/2);
+    ctx.strokeStyle = 'rgba(0,0,0,0.35)'; ctx.lineWidth = 4*SCALE;
+    ctx.beginPath(); ctx.arc(0, 0, this.r + 14*SCALE, 0, Math.PI*2); ctx.stroke();
+    ctx.strokeStyle = meta.color; ctx.shadowBlur = 14; ctx.shadowColor = meta.color;
+    ctx.lineWidth = 4*SCALE; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.arc(0, 0, this.r + 14*SCALE, 0, Math.PI*2*pct); ctx.stroke();
     ctx.restore();
   }
 
-  /* ========================================================================
-     DRAW
-     ======================================================================== */
   draw(){
     ctx.globalCompositeOperation = 'lighter';
     for (let i=0;i<this.trail.length;i++){
       const p = this.trail[i];
       const f = i/this.trail.length;
-      ctx.globalAlpha = f*0.24;
-      ctx.fillStyle = this.color;
-      ctx.beginPath();
-      ctx.arc(p.x,p.y,Math.max(1,this.r*f*0.9),0,Math.PI*2);
-      ctx.fill();
+      ctx.globalAlpha = f*0.24; ctx.fillStyle = this.color;
+      ctx.beginPath(); ctx.arc(p.x,p.y,Math.max(1,this.r*f*0.9),0,Math.PI*2); ctx.fill();
     }
     ctx.globalAlpha = 1;
     ctx.globalCompositeOperation = 'source-over';
-
     if (!this.alive) return;
-
     const pulse = this.dashTime>0 ? 1.07 : 1;
     const alpha = this.invisible>0 ? 0.35 : 1;
     const meta = ABILITY_META[this.ability] || {};
-
-    // Ready ability glow
     if (meta.active && this.abilityCd <= 0 && this.abilityDisabled <= 0){
       ctx.save();
       ctx.globalAlpha = (0.35 + Math.sin(performance.now()/180)*0.15) * alpha;
-      ctx.strokeStyle = meta.color;
-      ctx.lineWidth = 1.5*SCALE;
+      ctx.strokeStyle = meta.color; ctx.lineWidth = 1.5*SCALE;
       ctx.setLineDash([4, 6]);
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.r + 8*SCALE, 0, Math.PI*2);
-      ctx.stroke();
+      ctx.beginPath(); ctx.arc(this.x, this.y, this.r + 8*SCALE, 0, Math.PI*2); ctx.stroke();
       ctx.setLineDash([]);
       ctx.restore();
     }
-
-    // Disabled indicator
     if (this.abilityDisabled > 0){
       ctx.save();
-      ctx.globalAlpha = 0.5;
-      ctx.strokeStyle = '#444';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.r + 12*SCALE, 0, Math.PI*2);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(this.x - this.r*0.6, this.y - this.r*0.6);
-      ctx.lineTo(this.x + this.r*0.6, this.y + this.r*0.6);
-      ctx.stroke();
+      ctx.globalAlpha = 0.5; ctx.strokeStyle = '#444'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(this.x, this.y, this.r + 12*SCALE, 0, Math.PI*2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(this.x - this.r*0.6, this.y - this.r*0.6); ctx.lineTo(this.x + this.r*0.6, this.y + this.r*0.6); ctx.stroke();
       ctx.restore();
     }
-
-    // Glow
     ctx.save();
-    ctx.globalAlpha = alpha;
-    ctx.shadowBlur = 30;
-    ctx.shadowColor = this.color;
-    const g = ctx.createRadialGradient(
-      this.x - this.r*0.32, this.y - this.r*0.32, this.r*0.08,
-      this.x, this.y, this.r*pulse
-    );
-    g.addColorStop(0, this.light);
-    g.addColorStop(0.55, this.color);
-    g.addColorStop(1, this.color);
-    ctx.fillStyle = g;
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.r*pulse, 0, Math.PI*2);
-    ctx.fill();
+    ctx.globalAlpha = alpha; ctx.shadowBlur = 30; ctx.shadowColor = this.color;
+    const g = ctx.createRadialGradient(this.x-this.r*0.32, this.y-this.r*0.32, this.r*0.08, this.x, this.y, this.r*pulse);
+    g.addColorStop(0, this.light); g.addColorStop(0.55, this.color); g.addColorStop(1, this.color);
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(this.x, this.y, this.r*pulse, 0, Math.PI*2); ctx.fill();
     ctx.restore();
-
-    // Rim
+    ctx.globalAlpha = alpha; ctx.strokeStyle = 'rgba(255,255,255,0.78)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(this.x, this.y, this.r*pulse-1, 0, Math.PI*2); ctx.stroke();
+    ctx.globalAlpha = alpha*0.28; ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.ellipse(this.x-this.r*0.3, this.y-this.r*0.38, this.r*0.28, this.r*0.18, -0.6, 0, Math.PI*2); ctx.fill();
     ctx.globalAlpha = alpha;
-    ctx.strokeStyle = 'rgba(255,255,255,0.78)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.r*pulse-1, 0, Math.PI*2);
-    ctx.stroke();
-
-    // Highlight
-    ctx.globalAlpha = alpha*0.28;
-    ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.ellipse(this.x-this.r*0.3, this.y-this.r*0.38, this.r*0.28, this.r*0.18, -0.6, 0, Math.PI*2);
-    ctx.fill();
-    ctx.globalAlpha = alpha;
-
-    // Symbol
     ctx.save();
     ctx.translate(this.x, this.y);
     drawBallSymbol(this.ability, this.r, performance.now()/1000);
     ctx.restore();
-
-    // Eyes
     const sp = Math.hypot(this.vx,this.vy);
-    let ex=0, ey=0;
-    if (sp>12){ ex=this.vx/sp; ey=this.vy/sp; }
-    const px=-ey, py=ex;
-    const eOff = this.r*0.40;
-    const eyeR = this.r*0.14;
-    const pupR = this.r*0.07;
+    let ex=0, ey=0; if (sp>12){ ex=this.vx/sp; ey=this.vy/sp; }
+    const px=-ey, py=ex; const eOff = this.r*0.40; const eyeR = this.r*0.14; const pupR = this.r*0.07;
     for (const s of [-1,1]){
       const cx2 = this.x + ex*eOff*0.55 + px*eOff*0.72*s;
       const cy2 = this.y + ey*eOff*0.55 + py*eOff*0.72*s;
-      ctx.fillStyle = '#fff';
-      ctx.beginPath();
-      ctx.arc(cx2, cy2, eyeR, 0, Math.PI*2);
-      ctx.fill();
-      ctx.fillStyle = '#12101f';
-      ctx.beginPath();
-      ctx.arc(cx2+ex*eyeR*0.4, cy2+ey*eyeR*0.4, pupR, 0, Math.PI*2);
-      ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(cx2, cy2, eyeR, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#12101f'; ctx.beginPath(); ctx.arc(cx2+ex*eyeR*0.4, cy2+ey*eyeR*0.4, pupR, 0, Math.PI*2); ctx.fill();
     }
-
     this.drawCooldownRing();
-
-    // Status overlays
     if (this.shield > 0){
-      ctx.save();
-      ctx.globalAlpha = (0.55 + Math.sin(performance.now()/90)*0.25) * alpha;
-      ctx.strokeStyle = '#4fc3ff';
-      ctx.lineWidth = 3;
-      ctx.shadowBlur = 22;
-      ctx.shadowColor = '#4fc3ff';
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.r + 10*SCALE, 0, Math.PI*2);
-      ctx.stroke();
-      ctx.restore();
+      ctx.save(); ctx.globalAlpha = (0.55 + Math.sin(performance.now()/90)*0.25) * alpha;
+      ctx.strokeStyle = '#4fc3ff'; ctx.lineWidth = 3; ctx.shadowBlur = 22; ctx.shadowColor = '#4fc3ff';
+      ctx.beginPath(); ctx.arc(this.x, this.y, this.r + 10*SCALE, 0, Math.PI*2); ctx.stroke(); ctx.restore();
     }
     if (this.freeze > 0){
-      ctx.save();
-      ctx.globalAlpha = 0.65 * alpha;
-      ctx.strokeStyle = '#80ffff';
-      ctx.lineWidth = 3.5;
-      ctx.shadowBlur = 20;
-      ctx.shadowColor = '#80ffff';
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.r + 6*SCALE, 0, Math.PI*2);
-      ctx.stroke();
-      ctx.restore();
+      ctx.save(); ctx.globalAlpha = 0.65 * alpha; ctx.strokeStyle = '#80ffff'; ctx.lineWidth = 3.5;
+      ctx.shadowBlur = 20; ctx.shadowColor = '#80ffff';
+      ctx.beginPath(); ctx.arc(this.x, this.y, this.r + 6*SCALE, 0, Math.PI*2); ctx.stroke(); ctx.restore();
     }
     if (this.slow > 0){
-      ctx.save();
-      ctx.globalAlpha = 0.45 * alpha;
-      ctx.strokeStyle = '#a8e8ff';
-      ctx.lineWidth = 2.5;
+      ctx.save(); ctx.globalAlpha = 0.45 * alpha; ctx.strokeStyle = '#a8e8ff'; ctx.lineWidth = 2.5;
       ctx.setLineDash([5, 7]);
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.r + 5*SCALE, 0, Math.PI*2);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.restore();
+      ctx.beginPath(); ctx.arc(this.x, this.y, this.r + 5*SCALE, 0, Math.PI*2); ctx.stroke();
+      ctx.setLineDash([]); ctx.restore();
     }
-    if (this.poisonTimer > 0){
-      ctx.globalAlpha = 0.35 * alpha;
-      ctx.fillStyle = '#9dff4d';
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.r * 0.92, 0, Math.PI*2);
-      ctx.fill();
-    }
-    if (this.burnTimer > 0){
-      ctx.globalAlpha = 0.35 * alpha;
-      ctx.fillStyle = '#ff4400';
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.r * 0.92, 0, Math.PI*2);
-      ctx.fill();
-    }
-    if (this.bleedTimer > 0){
-      ctx.globalAlpha = 0.35 * alpha;
-      ctx.fillStyle = '#dc143c';
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.r * 0.92, 0, Math.PI*2);
-      ctx.fill();
-    }
+    if (this.poisonTimer > 0){ ctx.globalAlpha = 0.35 * alpha; ctx.fillStyle = '#9dff4d'; ctx.beginPath(); ctx.arc(this.x, this.y, this.r * 0.92, 0, Math.PI*2); ctx.fill(); }
+    if (this.burnTimer > 0){ ctx.globalAlpha = 0.35 * alpha; ctx.fillStyle = '#ff4400'; ctx.beginPath(); ctx.arc(this.x, this.y, this.r * 0.92, 0, Math.PI*2); ctx.fill(); }
+    if (this.bleedTimer > 0){ ctx.globalAlpha = 0.35 * alpha; ctx.fillStyle = '#dc143c'; ctx.beginPath(); ctx.arc(this.x, this.y, this.r * 0.92, 0, Math.PI*2); ctx.fill(); }
     if (this.sticky > 0){
-      ctx.save();
-      ctx.globalAlpha = 0.45 * alpha;
-      ctx.strokeStyle = '#88aa00';
-      ctx.lineWidth = 3;
+      ctx.save(); ctx.globalAlpha = 0.45 * alpha; ctx.strokeStyle = '#88aa00'; ctx.lineWidth = 3;
       ctx.beginPath();
       for (let i=0;i<8;i++){
         const a = i/8*Math.PI*2 + performance.now()/400;
         ctx.moveTo(this.x+Math.cos(a)*this.r, this.y+Math.sin(a)*this.r);
         ctx.lineTo(this.x+Math.cos(a)*(this.r+10*SCALE), this.y+Math.sin(a)*(this.r+10*SCALE));
       }
-      ctx.stroke();
-      ctx.restore();
+      ctx.stroke(); ctx.restore();
     }
     if (this.hitFlash > 0){
       ctx.globalAlpha = clamp(this.hitFlash*2.6, 0, 0.85) * alpha;
       ctx.fillStyle = '#fff';
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.r, 0, Math.PI*2);
-      ctx.fill();
+      ctx.beginPath(); ctx.arc(this.x, this.y, this.r, 0, Math.PI*2); ctx.fill();
     }
     ctx.globalAlpha = 1;
   }
@@ -2119,25 +1549,17 @@ function tryDash(ball){
   if (ball.dashCd>0 || ball.dashCharges<=0) return;
   const enemy = (ball===G.player) ? G.enemy : G.player;
   let dx=0, dy=0;
-  if (enemy && enemy.alive){
-    const edx = enemy.x-ball.x, edy = enemy.y-ball.y, l = Math.hypot(edx,edy)||1;
-    dx = edx/l; dy = edy/l;
-  } else {
-    const sp = Math.hypot(ball.vx,ball.vy)||1;
-    dx = ball.vx/sp; dy = ball.vy/sp;
-  }
+  if (enemy && enemy.alive){ const edx=enemy.x-ball.x, edy=enemy.y-ball.y, l=Math.hypot(edx,edy)||1; dx=edx/l; dy=edy/l; }
+  else { const sp=Math.hypot(ball.vx,ball.vy)||1; dx=ball.vx/sp; dy=ball.vy/sp; }
   const impulse = 1100*SCALE;
   ball.vx += dx*impulse; ball.vy += dy*impulse;
   ball.dashTime = 0.24;
   ball.dashCharges--;
-  if (ball.dashCharges>0) ball.dashCd = 0.35;
-  else ball.dashCd = ball.dashMax;
+  if (ball.dashCharges>0) ball.dashCd = 0.35; else ball.dashCd = ball.dashMax;
   ball.invuln = Math.max(ball.invuln, 0.20);
   Sound.dash();
   burst(ball.x,ball.y,20,ball.light,360,5);
-  G.shake = Math.max(G.shake, 9);
-  G.flash = Math.min(0.4, G.flash+0.22);
-  G.flashColor = ball.color;
+  G.shake = Math.max(G.shake, 9); G.flash = Math.min(0.4, G.flash+0.22); G.flashColor = ball.color;
 }
 
 function handleCollision(a, b){
@@ -2146,45 +1568,33 @@ function handleCollision(a, b){
   const minD = a.r + b.r;
   if (d >= minD) return;
   if (d === 0) d = 0.01;
-
   const nx = dx/d, ny = dy/d;
   const overlap = minD - d;
   const tm = a.mass + b.mass;
   a.x -= nx*overlap*(b.mass/tm); a.y -= ny*overlap*(b.mass/tm);
   b.x += nx*overlap*(a.mass/tm); b.y += ny*overlap*(a.mass/tm);
-
   const rvx = b.vx - a.vx, rvy = b.vy - a.vy;
   const relN = rvx*nx + rvy*ny;
   if (relN > 0) return;
-
   let e = 0.96;
   if (a.ability==='bouncer' || b.ability==='bouncer' || a.ability==='ram' || b.ability==='ram') e = 1.05;
-
   const j = -(1 + e) * relN / (1/a.mass + 1/b.mass);
   a.vx -= (j*nx)/a.mass; a.vy -= (j*ny)/a.mass;
   b.vx += (j*nx)/b.mass; b.vy += (j*ny)/b.mass;
-
   if (a.hitCd>0 || b.hitCd>0) return;
-
   const aTowardB = Math.max(0,  a.vx*nx + a.vy*ny);
   const bTowardA = Math.max(0, -(b.vx*nx + b.vy*ny));
   const impact = Math.abs(relN);
   const threshold = 70*SCALE;
   if (impact < threshold) return;
-
   let dmgToA = (bTowardA * b.attackStat * 0.30) / a.defenseStat;
   let dmgToB = (aTowardB * a.attackStat * 0.30) / b.defenseStat;
-
   if (b.dashTime>0) dmgToA *= 1.8;
   if (a.dashTime>0) dmgToB *= 1.8;
-
   if (a.ability==='wall'){ dmgToA *= 1.25; a.vx *= 1.15; a.vy *= 1.15; }
   if (b.ability==='wall'){ dmgToB *= 1.25; b.vx *= 1.15; b.vy *= 1.15; }
-
   const CAP = 40;
-  dmgToA = Math.min(dmgToA, CAP);
-  dmgToB = Math.min(dmgToB, CAP);
-
+  dmgToA = Math.min(dmgToA, CAP); dmgToB = Math.min(dmgToB, CAP);
   const total = dmgToA + dmgToB;
   if (total > 2){
     const midX = (a.x+b.x)/2, midY = (a.y+b.y)/2;
@@ -2194,12 +1604,9 @@ function handleCollision(a, b){
     burst(midX, midY, Math.min(18, 4+Math.floor(total)), '#fff', 190+total*10, 3.6);
     Sound.hit(clamp(total/26, 0.15, 1));
     a.hitCd = b.hitCd = 0.15;
-    b.onHit(a, dmgToA);
-    a.onHit(b, dmgToB);
+    b.onHit(a, dmgToA); a.onHit(b, dmgToB);
   }
-
-  b.dealDamageTo(a, dmgToA);
-  a.dealDamageTo(b, dmgToB);
+  b.dealDamageTo(a, dmgToA); a.dealDamageTo(b, dmgToB);
 }
 
 /* ============================================================
@@ -2211,49 +1618,25 @@ class PowerUp {
   constructor(type, x, y){ this.type=type; this.x=x; this.y=y; this.r=14*SCALE; this.color=PU_DEF[type].color; this.spin=Math.random()*Math.PI*2; this.life=16; this.bob=Math.random()*Math.PI*2; }
   update(dt){ this.spin += dt*1.7; this.bob += dt*2.6; this.life -= dt; }
   draw(){
-    const pulse = 1 + Math.sin(this.bob)*0.09;
-    const R = this.r*pulse;
-    ctx.save();
-    ctx.translate(this.x, this.y);
-    ctx.shadowBlur = 20; ctx.shadowColor = this.color;
-    ctx.rotate(this.spin);
-    ctx.fillStyle = 'rgba(10,5,25,0.9)';
-    ctx.strokeStyle = this.color; ctx.lineWidth = 2.2;
-    const s = R*0.92;
-    ctx.beginPath();
-    if (ctx.roundRect) ctx.roundRect(-s,-s,s*2,s*2,s*0.42);
-    else ctx.rect(-s,-s,s*2,s*2);
-    ctx.fill(); ctx.stroke();
-    ctx.rotate(-this.spin);
-    ctx.shadowBlur = 10;
-    ctx.fillStyle = this.color; ctx.strokeStyle = this.color; ctx.lineWidth = 2;
+    const pulse = 1 + Math.sin(this.bob)*0.09; const R = this.r*pulse;
+    ctx.save(); ctx.translate(this.x, this.y); ctx.shadowBlur = 20; ctx.shadowColor = this.color;
+    ctx.rotate(this.spin); ctx.fillStyle = 'rgba(10,5,25,0.9)'; ctx.strokeStyle = this.color; ctx.lineWidth = 2.2;
+    const s = R*0.92; ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(-s,-s,s*2,s*2,s*0.42); else ctx.rect(-s,-s,s*2,s*2);
+    ctx.fill(); ctx.stroke(); ctx.rotate(-this.spin);
+    ctx.shadowBlur = 10; ctx.fillStyle = this.color; ctx.strokeStyle = this.color; ctx.lineWidth = 2;
     const k = R*0.52;
-    if (this.type === 'speed'){
-      ctx.beginPath();
-      ctx.moveTo(k*0.3,-k); ctx.lineTo(-k*0.6,k*0.1);
-      ctx.lineTo(-k*0.05,k*0.1); ctx.lineTo(-k*0.3,k);
-      ctx.lineTo(k*0.6,-k*0.12); ctx.lineTo(k*0.05,-k*0.12);
-      ctx.closePath(); ctx.fill();
-    } else if (this.type === 'heal'){
-      ctx.fillRect(-k*0.28,-k,k*0.56,k*2);
-      ctx.fillRect(-k,-k*0.28,k*2,k*0.56);
-    } else if (this.type === 'shield'){
-      ctx.beginPath();
-      ctx.moveTo(0,-k); ctx.lineTo(k*0.85,-k*0.4); ctx.lineTo(k*0.85,k*0.25);
-      ctx.lineTo(0,k); ctx.lineTo(-k*0.85,k*0.25); ctx.lineTo(-k*0.85,-k*0.4);
-      ctx.closePath(); ctx.stroke();
-    } else {
-      ctx.beginPath(); ctx.arc(0,0,k*0.5,0,Math.PI*2); ctx.fill();
-      ctx.beginPath(); ctx.arc(0,0,k,0,Math.PI*2); ctx.stroke();
-    }
+    if (this.type === 'speed'){ ctx.beginPath(); ctx.moveTo(k*0.3,-k); ctx.lineTo(-k*0.6,k*0.1); ctx.lineTo(-k*0.05,k*0.1); ctx.lineTo(-k*0.3,k); ctx.lineTo(k*0.6,-k*0.12); ctx.lineTo(k*0.05,-k*0.12); ctx.closePath(); ctx.fill(); }
+    else if (this.type === 'heal'){ ctx.fillRect(-k*0.28,-k,k*0.56,k*2); ctx.fillRect(-k,-k*0.28,k*2,k*0.56); }
+    else if (this.type === 'shield'){ ctx.beginPath(); ctx.moveTo(0,-k); ctx.lineTo(k*0.85,-k*0.4); ctx.lineTo(k*0.85,k*0.25); ctx.lineTo(0,k); ctx.lineTo(-k*0.85,k*0.25); ctx.lineTo(-k*0.85,-k*0.4); ctx.closePath(); ctx.stroke(); }
+    else { ctx.beginPath(); ctx.arc(0,0,k*0.5,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(0,0,k,0,Math.PI*2); ctx.stroke(); }
     ctx.restore();
   }
 }
 function spawnPowerUp(){
   if (G.powerups.length>=3) return;
   const type = PU_KEYS[Math.floor(Math.random()*PU_KEYS.length)];
-  const ang = Math.random()*Math.PI*2;
-  const dist = Math.random()*arena.r*0.72;
+  const ang = Math.random()*Math.PI*2, dist = Math.random()*arena.r*0.72;
   G.powerups.push(new PowerUp(type, arena.cx+Math.cos(ang)*dist, arena.cy+Math.sin(ang)*dist));
 }
 function applyPowerUp(ball, pu){
@@ -2263,10 +1646,8 @@ function applyPowerUp(ball, pu){
     case 'shield': ball.shield = Math.max(ball.shield, 6.0); ball.showFloatText('SHIELD!', '#4fc3ff'); break;
     case 'big': ball.growth = Math.max(ball.growth, 0.55); ball.showFloatText('BIG!', '#c05bff'); break;
   }
-  Sound.pick();
-  burst(pu.x, pu.y, 20, pu.color, 260, 4);
-  G.flash = Math.min(0.3, G.flash+0.16);
-  G.flashColor = pu.color;
+  Sound.pick(); burst(pu.x, pu.y, 20, pu.color, 260, 4);
+  G.flash = Math.min(0.3, G.flash+0.16); G.flashColor = pu.color;
 }
 
 /* ============================================================
@@ -2287,17 +1668,14 @@ function startGame(playerDef, enemyDef){
   const ex = arena.cx + arena.r*0.5, ey = arena.cy;
   G.player = makeBall(playerDef, px, py, true);
   G.enemy = makeBall(enemyDef, ex, ey, false);
-
   if (playerDef.ability === 'mirror') G.player.ability = enemyDef.ability;
   if (enemyDef.ability === 'mirror')  G.enemy.ability = playerDef.ability;
-
   G.particles = []; G.projectiles = []; G.hazards = [];
   G.powerups = []; G.damageNums = []; G.floatTexts = [];
   G.elapsed = 0; G.score = 0; G.combo = 0; G.comboTimer = 0; G.maxCombo = 1;
   G.playerDmgDealt = 0; G.shake = 0; G.flash = 0; G.slowmo = 0; G.timeScale = 1;
   G.ending = false; G.endTimer = 0; G.spawnTimer = 3.0;
   G.mode = 'playing';
-
   showScreen(null);
   document.getElementById('hud').classList.remove('hidden');
   document.getElementById('youName').textContent = playerDef.name;
@@ -2316,21 +1694,16 @@ function update(dt){
   if (!p || !e) return;
   G.elapsed += dt;
   p.update(dt, e); e.update(dt, p);
-
   const decideDash = (ball, enemy) => {
     if (!ball.alive || !enemy || !enemy.alive || G.ending) return;
     if (ball.dashCd>0 || ball.dashCharges<=0) return;
     if (ball.freeze>0 || ball.sticky>0) return;
     const d = Math.hypot(enemy.x-ball.x, enemy.y-ball.y);
     const chance = (ball.ability==='warrior'||ball.ability==='dasher' ? 1.6 : 1.0) * dt;
-    if (d < arena.r*0.55 && d > ball.r+enemy.r && Math.random()<chance){
-      tryDash(ball);
-    }
+    if (d < arena.r*0.55 && d > ball.r+enemy.r && Math.random()<chance) tryDash(ball);
   };
   decideDash(p, e); decideDash(e, p);
-
   if (p.alive && e.alive && !G.ending) handleCollision(p, e);
-
   for (let i = G.projectiles.length-1; i>=0; i--){
     const pr = G.projectiles[i];
     const target = pr.owner === p ? e : p;
@@ -2338,14 +1711,9 @@ function update(dt){
     if (pr.life<=0){ G.projectiles.splice(i,1); continue; }
     if (target.alive){
       const d = Math.hypot(pr.x-target.x, pr.y-target.y);
-      if (d < target.r + pr.r){
-        pr.owner.dealDamageTo(target, pr.dmg, true);
-        burst(pr.x,pr.y,10,pr.color,220,3);
-        G.projectiles.splice(i,1);
-      }
+      if (d < target.r + pr.r){ pr.owner.dealDamageTo(target, pr.dmg, true); burst(pr.x,pr.y,10,pr.color,220,3); G.projectiles.splice(i,1); }
     }
   }
-
   for (let i = G.hazards.length-1; i>=0; i--){
     const h = G.hazards[i];
     h.update(dt);
@@ -2354,17 +1722,15 @@ function update(dt){
       if (ball===h.owner || !ball.alive) continue;
       const d = Math.hypot(ball.x-h.x, ball.y-h.y);
       if (d < h.r + ball.r*0.5){
-        if (h.color==='#32cd32'||h.color==='#808000'||h.color==='#9dff4d') ball.poisonTimer = Math.max(ball.poisonTimer, 0.5);
+        if (h.color==='#32cd32'||h.color==='#808000') ball.poisonTimer = Math.max(ball.poisonTimer, 0.5);
         if (h.color==='#ff4400'||h.color==='#ff4500'||h.color==='#8b0000'||h.color==='#ff2400'||h.color==='#da70d6') ball.burnTimer = Math.max(ball.burnTimer, 0.6);
         if (h.color==='#2e8b57'||h.color==='#2f4f4f'||h.color==='#88aa00') ball.sticky = Math.max(ball.sticky, 0.4);
         h.owner.dealDamageTo(ball, h.dmg*dt, true);
       }
     }
   }
-
   for (let i=G.damageNums.length-1;i>=0;i--){ G.damageNums[i].update(dt); if(G.damageNums[i].life<=0)G.damageNums.splice(i,1); }
   for (let i=G.floatTexts.length-1;i>=0;i--){ G.floatTexts[i].update(dt); if(G.floatTexts[i].life<=0)G.floatTexts.splice(i,1); }
-
   G.spawnTimer -= dt;
   if (G.spawnTimer<=0 && !G.ending){
     spawnPowerUp();
@@ -2373,7 +1739,6 @@ function update(dt){
     if (e.ability==='lucky') bonus -= 0.8;
     G.spawnTimer = rand(4.5, 7.5) + bonus;
   }
-
   for (let i=G.powerups.length-1;i>=0;i--){
     const pu = G.powerups[i];
     pu.update(dt);
@@ -2384,16 +1749,17 @@ function update(dt){
       if (d < ball.r + pu.r){ applyPowerUp(ball, pu); G.powerups.splice(i,1); break; }
     }
   }
-
   for (let i=G.particles.length-1;i>=0;i--){ const pt=G.particles[i]; pt.update(dt); if(pt.life<=0)G.particles.splice(i,1); }
   if (G.particles.length > MAX_PARTICLES) G.particles.splice(0, G.particles.length-MAX_PARTICLES);
-
   if (G.comboTimer>0){ G.comboTimer -= dt; if (G.comboTimer<=0){ G.combo=0; G.comboTimer=0; } }
-
   if (!G.ending && (!p.alive || !e.alive)){
     G.ending = true; G.endTimer = 1.8; G.slowmo = 1.8;
     G.shake = Math.max(G.shake, 22);
-    if (p.alive && !e.alive) Sound.win(); else if (!p.alive && e.alive) Sound.lose();
+    if (!T.active){
+      if (p.alive && !e.alive) Sound.win(); else if (!p.alive && e.alive) Sound.lose();
+    } else {
+      if (p.alive || e.alive) Sound.win();
+    }
   }
 }
 
@@ -2401,11 +1767,9 @@ function update(dt){
    15. RENDER
    ============================================================ */
 function drawBackground(){
-  ctx.fillStyle = bgGrad;
-  ctx.fillRect(0,0,W,H);
+  ctx.fillStyle = bgGrad; ctx.fillRect(0,0,W,H);
   const sp = 60; const off = (performance.now()*0.022) % sp;
-  ctx.lineWidth = 1;
-  ctx.strokeStyle = 'rgba(90,140,255,0.065)';
+  ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(90,140,255,0.065)';
   ctx.beginPath();
   for (let x=-off; x<W+sp; x+=sp){ ctx.moveTo(x,0); ctx.lineTo(x,H); }
   for (let y=-off; y<H+sp; y+=sp){ ctx.moveTo(0,y); ctx.lineTo(W,y); }
@@ -2414,55 +1778,31 @@ function drawBackground(){
   g.addColorStop(0, 'rgba(90,45,200,0.36)');
   g.addColorStop(0.55,'rgba(45,20,120,0.14)');
   g.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.fillStyle = g;
-  ctx.fillRect(0,0,W,H);
+  ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
 }
 function drawArena(){
   const t = performance.now()/1000;
   const fg = ctx.createRadialGradient(arena.cx, arena.cy, 0, arena.cx, arena.cy, arena.r);
-  fg.addColorStop(0, 'rgba(50,30,110,0.55)');
-  fg.addColorStop(0.7,'rgba(25,14,72,0.42)');
-  fg.addColorStop(1, 'rgba(80,30,150,0.16)');
-  ctx.fillStyle = fg;
-  ctx.beginPath(); ctx.arc(arena.cx, arena.cy, arena.r, 0, Math.PI*2); ctx.fill();
-
+  fg.addColorStop(0, 'rgba(50,30,110,0.55)'); fg.addColorStop(0.7,'rgba(25,14,72,0.42)'); fg.addColorStop(1, 'rgba(80,30,150,0.16)');
+  ctx.fillStyle = fg; ctx.beginPath(); ctx.arc(arena.cx, arena.cy, arena.r, 0, Math.PI*2); ctx.fill();
   ctx.save();
   ctx.beginPath(); ctx.arc(arena.cx, arena.cy, arena.r, 0, Math.PI*2); ctx.clip();
-  ctx.strokeStyle = 'rgba(90,140,255,0.06)';
-  ctx.lineWidth = 1;
+  ctx.strokeStyle = 'rgba(90,140,255,0.06)'; ctx.lineWidth = 1;
   const gsp = 42; const goff = (performance.now()*0.025) % gsp;
   ctx.beginPath();
   for (let x=arena.cx-arena.r-goff; x<arena.cx+arena.r+gsp; x+=gsp){ ctx.moveTo(x, arena.cy-arena.r); ctx.lineTo(x, arena.cy+arena.r); }
   for (let y=arena.cy-arena.r-goff; y<arena.cy+arena.r+gsp; y+=gsp){ ctx.moveTo(arena.cx-arena.r, y); ctx.lineTo(arena.cx+arena.r, y); }
-  ctx.stroke();
-  ctx.restore();
-
-  ctx.save();
-  ctx.translate(arena.cx, arena.cy); ctx.rotate(t*0.28);
-  ctx.strokeStyle = 'rgba(120,220,255,0.26)';
-  ctx.lineWidth = 2;
-  ctx.setLineDash([14,22]);
-  ctx.beginPath(); ctx.arc(0,0, arena.r*0.86, 0, Math.PI*2); ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.restore();
-
-  ctx.strokeStyle = 'rgba(162,91,255,0.30)';
-  ctx.lineWidth = 1.5;
+  ctx.stroke(); ctx.restore();
+  ctx.save(); ctx.translate(arena.cx, arena.cy); ctx.rotate(t*0.28);
+  ctx.strokeStyle = 'rgba(120,220,255,0.26)'; ctx.lineWidth = 2; ctx.setLineDash([14,22]);
+  ctx.beginPath(); ctx.arc(0,0, arena.r*0.86, 0, Math.PI*2); ctx.stroke(); ctx.setLineDash([]); ctx.restore();
+  ctx.strokeStyle = 'rgba(162,91,255,0.30)'; ctx.lineWidth = 1.5;
   ctx.beginPath(); ctx.arc(arena.cx, arena.cy, arena.r*0.32, 0, Math.PI*2); ctx.stroke();
   ctx.beginPath(); ctx.arc(arena.cx, arena.cy, arena.r*0.15, 0, Math.PI*2); ctx.stroke();
-
-  ctx.save();
-  ctx.shadowBlur = 34; ctx.shadowColor = '#4fd8ff';
-  ctx.strokeStyle = '#7ef0ff'; ctx.lineWidth = 4;
-  ctx.beginPath(); ctx.arc(arena.cx, arena.cy, arena.r, 0, Math.PI*2); ctx.stroke();
-  ctx.restore();
-
-  ctx.save();
-  ctx.shadowBlur = 20; ctx.shadowColor = '#a25bff';
-  ctx.strokeStyle = 'rgba(162,91,255,0.65)';
-  ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.arc(arena.cx, arena.cy, arena.r+8, 0, Math.PI*2); ctx.stroke();
-  ctx.restore();
+  ctx.save(); ctx.shadowBlur = 34; ctx.shadowColor = '#4fd8ff'; ctx.strokeStyle = '#7ef0ff'; ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.arc(arena.cx, arena.cy, arena.r, 0, Math.PI*2); ctx.stroke(); ctx.restore();
+  ctx.save(); ctx.shadowBlur = 20; ctx.shadowColor = '#a25bff'; ctx.strokeStyle = 'rgba(162,91,255,0.65)'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(arena.cx, arena.cy, arena.r+8, 0, Math.PI*2); ctx.stroke(); ctx.restore();
 }
 function render(){
   ctx.setTransform(DPR,0,0,DPR,0,0);
@@ -2482,34 +1822,22 @@ function render(){
   for (const dn of G.damageNums) dn.draw();
   for (const ft of G.floatTexts) ft.draw();
   ctx.restore();
-  if (G.flash>0.01){
-    ctx.globalAlpha = Math.min(0.75, G.flash);
-    ctx.fillStyle = G.flashColor;
-    ctx.fillRect(0,0,W,H);
-    ctx.globalAlpha = 1;
-  }
+  if (G.flash>0.01){ ctx.globalAlpha = Math.min(0.75, G.flash); ctx.fillStyle = G.flashColor; ctx.fillRect(0,0,W,H); ctx.globalAlpha = 1; }
 }
 
 /* ============================================================
    16. HUD
    ============================================================ */
 const hudEls = {
-  youHp: document.getElementById('youHp'),
-  foeHp: document.getElementById('foeHp'),
-  timer: document.getElementById('hudTimer'),
-  comboEl: document.getElementById('comboEl'),
-  youStatus: document.getElementById('youStatus'),
-  foeStatus: document.getElementById('foeStatus')
+  youHp: document.getElementById('youHp'), foeHp: document.getElementById('foeHp'),
+  timer: document.getElementById('hudTimer'), comboEl: document.getElementById('comboEl'),
+  youStatus: document.getElementById('youStatus'), foeStatus: document.getElementById('foeStatus')
 };
 const STATUS_DEFS = [
-  { key:'shield', icon:'◈', color:'#4fc3ff' },
-  { key:'freeze', icon:'❄', color:'#80ffff' },
-  { key:'slow',   icon:'↓', color:'#a8e8ff' },
-  { key:'poisonTimer', icon:'☠', color:'#9dff4d' },
-  { key:'burnTimer',   icon:'🔥', color:'#ff4400' },
-  { key:'bleedTimer',  icon:'✂', color:'#dc143c' },
-  { key:'sticky',      icon:'≈', color:'#88aa00' },
-  { key:'invisible',   icon:'◌', color:'#c0c0ff' },
+  { key:'shield', icon:'◈', color:'#4fc3ff' }, { key:'freeze', icon:'❄', color:'#80ffff' },
+  { key:'slow',   icon:'↓', color:'#a8e8ff' }, { key:'poisonTimer', icon:'☠', color:'#9dff4d' },
+  { key:'burnTimer',   icon:'🔥', color:'#ff4400' }, { key:'bleedTimer', icon:'✂', color:'#dc143c' },
+  { key:'sticky',      icon:'≈', color:'#88aa00' }, { key:'invisible', icon:'◌', color:'#c0c0ff' },
   { key:'abilityDisabled', icon:'⊗', color:'#444444' }
 ];
 function buildStatusHTML(ball){
@@ -2571,6 +1899,9 @@ const screens = {
   howto: document.getElementById('scr-howto'),
   balls: document.getElementById('scr-balls'),
   select: document.getElementById('scr-select'),
+  'tourney-select': document.getElementById('scr-tourney-select'),
+  bracket: document.getElementById('scr-bracket'),
+  champion: document.getElementById('scr-champion'),
   pause: document.getElementById('scr-pause'),
   over: document.getElementById('scr-over')
 };
@@ -2581,6 +1912,7 @@ function showScreen(name){
 function pauseGame(){ if (G.mode!=='playing') return; G.mode='paused'; showScreen('pause'); }
 function resumeGame(){ if (G.mode!=='paused') return; G.mode='playing'; showScreen(null); }
 function restartGame(){
+  if (T.active) return;
   G.mode = 'menu';
   const pDef = G.playerDef || BALL_MAP[selectedBallId] || BALL_MAP['basic'];
   const eDef = G.enemyDef || pickRandomEnemy(pDef);
@@ -2588,6 +1920,7 @@ function restartGame(){
   startGame(pDef, eDef);
 }
 function goToMenu(){
+  T.active = false;
   G.mode = 'menu'; G.player = null; G.enemy = null;
   G.particles=[]; G.projectiles=[]; G.hazards=[]; G.powerups=[]; G.damageNums=[]; G.floatTexts=[];
   G.ending=false; G.endTimer=0; G.slowmo=0; G.timeScale=1; G.shake=0; G.flash=0;
@@ -2596,7 +1929,213 @@ function goToMenu(){
 }
 
 /* ============================================================
-   19. GRIDS
+   19. TOURNAMENT
+   ============================================================ */
+function initTournamentSelect(){
+  T.active = false;
+  T.participants = [];
+  T.phase = 'select';
+  renderTourneySlots();
+  renderTournamentGrid();
+  updateTourneyStartBtn();
+  document.getElementById('tourneySearch').value = '';
+}
+
+function toggleTourneyPick(def){
+  const idx = T.participants.findIndex(p => p.id === def.id);
+  if (idx >= 0){
+    T.participants.splice(idx, 1);
+  } else {
+    if (T.participants.length < 8) T.participants.push(def);
+    else { Sound.tone(140, 0.14, 'square', 0.09); return; }
+  }
+  Sound.ui();
+  renderTourneySlots();
+  renderTournamentGrid(document.getElementById('tourneySearch').value);
+  updateTourneyStartBtn();
+}
+
+function renderTourneySlots(){
+  const wrap = document.getElementById('tourneySlots');
+  wrap.innerHTML = '';
+  for (let i=0; i<8; i++){
+    const def = T.participants[i];
+    const slot = document.createElement('div');
+    slot.className = 'tourney-slot ' + (def ? 'filled' : 'empty');
+    if (def){
+      slot.innerHTML =
+        '<div class="ts-orb" style="background:radial-gradient(circle at 35% 30%,'+def.light+','+def.color+');box-shadow:0 0 10px '+def.color+'"></div>' +
+        '<div class="ts-name">'+def.name+'</div>';
+      slot.addEventListener('click', () => {
+        T.participants = T.participants.filter(p => p.id !== def.id);
+        Sound.ui();
+        renderTourneySlots();
+        renderTournamentGrid(document.getElementById('tourneySearch').value);
+        updateTourneyStartBtn();
+      });
+    }
+    wrap.appendChild(slot);
+  }
+  document.getElementById('tourneyCount').textContent = T.participants.length + ' / 8 terpilih';
+}
+
+function renderTournamentGrid(filter){
+  const grid = document.getElementById('tourneyGrid');
+  grid.innerHTML = '';
+  const pickedIds = new Set(T.participants.map(p => p.id));
+  filterBalls(filter).forEach(def => {
+    const card = makeBallCard(def);
+    if (pickedIds.has(def.id)) card.classList.add('picked-tourney');
+    card.addEventListener('click', () => toggleTourneyPick(def));
+    grid.appendChild(card);
+  });
+}
+
+function updateTourneyStartBtn(){
+  document.getElementById('tourneyStartBtn').disabled = T.participants.length !== 8;
+}
+
+function startTournament(){
+  if (T.participants.length !== 8) return;
+  const p = T.participants.slice();
+  T.rounds = [
+    [[p[0],p[1]],[p[2],p[3]],[p[4],p[5]],[p[6],p[7]]],
+    [[null,null],[null,null]],
+    [[null,null]]
+  ];
+  T.currentRound = 0;
+  T.currentMatch = 0;
+  T.results = [];
+  T.champion = null;
+  T.lastResult = null;
+  T.active = true;
+  T.phase = 'bracket';
+  showBracket();
+}
+
+function showBracket(){
+  Sound.ui();
+  showScreen('bracket');
+  const wrap = document.getElementById('bracketWrap');
+  wrap.innerHTML = '';
+  const labels = ['QUARTER FINALS', 'SEMI FINALS', 'FINAL'];
+  T.rounds.forEach((round, ri) => {
+    const col = document.createElement('div');
+    col.className = 'bracket-col';
+    const lbl = document.createElement('div');
+    lbl.className = 'bracket-label';
+    lbl.textContent = labels[ri];
+    col.appendChild(lbl);
+    round.forEach((match, mi) => {
+      const mEl = document.createElement('div');
+      mEl.className = 'bracket-match';
+      const isCurrent = (ri === T.currentRound && mi === T.currentMatch);
+      const isDone = (ri < T.currentRound || (ri === T.currentRound && mi < T.currentMatch));
+      if (isCurrent) mEl.classList.add('current');
+      if (isDone) mEl.classList.add('done');
+      [0,1].forEach(side => {
+        const def = match[side];
+        const slot = document.createElement('div');
+        slot.className = 'bm-slot';
+        if (!def){
+          slot.classList.add('tbd');
+          slot.innerHTML = '<div class="bm-orb" style="background:#333"></div><div class="bm-name">?</div>';
+        } else {
+          slot.innerHTML =
+            '<div class="bm-orb" style="background:radial-gradient(circle at 35% 30%,'+def.light+','+def.color+');box-shadow:0 0 6px '+def.color+'"></div>' +
+            '<div class="bm-name">'+def.name+'</div>';
+        }
+        mEl.appendChild(slot);
+      });
+      col.appendChild(mEl);
+    });
+    wrap.appendChild(col);
+  });
+  // Update next match info
+  const info = document.getElementById('nextMatchInfo');
+  const cur = T.rounds[T.currentRound] && T.rounds[T.currentRound][T.currentMatch];
+  if (cur && cur[0] && cur[1]){
+    info.innerHTML =
+      '<div class="next-match-label">PERTANDINGAN BERIKUTNYA</div>' +
+      '<div class="next-match-vs">' +
+      '<span style="color:'+cur[0].color+';text-shadow:0 0 10px '+cur[0].color+'">'+cur[0].name+'</span>' +
+      ' <span style="opacity:.5;font-size:14px">VS</span> ' +
+      '<span style="color:'+cur[1].color+';text-shadow:0 0 10px '+cur[1].color+'">'+cur[1].name+'</span>' +
+      '</div>' +
+      '<div style="font-size:10px;letter-spacing:2px;opacity:.5;margin-top:6px">' +
+      (T.currentRound === 0 ? 'QUARTER FINAL' : T.currentRound === 1 ? 'SEMI FINAL' : 'FINAL') +
+      ' · MATCH ' + (T.currentMatch+1) + ' / ' + T.rounds[T.currentRound].length +
+      '</div>';
+  } else {
+    info.innerHTML = '<div class="next-match-label">SEMUA PERTANDINGAN SELESAI</div>';
+  }
+  document.getElementById('nextMatchBtn').style.display = 'block';
+}
+
+function runTournamentMatch(){
+  if (!T.active || T.phase !== 'bracket') return;
+  const cur = T.rounds[T.currentRound][T.currentMatch];
+  if (!cur || !cur[0] || !cur[1]) return;
+  T.phase = 'match';
+  G.playerDef = cur[0];
+  G.enemyDef = cur[1];
+  startGame(cur[0], cur[1]);
+}
+
+function advanceTournament(winnerDef){
+  const r = T.currentRound;
+  const m = T.currentMatch;
+  const match = T.rounds[r][m];
+  const loserDef = match[0] === winnerDef ? match[1] : match[0];
+
+  // Store in next round
+  if (r + 1 < T.rounds.length){
+    const nextSlot = Math.floor(m / 2);
+    const nextSide = m % 2;
+    T.rounds[r+1][nextSlot][nextSide] = winnerDef;
+  }
+
+  T.results.push({ round:r, match:m, winner:winnerDef, loser:loserDef });
+  T.lastResult = { winner: winnerDef, loser: loserDef };
+
+  T.currentMatch++;
+  if (T.currentMatch >= T.rounds[r].length){
+    T.currentRound++;
+    T.currentMatch = 0;
+  }
+
+  if (T.currentRound >= T.rounds.length){
+    T.champion = winnerDef;
+    T.phase = 'champion';
+    showChampion();
+    return;
+  }
+
+  T.phase = 'bracket';
+  showBracket();
+}
+
+function showChampion(){
+  const c = T.champion;
+  const orb = document.getElementById('championOrb');
+  orb.style.background = 'radial-gradient(circle at 35% 30%,'+c.light+','+c.color+')';
+  orb.style.boxShadow = '0 0 40px '+c.color+', 0 0 80px '+c.color;
+  document.getElementById('championName').textContent = c.name;
+  document.getElementById('championName').style.color = c.color;
+  document.getElementById('championName').style.textShadow = '0 0 20px '+c.color;
+  document.getElementById('championDesc').textContent = c.desc;
+  const meta = ABILITY_META[c.ability] || { label:'—' };
+  document.getElementById('championStats').innerHTML =
+    '<div class="stat"><div class="v">'+c.hp+'</div><div class="l">HP</div></div>' +
+    '<div class="stat"><div class="v">'+c.atk.toFixed(2)+'</div><div class="l">ATK</div></div>' +
+    '<div class="stat"><div class="v">'+c.def.toFixed(2)+'</div><div class="l">DEF</div></div>' +
+    '<div class="stat"><div class="v" style="font-size:12px;color:'+meta.color+'">'+meta.label+'</div><div class="l">ABILITY</div></div>';
+  Sound.win();
+  showScreen('champion');
+}
+
+/* ============================================================
+   20. BALL GRIDS (shared)
    ============================================================ */
 function makeBallCard(def){
   const card = document.createElement('div');
@@ -2619,7 +2158,7 @@ function renderAllBallsGrid(filter){
   grid.innerHTML = '';
   filterBalls(filter).forEach(def => {
     const card = makeBallCard(def);
-    card.title = def.desc + ' — HP ' + def.hp + ' · ATK ' + def.atk.toFixed(2) + ' · DEF ' + def.def.toFixed(2);
+    card.title = def.desc + ' — HP '+def.hp+' · ATK '+def.atk.toFixed(2)+' · DEF '+def.def.toFixed(2);
     grid.appendChild(card);
   });
 }
@@ -2649,26 +2188,36 @@ function updatePicked(def){
   orb.style.background = 'radial-gradient(circle at 35% 30%,'+def.light+','+def.color+')';
   orb.style.boxShadow = '0 0 18px '+def.color;
   const meta = ABILITY_META[def.ability] || { label:'—' };
-  nm.textContent = def.name + ' · HP ' + def.hp + ' · PWR ' + def.pwr + '/9';
+  nm.textContent = def.name + ' · HP '+def.hp+' · PWR '+def.pwr+'/9';
   ds.textContent = def.desc + ' — Kemampuan: ' + meta.label;
   st.innerHTML = 'ATK <b>'+def.atk.toFixed(2)+'</b> · DEF <b>'+def.def.toFixed(2)+'</b> · SPD <b>'+def.spd.toFixed(2)+'</b>';
 }
 
 /* ============================================================
-   20. GAME OVER
+   21. GAME OVER
    ============================================================ */
 function showGameOver(){
+  // === TOURNAMENT MODE ===
+  if (T.active){
+    const playerWon = G.player.alive && !G.enemy.alive;
+    const winnerDef = playerWon ? G.playerDef : G.enemyDef;
+    document.getElementById('hud').classList.add('hidden');
+    G.mode = 'tournament-result';
+    T.phase = 'result';
+    setTimeout(() => advanceTournament(winnerDef), 1300);
+    return;
+  }
+
+  // Normal game over
   G.mode = 'over';
   document.getElementById('hud').classList.add('hidden');
   const p = G.player, e = G.enemy;
   const win = p.alive && !e.alive;
-
   document.getElementById('overTitle').textContent = win ? 'VICTORY' : 'DEFEAT';
   document.getElementById('overTitle').className = 'title ' + (win ? 'win' : 'lose');
   document.getElementById('overSub').textContent = win
     ? 'Bolamu (' + p.name + ') menghancurkan ' + e.name + '!'
     : (e.alive ? 'Bolamu (' + p.name + ') hancur.' : 'Kamu kalah.');
-
   const you = document.getElementById('resultYou');
   const foe = document.getElementById('resultFoe');
   you.style.background = 'radial-gradient(circle at 35% 30%,'+p.light+','+p.color+')';
@@ -2677,55 +2226,82 @@ function showGameOver(){
   foe.style.background = 'radial-gradient(circle at 35% 30%,'+e.light+','+e.color+')';
   foe.style.boxShadow = '0 0 20px '+e.color;
   foe.classList.toggle('dead', !e.alive);
-
   document.getElementById('resultYouHp').style.width = Math.max(0, (p.hp/p.maxHp)*100)+'%';
   document.getElementById('resultFoeHp').style.width = Math.max(0, (e.hp/e.maxHp)*100)+'%';
-
   document.getElementById('ovTime').textContent = fmtTime(G.elapsed);
   document.getElementById('ovDmg').textContent = Math.floor(G.playerDmgDealt);
-  document.getElementById('ovCombo').textContent = 'x' + G.maxCombo;
-
+  document.getElementById('ovCombo').textContent = 'x'+G.maxCombo;
   const finalScore = Math.floor(G.score) + (win ? 500 : 0);
   let best = 0;
   try { best = parseInt(localStorage.getItem('bvb_best')||'0', 10)||0; } catch(err){}
   if (finalScore > best){ best = finalScore; try { localStorage.setItem('bvb_best', String(best)); } catch(err){} }
   document.getElementById('bestInfo').textContent = 'BEST SCORE: ' + best;
-
   showScreen('over');
 }
 
 /* ============================================================
-   21. UI EVENTS
+   22. UI EVENTS
    ============================================================ */
 document.querySelectorAll('[data-act]').forEach(btn => {
   btn.addEventListener('click', () => {
     Sound.init(); Sound.resume(); Sound.ui();
     const act = btn.getAttribute('data-act');
-    if (act==='play'){ renderSelectGrid(); updatePicked(BALL_MAP[selectedBallId]); showScreen('select'); }
-    if (act==='howto') showScreen('howto');
-    if (act==='balls'){ renderAllBallsGrid(); showScreen('balls'); }
-    if (act==='back') showScreen('menu');
-    if (act==='resume') resumeGame();
-    if (act==='restart') restartGame();
-    if (act==='menu') goToMenu();
+    if (act === 'play'){ renderSelectGrid(); updatePicked(BALL_MAP[selectedBallId]); showScreen('select'); }
+    if (act === 'howto') showScreen('howto');
+    if (act === 'balls'){ renderAllBallsGrid(); showScreen('balls'); }
+    if (act === 'back') showScreen('menu');
+    if (act === 'resume') resumeGame();
+    if (act === 'restart') restartGame();
+    if (act === 'menu') goToMenu();
+    if (act === 'tournament'){ initTournamentSelect(); showScreen('tourney-select'); }
   });
 });
+
 document.getElementById('fightBtn').addEventListener('click', () => {
   Sound.ui();
+  T.active = false;
   const pDef = BALL_MAP[selectedBallId];
   const eDef = pickRandomEnemy(pDef);
   G.playerDef = pDef; G.enemyDef = eDef;
   startGame(pDef, eDef);
 });
+
 document.getElementById('searchBalls').addEventListener('input', e => renderAllBallsGrid(e.target.value));
 document.getElementById('searchSelect').addEventListener('input', e => renderSelectGrid(e.target.value));
+document.getElementById('tourneySearch').addEventListener('input', e => renderTournamentGrid(e.target.value));
+
+// Tournament buttons
+document.getElementById('tourneyRandomBtn').addEventListener('click', () => {
+  Sound.ui();
+  const shuffled = BALLS.slice().sort(() => Math.random() - 0.5);
+  T.participants = shuffled.slice(0, 8);
+  renderTourneySlots();
+  renderTournamentGrid(document.getElementById('tourneySearch').value);
+  updateTourneyStartBtn();
+});
+document.getElementById('tourneyClearBtn').addEventListener('click', () => {
+  Sound.ui();
+  T.participants = [];
+  renderTourneySlots();
+  renderTournamentGrid(document.getElementById('tourneySearch').value);
+  updateTourneyStartBtn();
+});
+document.getElementById('tourneyStartBtn').addEventListener('click', () => {
+  Sound.ui();
+  startTournament();
+});
+document.getElementById('nextMatchBtn').addEventListener('click', () => {
+  Sound.ui();
+  runTournamentMatch();
+});
+
 function pickRandomEnemy(playerDef){
   const pool = BALLS.filter(b => b.id !== playerDef.id);
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
 /* ============================================================
-   22. INIT
+   23. INIT
    ============================================================ */
 resize();
 setupInput();
