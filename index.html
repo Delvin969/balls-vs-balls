@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
-<title>Ball vs Ball — 130 Balls + Tournament</title>
+<title>Ball vs Ball — 150 Balls (Naruto Edition)</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{height:100%;overflow:hidden;background:#04020e;font-family:'Segoe UI',system-ui,sans-serif;color:#fff;-webkit-user-select:none;user-select:none;touch-action:none;}
@@ -54,7 +54,7 @@ h2.title{font-size:clamp(22px,5.5vw,30px);font-weight:900;letter-spacing:3px;mar
 .card ul{list-style:none;}
 .card li{margin-bottom:5px;}
 .card .k{display:inline-block;padding:1px 7px;border-radius:5px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);font-weight:700;font-size:11px;margin:0 2px;}
-.ball-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:6px;width:100%;max-height:50vh;overflow-y:auto;padding:4px;margin-bottom:14px;position:relative;}
+.ball-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:6px;width:100%;max-height:50vh;overflow-y:auto;padding:4px;margin-bottom:14px;}
 .ball-grid::-webkit-scrollbar{width:6px;}
 .ball-grid::-webkit-scrollbar-thumb{background:rgba(162,91,255,.5);border-radius:3px;}
 .ball-card{border-radius:11px;padding:6px 4px 5px;cursor:pointer;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.13);transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative;}
@@ -91,8 +91,6 @@ h2.title{font-size:clamp(22px,5.5vw,30px);font-weight:900;letter-spacing:3px;mar
 .lose{color:#ff5f7e !important;text-shadow:0 0 26px #ff5f7e !important;}
 .key-hint{font-size:10px;letter-spacing:1.5px;opacity:.55;margin-top:2px;margin-bottom:10px;text-align:center;}
 .key-hint b{display:inline-block;padding:2px 7px;border-radius:5px;margin:0 3px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);font-size:10px;color:#5fe6ff;}
-
-/* === Tournament === */
 .tourney-slots{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%;margin-bottom:12px;padding:8px;background:rgba(255,255,255,0.04);border-radius:12px;border:1px dashed rgba(255,255,255,0.15);}
 .tourney-slot{aspect-ratio:1;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px;background:rgba(255,255,255,0.04);border:2px solid rgba(255,255,255,0.1);cursor:pointer;transition:all .15s;gap:3px;font-size:8px;text-align:center;position:relative;overflow:hidden;}
 .tourney-slot.empty::before{content:'+';font-size:22px;opacity:0.2;font-weight:900;}
@@ -155,11 +153,12 @@ h2.title{font-size:clamp(22px,5.5vw,30px);font-weight:900;letter-spacing:3px;mar
 <div id="overlay">
   <div class="screen active" id="scr-menu">
     <h1 class="logo">BALL <span>VS</span> BALL</h1>
-    <p class="sub">130 Bola · 130 Kemampuan Unik</p>
+    <p class="sub">150 Bola · 150 Kemampuan · Naruto Edition</p>
     <button class="btn primary" data-act="play">⚔ PERTARUNGAN 1v1</button>
     <button class="btn primary" data-act="tournament" style="background:linear-gradient(100deg,rgba(255,180,0,.85),rgba(255,80,0,.85));box-shadow:0 0 30px rgba(255,180,0,.6);">🏆 TURNAMEN 8 BOLA</button>
+    <button class="btn" data-act="naruto" style="background:linear-gradient(100deg,rgba(255,140,0,.4),rgba(200,50,50,.4));border-color:rgba(255,140,0,.7);">🍥 BOLA NARUTO</button>
     <button class="btn" data-act="howto">? CARA MAIN</button>
-    <button class="btn" data-act="balls">📖 DAFTAR BOLA (130)</button>
+    <button class="btn" data-act="balls">📖 DAFTAR BOLA (150)</button>
     <div style="margin-top:10px;font-size:11px;letter-spacing:2px;opacity:.6" id="bestInfo">—</div>
   </div>
 
@@ -168,18 +167,25 @@ h2.title{font-size:clamp(22px,5.5vw,30px);font-weight:900;letter-spacing:3px;mar
     <div class="card">
       <ul>
         <li>Bola bergerak <b>lurus</b> dan <b>memantul</b> di dinding arena.</li>
-        <li>Setiap bola punya <b>kemampuan unik</b>. 130 bola = 130 kemampuan berbeda.</li>
+        <li><b>150 bola = 150 kemampuan berbeda.</b> 20 di antaranya bertema Naruto Shippuden.</li>
         <li><b>ATK</b> = damage yang diberikan. <b>DEF</b> = damage yang dikurangi.</li>
         <li><b>Hanya yang menabrak yang memberi damage!</b></li>
-        <li><b>TURNAMEN:</b> Pilih 8 bola, lalu tonton bracket sampai tersisa 1 juara. 🏆</li>
-        <li>Tekan <span class="k">ESC</span> untuk pause.</li>
+        <li><b>NARUTO BALLS:</b> 🍥 NARUTO · ⚡ SASUKE · 👁 KAKASHI · ◈ HINATA · 🔥 ITACHI · ⛨ MADARA · ✊ SAKURA · ⚡ ROCK LEE · ◈ GAARA · 🐙 KILLER BEE · ◎ OBITO · ✹ PAIN · ✧ KONAN · ✿ JIRAIYA · ✚ TSUNADE · ✧ MINATO · ♣ YAMATO · ◐ SHIKAMARU · ◎ CHOJI · ✺ NEJI</li>
+        <li><b>TURNAMEN:</b> Pilih 8 bola, tonton bracket sampai juara. 🏆</li>
       </ul>
     </div>
     <button class="btn" data-act="back">← KEMBALI</button>
   </div>
 
+  <div class="screen" id="scr-naruto">
+    <h2 class="title">🍥 BOLA NARUTO</h2>
+    <p class="sub" style="margin-bottom:12px;">20 karakter Naruto Shippuden dengan kemampuan khas</p>
+    <div class="ball-grid" id="narutoGrid"></div>
+    <button class="btn" data-act="back">← KEMBALI</button>
+  </div>
+
   <div class="screen" id="scr-balls">
-    <h2 class="title">DAFTAR BOLA (130)</h2>
+    <h2 class="title">DAFTAR BOLA (150)</h2>
     <input type="text" class="search-bar" id="searchBalls" placeholder="🔍 Cari nama bola atau kemampuan..."/>
     <div class="ball-grid" id="allBallsGrid"></div>
     <button class="btn" data-act="back">← KEMBALI</button>
@@ -201,7 +207,6 @@ h2.title{font-size:clamp(22px,5.5vw,30px);font-weight:900;letter-spacing:3px;mar
     <button class="btn ghost" data-act="back">← KEMBALI</button>
   </div>
 
-  <!-- === TOURNAMENT: SELECT 8 === -->
   <div class="screen" id="scr-tourney-select">
     <h2 class="title">🏆 PILIH 8 PESERTA</h2>
     <p class="sub" style="margin-bottom:12px;" id="tourneyCount">0 / 8 terpilih</p>
@@ -209,12 +214,12 @@ h2.title{font-size:clamp(22px,5.5vw,30px);font-weight:900;letter-spacing:3px;mar
     <input type="text" class="search-bar" id="tourneySearch" placeholder="🔍 Cari bola untuk ditambahkan..."/>
     <div class="ball-grid" id="tourneyGrid"></div>
     <button class="btn" id="tourneyRandomBtn">🎲 ACAK 8 BOLA</button>
+    <button class="btn" id="tourneyNarutoBtn" style="background:rgba(255,140,0,.2);border-color:rgba(255,140,0,.5)">🍥 8 NARUTO RANDOM</button>
     <button class="btn ghost" id="tourneyClearBtn">✖ KOSONGKAN</button>
     <button class="btn primary" id="tourneyStartBtn" disabled>🏆 MULAI TURNAMEN</button>
     <button class="btn ghost" data-act="back">← KEMBALI</button>
   </div>
 
-  <!-- === TOURNAMENT: BRACKET === -->
   <div class="screen" id="scr-bracket">
     <h2 class="title">🏆 TURNAMEN</h2>
     <div class="bracket-wrap" id="bracketWrap"></div>
@@ -223,7 +228,6 @@ h2.title{font-size:clamp(22px,5.5vw,30px);font-weight:900;letter-spacing:3px;mar
     <button class="btn ghost" data-act="menu">⌂ MENU UTAMA</button>
   </div>
 
-  <!-- === TOURNAMENT: CHAMPION === -->
   <div class="screen" id="scr-champion">
     <div class="trophy-icon">🏆</div>
     <h2 class="title win">JUARA TURNAMEN</h2>
@@ -316,6 +320,7 @@ const Sound = {
   pick(){ this.tone(700,0.09,'sine',0.1); setTimeout(()=>this.tone(1120,0.13,'sine',0.09),65); },
   bounce(){ this.tone(200,0.06,'triangle',0.05,140); },
   ability(){ this.tone(900,0.1,'sine',0.07); this.tone(1400,0.1,'sine',0.05); },
+  jutsu(){ this.tone(500,0.15,'sawtooth',0.1,900); this.noise(0.2,0.08,1500,1.5); },
   win(){ [523,659,784,1047,1319].forEach((f,i)=>setTimeout(()=>this.tone(f,0.3,'triangle',0.13),i*100)); },
   lose(){ [392,330,262,175].forEach((f,i)=>setTimeout(()=>this.tone(f,0.32,'sawtooth',0.1),i*130)); },
   ui(){ this.tone(560,0.06,'sine',0.07); }
@@ -332,9 +337,10 @@ const MAX_DAMAGE_NUMS = 60;
 const MAX_FLOATING_TEXTS = 40;
 
 /* ============================================================
-   4. BALLS (130 unique abilities)
+   4. BALLS — 150 unique abilities (130 original + 20 Naruto)
    ============================================================ */
 const BALL_DEFS = [
+  // ===== ORIGINAL 130 =====
   ['basic','BASIC','#7ec8ff',100,22,1.00,1.00,1.00,5,'basic','Tanpa kemampuan khusus.'],
   ['sturdy','STURDY','#a8c0d8',115,23,0.95,0.95,1.30,5,'sturdy','DEF +30% permanen.'],
   ['swift','SWIFT','#ffe066',85,20,1.35,0.90,0.85,5,'swift','SPD +35% permanen.'],
@@ -357,7 +363,7 @@ const BALL_DEFS = [
   ['drill','DRILL','#808080',80,21,1.15,1.25,0.85,8,'drill','Menembus shield musuh.'],
   ['tank','TANK','#9b9b9b',180,28,0.70,0.70,1.55,5,'tank','HP & DEF tinggi, lambat.'],
   ['wall','WALL','#666680',140,25,0.85,0.85,1.40,5,'wall','Kena damage → speed boost.'],
-  ['fortress','FORTRESS','#505060',200,30,0.55,0.60,1.80,5,'fortress','DEF sangat tinggi, hampir tak bergerak.'],
+  ['fortress','FORTRESS','#505060',200,30,0.55,0.60,1.80,5,'fortress','DEF sangat tinggi.'],
   ['paladin','PALADIN','#e8e0c8',120,24,0.90,0.95,1.60,6,'paladin','Shield regen tiap 7 detik.'],
   ['guardian','GUARDIAN','#b0c4de',130,25,0.85,0.85,1.50,6,'guardian','Damage dikurangi 20% flat.'],
   ['juggernaut','JUGGERNAUT','#556b2f',110,24,0.95,1.00,1.30,6,'juggernaut','Kebal slow/freeze.'],
@@ -371,111 +377,136 @@ const BALL_DEFS = [
   ['resilient','RESILIENT','#20b2aa',110,23,1.00,0.95,1.30,7,'resilient','Regen shield kecil tiap detik.'],
   ['immortal','IMMORTAL','#ffd700',90,23,1.00,1.00,1.10,8,'immortal','Bertahan 1x dari kematian.'],
   ['adamant','ADAMANT','#b8860b',150,26,0.75,0.80,1.60,5,'adamant','Kebal knockback.'],
-  ['bulwark','BULWARK','#a9a9a9',145,26,0.80,0.85,1.55,6,'bulwark','Shield menyerap 60% damage.'],
-  ['fortitude','FORTITUDE','#66cdaa',125,24,0.90,0.90,1.45,6,'fortitude','Setiap 5 detik heal 10 HP.'],
-  ['warden','WARDEN','#3cb371',115,24,0.95,1.00,1.35,7,'warden','Shield otomatis saat HP<40%.'],
-  ['aegis2','BULWARK II','#00ced1',105,24,1.00,0.95,1.40,7,'aegis2','Shield beregenerasi cepat.'],
+  ['bulwark','BULWARK','#a9a9a9',145,26,0.80,0.85,1.55,6,'bulwark','Shield menyerap 60%.'],
+  ['fortitude','FORTITUDE','#66cdaa',125,24,0.90,0.90,1.45,6,'fortitude','Heal 10 HP tiap 5 detik.'],
+  ['warden','WARDEN','#3cb371',115,24,0.95,1.00,1.35,7,'warden','Shield saat HP<40%.'],
+  ['aegis2','BULWARK II','#00ced1',105,24,1.00,0.95,1.40,7,'aegis2','Shield regen cepat.'],
   ['fire','FIRE','#ff4400',85,22,1.05,1.00,0.90,6,'fire','Jejak api 12 dmg/s.'],
   ['ice','ICE','#80ffff',80,22,1.00,0.90,1.00,6,'ice','Freeze musuh 1.5 detik.'],
-  ['freezer','FREEZER','#a8e8ff',80,22,1.00,0.90,1.00,7,'freezer','Slow 55% selama 2.5 detik.'],
-  ['poison','POISON','#9dff4d',80,22,1.00,0.90,1.00,7,'poison','Racun 25 damage/4 detik.'],
-  ['lightning','LIGHTNING','#ffff44',70,22,1.05,1.15,0.90,8,'lightning','Zap tambahan 6 damage.'],
+  ['freezer','FREEZER','#a8e8ff',80,22,1.00,0.90,1.00,7,'freezer','Slow 55% 2.5 detik.'],
+  ['poison','POISON','#9dff4d',80,22,1.00,0.90,1.00,7,'poison','Racun 25 dmg/4 detik.'],
+  ['lightning','LIGHTNING','#ffff44',70,22,1.05,1.15,0.90,8,'lightning','Zap tambahan 6 dmg.'],
   ['shaman','SHAMAN','#40e0d0',75,22,1.00,1.15,0.95,8,'shaman','Chain shock otomatis.'],
   ['dragon','DRAGON','#8b0000',60,24,1.05,1.40,0.85,9,'dragon','Napas api + burn 2.5s.'],
-  ['frost','FROST','#b0e0e6',80,22,1.00,0.95,1.05,7,'frost','Ice spike burst saat hit.'],
+  ['frost','FROST','#b0e0e6',80,22,1.00,0.95,1.05,7,'frost','Ice spike burst.'],
   ['magma','MAGMA','#ff4500',80,23,1.00,1.10,0.90,7,'magma','Lava trail 18 dmg/s.'],
-  ['storm','STORM','#9370db',70,22,1.05,1.05,1.00,8,'storm','Lightning aura otomatis.'],
-  ['toxic','TOXIC','#32cd32',80,22,1.00,0.95,1.00,7,'toxic','Poison cloud di area.'],
-  ['blaze','BLAZE','#ff6347',80,23,1.05,1.15,0.90,8,'blaze','Fire nova saat menabrak.'],
-  ['thunder','THUNDER','#ffd700',70,22,1.05,1.20,0.90,8,'thunder','Chain lightning ke 3 target.'],
-  ['glacier','GLACIER','#afeeee',85,23,0.95,0.90,1.15,7,'glacier','Freeze aura di sekitar.'],
-  ['inferno','INFERNO','#ff2400',65,24,1.00,1.35,0.85,9,'inferno','Fire lebih besar + burn.'],
+  ['storm','STORM','#9370db',70,22,1.05,1.05,1.00,8,'storm','Lightning aura.'],
+  ['toxic','TOXIC','#32cd32',80,22,1.00,0.95,1.00,7,'toxic','Poison cloud.'],
+  ['blaze','BLAZE','#ff6347',80,23,1.05,1.15,0.90,8,'blaze','Fire nova saat hit.'],
+  ['thunder','THUNDER','#ffd700',70,22,1.05,1.20,0.90,8,'thunder','Chain lightning x3.'],
+  ['glacier','GLACIER','#afeeee',85,23,0.95,0.90,1.15,7,'glacier','Freeze aura.'],
+  ['inferno','INFERNO','#ff2400',65,24,1.00,1.35,0.85,9,'inferno','Fire besar + burn.'],
   ['blizzard','BLIZZARD','#e0ffff',75,23,1.00,0.90,1.10,7,'blizzard','Slow aura luas.'],
-  ['plague','PLAGUE','#808000',75,22,1.00,0.95,1.00,8,'plague','Poison menyebar ke sekitar.'],
-  ['venom','VENOM','#6b8e23',75,22,1.00,1.00,1.00,8,'venom','Racun lebih kuat 40 dmg.'],
+  ['plague','PLAGUE','#808000',75,22,1.00,0.95,1.00,8,'plague','Poison menyebar.'],
+  ['venom','VENOM','#6b8e23',75,22,1.00,1.00,1.00,8,'venom','Racun kuat 40 dmg.'],
   ['static','STATIC','#fffacd',75,22,1.05,1.10,0.95,7,'static','Zap saat kontak.'],
-  ['plasma','PLASMA','#da70d6',70,23,1.05,1.20,0.95,8,'plasma','Burn + slow sekaligus.'],
+  ['plasma','PLASMA','#da70d6',70,23,1.05,1.20,0.95,8,'plasma','Burn + slow.'],
   ['speedy','SPEEDY','#ffd93d',80,19,1.60,0.85,0.70,5,'speedy','Sangat cepat, DEF rendah.'],
   ['dasher','DASHER','#ff8c00',85,22,1.10,1.00,0.95,7,'dasher','4 dash tersimpan.'],
-  ['teleport','TELEPORT','#7b68ee',70,22,1.00,1.00,1.00,8,'teleport','Berkedip tiap 5 detik.'],
+  ['teleport','TELEPORT','#7b68ee',70,22,1.00,1.00,1.00,8,'teleport','Berkedip tiap 5s.'],
   ['phantom','PHANTOM','#9370db',75,22,1.05,1.00,1.05,8,'phantom','Bisa tembus musuh.'],
   ['sprinter','SPRINTER','#32cd32',85,21,1.45,0.90,0.85,6,'sprinter','Speed boost konstan.'],
-  ['warp','WARP','#483d8b',70,22,1.05,1.00,1.00,8,'warp','Teleport lebih sering.'],
-  ['ghost','GHOST','#c0c0ff',70,22,1.05,1.00,1.15,8,'ghost','28% peluang menghindar.'],
-  ['shadow','SHADOW','#2f2f2f',75,22,1.05,1.10,1.00,8,'shadow','Menghilang tiap 6 detik.'],
-  ['cyclone','CYCLONE','#87ceeb',80,22,1.20,0.95,0.90,7,'cyclone','Spin cepat + AoE.'],
-  ['jitter','JITTER','#ff69b4',80,22,1.15,0.95,0.95,7,'jitter','Gerak tidak terduga.'],
+  ['warp','WARP','#483d8b',70,22,1.05,1.00,1.00,8,'warp','Teleport sering.'],
+  ['ghost','GHOST','#c0c0ff',70,22,1.05,1.00,1.15,8,'ghost','28% dodge.'],
+  ['shadow','SHADOW','#2f2f2f',75,22,1.05,1.10,1.00,8,'shadow','Invisible tiap 6s.'],
+  ['cyclone','CYCLONE','#87ceeb',80,22,1.20,0.95,0.90,7,'cyclone','Spin + AoE.'],
+  ['jitter','JITTER','#ff69b4',80,22,1.15,0.95,0.95,7,'jitter','Gerak tak terduga.'],
   ['blink','BLINK','#6a5acd',75,22,1.10,1.00,1.00,8,'blink','Short range teleport.'],
   ['dashmaster','DASH MASTER','#ffa500',80,22,1.15,1.05,0.90,8,'dashmaster','Cooldown dash pendek.'],
-  ['ghostwalk','GHOSTWALK','#b0c4de',70,22,1.10,0.95,1.10,8,'ghostwalk','Damage dikurangi 30% saat low HP.'],
+  ['ghostwalk','GHOSTWALK','#b0c4de',70,22,1.10,0.95,1.10,8,'ghostwalk','DEF+ saat low HP.'],
   ['turbo','TURBO','#ff4500',75,21,1.40,1.00,0.80,7,'turbo','Speed tinggi, rawan.'],
   ['ninja','NINJA','#333340',65,22,1.15,1.20,0.80,8,'ninja','30% crit + invis.'],
-  ['healer','HEALER','#4dff88',85,22,1.00,0.85,1.00,6,'healer','Regen 6 HP/detik.'],
-  ['druid','DRUID','#6b8e23',90,23,1.00,0.95,1.10,6,'druid','Regen 8 HP/detik.'],
-  ['shield','SHIELD','#4fc3ff',85,22,0.95,0.85,1.20,6,'shield','Shield regen tiap 9 detik.'],
+  ['healer','HEALER','#4dff88',85,22,1.00,0.85,1.00,6,'healer','Regen 6 HP/s.'],
+  ['druid','DRUID','#6b8e23',90,23,1.00,0.95,1.10,6,'druid','Regen 8 HP/s.'],
+  ['shield','SHIELD','#4fc3ff',85,22,0.95,0.85,1.20,6,'shield','Shield regen tiap 9s.'],
   ['magnet','MAGNET','#ff69b4',110,24,0.95,0.90,1.10,4,'magnet','Menarik power-up.'],
   ['lucky','LUCKY','#ffd700',105,22,1.00,0.95,1.00,4,'lucky','Power-up lebih sering.'],
   ['oracle','ORACLE','#ffd700',70,22,1.00,1.00,1.20,8,'oracle','40% dodge.'],
-  ['medic','MEDIC','#00ff7f',90,22,1.00,0.90,1.05,6,'medic','Heal berlebih 20 HP.'],
-  ['priest','PRIEST','#f0e68c',85,22,1.00,0.95,1.10,7,'priest','Heal burst saat menabrak.'],
+  ['medic','MEDIC','#00ff7f',90,22,1.00,0.90,1.05,6,'medic','Overheal 20 HP.'],
+  ['priest','PRIEST','#f0e68c',85,22,1.00,0.95,1.10,7,'priest','Heal burst.'],
   ['sage','SAGE','#dda0dd',90,22,1.00,0.95,1.05,6,'sage','Bonus score +50%.'],
   ['monk','MONK','#ffdead',100,23,1.00,1.00,1.15,6,'monk','Balanced stats.'],
   ['mystic','MYSTIC','#40e0d0',85,22,1.00,1.05,1.10,7,'mystic','Heal + shock.'],
-  ['cleric','CLERIC','#fffacd',80,22,1.00,0.95,1.10,7,'cleric','Heal 5 HP saat hit.'],
-  ['acolyte','ACOLYTE','#e6e6fa',85,22,1.00,0.90,1.05,6,'acolyte','Regen kecil 3/detik.'],
-  ['prophet','PROPHET','#dc143c',80,22,1.00,1.00,1.05,7,'prophet','Lihat HP musuh (bonus info).'],
-  ['trickster','TRICKSTER','#ff00ff',80,22,1.05,1.00,1.00,7,'trickster','Random buff tiap 5 detik.'],
-  ['mender','MENDER','#98fb98',85,22,1.00,0.90,1.10,6,'mender','Heal setelah kena hit.'],
+  ['cleric','CLERIC','#fffacd',80,22,1.00,0.95,1.10,7,'cleric','Heal 5 HP hit.'],
+  ['acolyte','ACOLYTE','#e6e6fa',85,22,1.00,0.90,1.05,6,'acolyte','Regen 3/s.'],
+  ['prophet','PROPHET','#dc143c',80,22,1.00,1.00,1.05,7,'prophet','Sight bonus.'],
+  ['trickster','TRICKSTER','#ff00ff',80,22,1.05,1.00,1.00,7,'trickster','Random buff.'],
+  ['mender','MENDER','#98fb98',85,22,1.00,0.90,1.10,6,'mender','Heal setelah hit.'],
   ['lifebinder','LIFEBINDER','#9370db',80,22,1.00,0.95,1.10,7,'lifebinder','Regen + shield.'],
-  ['reviver','REVIVER','#32cd32',75,22,1.00,0.95,1.10,8,'reviver','Bangkit 1x dengan 25 HP.'],
-  ['eternal','ETERNAL','#ffd700',75,22,1.00,1.00,1.10,8,'eternal','Regen konstan tiap detik.'],
-  ['grace','GRACE','#f0f8ff',80,22,1.00,0.95,1.10,7,'grace','Heal besar setelah kill.'],
-  ['reflector','REFLECTOR','#ff77ff',70,22,1.00,0.85,1.30,8,'reflector','Reflect 55% damage.'],
+  ['reviver','REVIVER','#32cd32',75,22,1.00,0.95,1.10,8,'reviver','Bangkit 1x.'],
+  ['eternal','ETERNAL','#ffd700',75,22,1.00,1.00,1.10,8,'eternal','Regen konstan.'],
+  ['grace','GRACE','#f0f8ff',80,22,1.00,0.95,1.10,7,'grace','Heal setelah kill.'],
+  ['reflector','REFLECTOR','#ff77ff',70,22,1.00,0.85,1.30,8,'reflector','Reflect 55%.'],
   ['vampire','VAMPIRE','#b0004d',70,22,1.05,1.10,0.90,8,'vampire','Lifesteal 45%.'],
-  ['mirror','MIRROR','#e0e0e0',70,22,1.00,1.00,1.00,8,'mirror','Meniru kemampuan musuh.'],
-  ['absorber','ABSORBER','#8a2be2',80,22,1.00,1.00,1.10,8,'absorber','Mencuri HP saat hit.'],
-  ['puller','PULLER','#20b2aa',85,22,1.00,1.00,1.10,7,'puller','Menarik musuh mendekat.'],
+  ['mirror','MIRROR','#e0e0e0',70,22,1.00,1.00,1.00,8,'mirror','Tiru kemampuan.'],
+  ['absorber','ABSORBER','#8a2be2',80,22,1.00,1.00,1.10,8,'absorber','Curi HP.'],
+  ['puller','PULLER','#20b2aa',85,22,1.00,1.00,1.10,7,'puller','Tarik musuh.'],
   ['leech','LEECH','#556b2f',75,22,1.00,1.00,1.05,8,'leech','Lifesteal + slow.'],
-  ['shrinker','SHRINKER','#32cd32',80,22,1.00,0.90,1.00,7,'shrinker','Mengecilkan musuh.'],
-  ['sticky','STICKY','#88aa00',80,22,1.00,0.90,1.00,7,'sticky','Menempelkan musuh 1s.'],
+  ['shrinker','SHRINKER','#32cd32',80,22,1.00,0.90,1.00,7,'shrinker','Kecilkan musuh.'],
+  ['sticky','STICKY','#88aa00',80,22,1.00,0.90,1.00,7,'sticky','Tempel musuh 1s.'],
   ['boxer','BOXER','#ff6347',75,22,1.05,1.30,0.85,7,'boxer','Knockback kuat.'],
-  ['grabber','GRABBER','#b0e0e6',85,22,1.00,1.05,1.05,7,'grabber','Menarik musuh lebih kuat.'],
-  ['repulsor','REPULSOR','#00ced1',80,22,1.00,1.10,1.05,7,'repulsor','Mendorong musuh menjauh.'],
-  ['vacuum','VACUUM','#696969',80,22,1.00,1.00,1.05,8,'vacuum','Tarik power-up + musuh.'],
-  ['jammer','JAMMER','#444444',75,22,1.00,1.05,1.00,8,'jammer','Disable ability musuh 3s.'],
-  ['antimagic','ANTI-MAGIC','#2f4f4f',80,22,1.00,1.00,1.10,8,'antimagic','Blok ability musuh.'],
-  ['nullify','NULLIFY','#808080',75,22,1.00,1.05,1.05,8,'nullify','Reset cooldown musuh.'],
-  ['aura','AURA','#dda0dd',90,24,1.00,0.85,1.05,6,'aura','Damage pasif 9/s.'],
-  ['spinner','SPINNER','#00ced1',80,24,0.95,1.00,1.00,7,'spinner','Spin AoE 12 dmg.'],
-  ['nova','NOVA','#ff1493',70,23,1.05,1.15,0.90,8,'nova','Nova explosion saat hit.'],
-  ['blaster','BLASTER','#9400d3',75,22,1.00,1.10,1.00,8,'blaster','Tembak proyektil.'],
-  ['bomber','BOMBER','#ff5b2e',52,22,1.05,1.45,0.65,9,'bomber','Ledakan AoE saat nabrak.'],
-  ['exploder','EXPLODER','#ffa500',80,22,1.00,1.00,0.90,7,'exploder','Ledakan besar saat mati.'],
-  ['sniper','SNIPER','#ffcc00',55,20,1.00,1.30,0.65,9,'sniper','Auto shoot tiap 2 detik.'],
-  ['trapper','TRAPPER','#2e8b57',80,22,1.00,0.95,1.10,7,'trapper','Tinggalkan jebakan.'],
-  ['cluster','CLUSTER','#daa520',75,22,1.00,1.10,1.00,8,'cluster','Multi-projectile.'],
-  ['mirage','MIRAGE','#dda0dd',80,22,1.00,0.95,1.10,8,'mirage','Buat decoy.'],
-  ['shatter','SHATTER','#b0c4de',85,22,1.00,1.10,1.05,8,'shatter','Hancurkan shield musuh.'],
-  ['quake','QUAKE','#8b4513',90,24,0.90,1.05,1.15,7,'quake','Shockwave tiap 3s.'],
-  ['vortex','VORTEX','#4b0082',75,22,1.00,1.00,1.05,8,'vortex','Vortex menarik musuh.'],
-  ['implode','IMPLODE','#191970',70,22,1.05,1.20,0.95,8,'implode','Damage burst pada HP rendah.'],
-  ['singularity','SINGULARITY','#000080',70,23,1.00,1.15,1.05,9,'singularity','Tarik + damage berkelanjutan.'],
-  ['wolf','WOLF','#696969',95,22,1.05,1.10,1.00,7,'wolf','Bonus damage saat HP musuh rendah.'],
-  ['bear','BEAR','#8b4513',150,27,0.80,1.05,1.40,6,'bear','HP raksasa + kuat.'],
-  ['lion','LION','#daa520',100,24,1.00,1.15,1.10,7,'lion','Bonus damage ke musuh lebih lemah.'],
-  ['tiger','TIGER','#ff8c00',90,22,1.15,1.20,0.95,8,'tiger','Speed burst tiap 5s.'],
+  ['grabber','GRABBER','#b0e0e6',85,22,1.00,1.05,1.05,7,'grabber','Tarik kuat.'],
+  ['repulsor','REPULSOR','#00ced1',80,22,1.00,1.10,1.05,7,'repulsor','Dorong musuh.'],
+  ['vacuum','VACUUM','#696969',80,22,1.00,1.00,1.05,8,'vacuum','Tarik semua.'],
+  ['jammer','JAMMER','#444444',75,22,1.00,1.05,1.00,8,'jammer','Disable 3s.'],
+  ['antimagic','ANTI-MAGIC','#2f4f4f',80,22,1.00,1.00,1.10,8,'antimagic','Blok ability.'],
+  ['nullify','NULLIFY','#808080',75,22,1.00,1.05,1.05,8,'nullify','Reset cooldown.'],
+  ['aura','AURA','#dda0dd',90,24,1.00,0.85,1.05,6,'aura','Aura 9/s.'],
+  ['spinner','SPINNER','#00ced1',80,24,0.95,1.00,1.00,7,'spinner','Spin AoE.'],
+  ['nova','NOVA','#ff1493',70,23,1.05,1.15,0.90,8,'nova','Nova hit.'],
+  ['blaster','BLASTER','#9400d3',75,22,1.00,1.10,1.00,8,'blaster','Tembak.'],
+  ['bomber','BOMBER','#ff5b2e',52,22,1.05,1.45,0.65,9,'bomber','Ledakan AoE.'],
+  ['exploder','EXPLODER','#ffa500',80,22,1.00,1.00,0.90,7,'exploder','Ledakan saat mati.'],
+  ['sniper','SNIPER','#ffcc00',55,20,1.00,1.30,0.65,9,'sniper','Auto shoot.'],
+  ['trapper','TRAPPER','#2e8b57',80,22,1.00,0.95,1.10,7,'trapper','Jebakan.'],
+  ['cluster','CLUSTER','#daa520',75,22,1.00,1.10,1.00,8,'cluster','Multi proyektil.'],
+  ['mirage','MIRAGE','#dda0dd',80,22,1.00,0.95,1.10,8,'mirage','Decoy.'],
+  ['shatter','SHATTER','#b0c4de',85,22,1.00,1.10,1.05,8,'shatter','Hancurkan shield.'],
+  ['quake','QUAKE','#8b4513',90,24,0.90,1.05,1.15,7,'quake','Shockwave.'],
+  ['vortex','VORTEX','#4b0082',75,22,1.00,1.00,1.05,8,'vortex','Vortex tarik.'],
+  ['implode','IMPLODE','#191970',70,22,1.05,1.20,0.95,8,'implode','Damage HP rendah.'],
+  ['singularity','SINGULARITY','#000080',70,23,1.00,1.15,1.05,9,'singularity','Tarik + dmg.'],
+  ['wolf','WOLF','#696969',95,22,1.05,1.10,1.00,7,'wolf','Bonus HP rendah.'],
+  ['bear','BEAR','#8b4513',150,27,0.80,1.05,1.40,6,'bear','HP raksasa.'],
+  ['lion','LION','#daa520',100,24,1.00,1.15,1.10,7,'lion','Bonus vs lemah.'],
+  ['tiger','TIGER','#ff8c00',90,22,1.15,1.20,0.95,8,'tiger','Speed burst.'],
   ['eagle','EAGLE','#8b0000',85,22,1.10,1.15,1.00,8,'eagle','Crit + vision.'],
-  ['snake','SNAKE','#228b22',80,22,1.05,1.00,1.00,7,'snake','Poison + strike.'],
-  ['spider','SPIDER','#2f4f4f',80,22,1.00,0.95,1.05,7,'spider','Web trap musuh.'],
-  ['shark','SHARK','#4682b4',85,23,1.05,1.20,0.95,8,'shark','Execute damage ke HP<35%.'],
-  ['rhino','RHINO','#778899',130,26,0.85,1.10,1.30,6,'rhino','Charge attack bonus.'],
-  ['fox','FOX','#ff6347',80,22,1.10,1.00,1.05,7,'fox','Smart dodge 35%.'],
-  ['panther','PANTHER','#1a1a1a',75,22,1.15,1.15,0.95,8,'panther','Stealth + ambush.'],
-  ['cheetah','CHEETAH','#ffcc00',75,21,1.55,1.00,0.80,7,'cheetah','Burst speed tercepat.'],
-  ['cobra','COBRA','#4b0082',80,22,1.05,1.10,1.00,8,'cobra','Poison + venom strike.'],
-  ['falcon','FALCON','#cd853f',80,22,1.15,1.15,0.95,8,'falcon','Fast strike + vision.'],
-  ['phoenix','PHOENIX','#ff5500',65,22,1.05,1.20,0.95,9,'phoenix','Reborn + fire nova.']
+  ['snake','SNAKE','#228b22',80,22,1.05,1.00,1.00,7,'snake','Poison.'],
+  ['spider','SPIDER','#2f4f4f',80,22,1.00,0.95,1.05,7,'spider','Web trap.'],
+  ['shark','SHARK','#4682b4',85,23,1.05,1.20,0.95,8,'shark','Execute <35%.'],
+  ['rhino','RHINO','#778899',130,26,0.85,1.10,1.30,6,'rhino','Charge bonus.'],
+  ['fox','FOX','#ff6347',80,22,1.10,1.00,1.05,7,'fox','Dodge 35%.'],
+  ['panther','PANTHER','#1a1a1a',75,22,1.15,1.15,0.95,8,'panther','Stealth ambush.'],
+  ['cheetah','CHEETAH','#ffcc00',75,21,1.55,1.00,0.80,7,'cheetah','Speed tercepat.'],
+  ['cobra','COBRA','#4b0082',80,22,1.05,1.10,1.00,8,'cobra','Poison strike.'],
+  ['falcon','FALCON','#cd853f',80,22,1.15,1.15,0.95,8,'falcon','Fast + vision.'],
+  ['phoenix','PHOENIX','#ff5500',65,22,1.05,1.20,0.95,9,'phoenix','Reborn + fire.'],
+
+  // ===== 20 NARUTO SHIPPUDEN BALLS =====
+  ['naruto','NARUTO','#ff9900',95,22,1.05,1.20,1.00,9,'rasengan','Rasengan — bonus spiral AoE damage saat hit.'],
+  ['sasuke','SASUKE','#1a1a4d',85,22,1.10,1.30,0.90,9,'chidori','Chidori — pierce shield + lightning burst.'],
+  ['kakashi','KAKASHI','#3a3a5a',95,22,1.05,1.15,1.05,8,'sharingan','Sharingan — dodge + tiru kemampuan musuh.'],
+  ['hinata','HINATA','#b0b0ff',90,22,1.00,1.10,1.05,8,'byakugan','Byakugan — damage menembus DEF.'],
+  ['itachi','ITACHI','#2a0a2a',70,22,1.05,1.35,0.85,9,'amaterasu','Amaterasu — black flames membara selamanya.'],
+  ['madara','MADARA','#5a0a0a',80,22,1.00,1.30,1.20,9,'susanoo','Susanoo — invulnerability periodik + reflect.'],
+  ['sakura','SAKURA','#ff88cc',100,23,1.00,1.25,1.10,8,'sakura_punch','Chakra Punch — knockback + damage masif.'],
+  ['rocklee','ROCK LEE','#00aa00',90,22,1.20,1.15,0.95,8,'eight_gates','Eight Gates — speed & ATK ekstrem (self-dmg).'],
+  ['gaara','GAARA','#cc8844',110,24,0.90,0.95,1.35,7,'sand_shield','Sand Shield — auto regenerasi konstan.'],
+  ['killerbee','KILLER BEE','#8a2a2a',85,23,1.05,1.25,0.95,8,'eight_tails','Eight Tails — multi-hit combo AoE.'],
+  ['obito','OBITO','#4a2a6a',75,22,1.05,1.20,1.00,9,'kamui','Kamui — phase through attacks (invincible).'],
+  ['pain','PAIN','#aa4400',75,22,1.00,1.25,1.00,9,'shinra_tensei','Shinra Tensei — AoE push blast besar.'],
+  ['konan','KONAN','#4a4a9a',85,22,1.00,1.05,1.15,7,'paper_dance','Paper Dance — buat decoy + shield.'],
+  ['jiraya','JIRAIYA','#cc3333',95,23,1.00,1.15,1.10,8,'sage_mode','Sage Mode — regen + damage boost.'],
+  ['tsunade','TSUNADE','#ffbb88',100,23,0.95,1.15,1.15,8,'tsunade_heal','Healing Jutsu — regen masif + heal hit.'],
+  ['minato','MINATO','#ffdd33',80,22,1.15,1.25,0.90,9,'flying_thunder','Flying Thunder God — teleport strike.'],
+  ['yamato','YAMATO','#8a5a2a',95,23,0.95,1.00,1.20,7,'wood_release','Wood Release — jebak musuh di kayu.'],
+  ['shikamaru','SHIKAMARU','#2a4a2a',85,22,1.00,1.00,1.10,7,'shadow_possess','Shadow Possession — imobilisasi musuh.'],
+  ['choji','CHOJI','#aa6622',130,26,0.80,1.10,1.25,7,'expansion','Expansion Jutsu — membesar + push besar.'],
+  ['neji','NEJI','#ccaabb',90,22,1.05,1.15,1.05,8,'rotation','Rotation — reflect proyektil + AoE.']
 ];
+
+if (BALL_DEFS.length !== 150) console.warn('Ball count:', BALL_DEFS.length);
+
 const BALLS = BALL_DEFS.map(d => ({
   id:d[0], name:d[1], color:d[2],
   hp:d[3], r:d[4], spd:d[5], atk:d[6], def:d[7], pwr:d[8],
@@ -488,6 +519,9 @@ function lighten(hex){
 }
 const BALL_MAP = {};
 BALLS.forEach(b => BALL_MAP[b.id]=b);
+
+// Naruto-only balls for filter
+const NARUTO_IDS = ['naruto','sasuke','kakashi','hinata','itachi','madara','sakura','rocklee','gaara','killerbee','obito','pain','konan','jiraya','tsunade','minato','yamato','shikamaru','choji','neji'];
 
 /* ============================================================
    5. ABILITY META
@@ -632,7 +666,29 @@ const ABILITY_META = {
   cheetah:{label:'CHEETAH',icon:'≫',color:'#ffcc00'},
   cobra:{label:'COBRA',icon:'☠',color:'#4b0082'},
   falcon:{label:'FALCON',icon:'⊕',color:'#cd853f'},
-  phoenix:{label:'REBORN',icon:'✵',color:'#ff5500',active:true}
+  phoenix:{label:'REBORN',icon:'✵',color:'#ff5500',active:true},
+
+  // ===== NARUTO =====
+  rasengan:{label:'RASENGAN',icon:'🌀',color:'#ff9900'},
+  chidori:{label:'CHIDORI',icon:'⚡',color:'#4a4aff'},
+  sharingan:{label:'SHARINGAN',icon:'◉',color:'#c02020'},
+  byakugan:{label:'BYAKUGAN',icon:'◈',color:'#d0d0ff'},
+  amaterasu:{label:'AMATERASU',icon:'🔥',color:'#0a0a0a',active:true},
+  susanoo:{label:'SUSANOO',icon:'⛨',color:'#a020a0',active:true},
+  sakura_punch:{label:'CHAKRA PUNCH',icon:'✊',color:'#ff88cc'},
+  eight_gates:{label:'8 GATES',icon:'⚡',color:'#00cc00',active:true},
+  sand_shield:{label:'SAND SHIELD',icon:'◈',color:'#cc8844',active:true},
+  eight_tails:{label:'8 TAILS',icon:'🐙',color:'#cc3333',active:true},
+  kamui:{label:'KAMUI',icon:'◎',color:'#6a3a9a',active:true},
+  shinra_tensei:{label:'SHINRA',icon:'✹',color:'#cc5500',active:true},
+  paper_dance:{label:'PAPER DANCE',icon:'✧',color:'#6a6aba',active:true},
+  sage_mode:{label:'SAGE MODE',icon:'✿',color:'#cc3333'},
+  tsunade_heal:{label:'HEAL JUTSU',icon:'✚',color:'#ffbb88'},
+  flying_thunder:{label:'FTG',icon:'✧',color:'#ffdd33',active:true},
+  wood_release:{label:'WOOD',icon:'♣',color:'#8a5a2a',active:true},
+  shadow_possess:{label:'SHADOW POSS',icon:'◐',color:'#2a4a2a',active:true},
+  expansion:{label:'EXPANSION',icon:'◎',color:'#aa6622'},
+  rotation:{label:'ROTATION',icon:'✺',color:'#ccaabb',active:true}
 };
 
 /* ============================================================
@@ -648,17 +704,10 @@ const G = {
   spawnTimer:3.0, playerDmgDealt:0
 };
 
-/* Tournament state */
 const T = {
-  active: false,
-  phase: 'select', // select | bracket | match | champion | result
-  participants: [],
-  rounds: [],
-  currentRound: 0,
-  currentMatch: 0,
-  results: [],
-  lastResult: null,
-  champion: null
+  active: false, phase: 'select', participants: [],
+  rounds: [], currentRound: 0, currentMatch: 0,
+  results: [], lastResult: null, champion: null
 };
 
 /* ============================================================
@@ -768,6 +817,218 @@ function drawBallSymbol(ab, r, t){
   ctx.strokeStyle='rgba(255,255,255,0.92)';
   ctx.fillStyle='rgba(255,255,255,0.92)';
 
+  // === NARUTO SYMBOLS ===
+  if (ab==='rasengan'){
+    // Spiral
+    ctx.beginPath();
+    for (let a=0;a<Math.PI*6;a+=0.12){
+      const rr = a/(Math.PI*6)*S*0.95;
+      const x = Math.cos(a)*rr, y = Math.sin(a)*rr;
+      if (a===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    return;
+  }
+  if (ab==='chidori'){
+    // Lightning
+    ctx.beginPath();
+    ctx.moveTo(S*0.3,-S); ctx.lineTo(-S*0.4,S*0.1); ctx.lineTo(S*0.15,S*0.1);
+    ctx.lineTo(-S*0.3,S); ctx.lineTo(S*0.4,-S*0.15); ctx.lineTo(-S*0.1,-S*0.15);
+    ctx.closePath(); ctx.fill();
+    return;
+  }
+  if (ab==='sharingan'){
+    // Red eye with 3 tomoe
+    ctx.beginPath(); ctx.arc(0,0,S*0.85,0,Math.PI*2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(0,0,S*0.32,0,Math.PI*2); ctx.stroke();
+    for (let i=0;i<3;i++){
+      const a = i/3*Math.PI*2 - Math.PI/2;
+      ctx.beginPath();
+      ctx.arc(Math.cos(a)*S*0.55, Math.sin(a)*S*0.55, S*0.14, 0, Math.PI*2);
+      ctx.fill();
+    }
+    return;
+  }
+  if (ab==='byakugan'){
+    // Eye with veins
+    ctx.beginPath(); ctx.arc(0,0,S*0.75,0,Math.PI*2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(0,0,S*0.22,0,Math.PI*2); ctx.fill();
+    for (let i=0;i<8;i++){
+      const a = i/8*Math.PI*2;
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(a)*S*0.75, Math.sin(a)*S*0.75);
+      ctx.lineTo(Math.cos(a+0.2)*S, Math.sin(a+0.2)*S);
+      ctx.stroke();
+    }
+    return;
+  }
+  if (ab==='amaterasu'){
+    // Black flame
+    ctx.beginPath();
+    ctx.moveTo(0,S);
+    ctx.bezierCurveTo(-S*0.75,S*0.4, -S*0.55,-S*0.3, 0,-S);
+    ctx.bezierCurveTo(S*0.55,-S*0.3, S*0.75,S*0.4, 0,S);
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath();
+    ctx.arc(0, 0, S*0.35, 0, Math.PI*2); ctx.stroke();
+    return;
+  }
+  if (ab==='susanoo'){
+    // Armored diamond
+    ctx.beginPath();
+    ctx.moveTo(0,-S); ctx.lineTo(S*0.7,-S*0.4);
+    ctx.lineTo(S*0.7,S*0.4); ctx.lineTo(0,S);
+    ctx.lineTo(-S*0.7,S*0.4); ctx.lineTo(-S*0.7,-S*0.4);
+    ctx.closePath(); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(0,-S*0.5); ctx.lineTo(S*0.35,0); ctx.lineTo(0,S*0.5); ctx.lineTo(-S*0.35,0);
+    ctx.closePath(); ctx.fill();
+    return;
+  }
+  if (ab==='sakura_punch'){
+    ctx.beginPath(); ctx.arc(-S*0.2,0,S*0.6,0,Math.PI*2); ctx.stroke();
+    ctx.fillRect(-S*0.95,-S*0.5,S*0.35,S);
+    ctx.beginPath(); ctx.arc(S*0.3,-S*0.3,S*0.15,0,Math.PI*2); ctx.fill();
+    return;
+  }
+  if (ab==='eight_gates'){
+    // Chakra flame
+    for (let i=0;i<3;i++){
+      ctx.beginPath();
+      ctx.moveTo(0,S*(1-i*0.3));
+      ctx.bezierCurveTo(-S*(0.5+i*0.1),S*0.4, -S*(0.4+i*0.1),-S*0.3, 0,-S*(1-i*0.15));
+      ctx.bezierCurveTo(S*(0.4+i*0.1),-S*0.3, S*(0.5+i*0.1),S*0.4, 0,S*(1-i*0.3));
+      ctx.stroke();
+    }
+    return;
+  }
+  if (ab==='sand_shield'){
+    // Sand swirl
+    for (let i=1;i<=3;i++){
+      ctx.beginPath(); ctx.arc(0,0,S*i/3,0,Math.PI*1.7);
+      ctx.stroke();
+    }
+    ctx.beginPath(); ctx.arc(0,0,S*0.2,0,Math.PI*2); ctx.fill();
+    return;
+  }
+  if (ab==='eight_tails'){
+    // Octopus
+    ctx.beginPath(); ctx.arc(0,-S*0.2,S*0.4,0,Math.PI*2); ctx.stroke();
+    for (let i=0;i<6;i++){
+      const a = i/6*Math.PI*2;
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(a)*S*0.35, -S*0.2+Math.sin(a)*S*0.35);
+      ctx.quadraticCurveTo(Math.cos(a)*S*0.8, Math.sin(a)*S*0.5, Math.cos(a)*S*0.9, Math.sin(a)*S*0.9);
+      ctx.stroke();
+    }
+    return;
+  }
+  if (ab==='kamui'){
+    // Spiral vortex
+    ctx.beginPath();
+    for (let a=0;a<Math.PI*4;a+=0.15){
+      const rr = a/(Math.PI*4)*S;
+      const x = Math.cos(a+t*2)*rr, y = Math.sin(a+t*2)*rr;
+      if (a===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    ctx.beginPath(); ctx.arc(0,0,S*0.2,0,Math.PI*2); ctx.fill();
+    return;
+  }
+  if (ab==='shinra_tensei'){
+    ctx.beginPath(); ctx.arc(0,0,S*0.3,0,Math.PI*2); ctx.fill();
+    for (let i=0;i<8;i++){
+      const a = i/8*Math.PI*2;
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(a)*S*0.45, Math.sin(a)*S*0.45);
+      ctx.lineTo(Math.cos(a)*S, Math.sin(a)*S);
+      ctx.stroke();
+    }
+    return;
+  }
+  if (ab==='paper_dance'){
+    // Paper sheet
+    ctx.beginPath();
+    ctx.moveTo(-S*0.7,-S*0.5); ctx.lineTo(S*0.5,-S*0.7);
+    ctx.lineTo(S*0.7,S*0.5); ctx.lineTo(-S*0.5,S*0.7);
+    ctx.closePath(); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(-S*0.4,-S*0.2); ctx.lineTo(S*0.3,-S*0.35);
+    ctx.stroke();
+    return;
+  }
+  if (ab==='sage_mode'){
+    // Sage marks
+    ctx.beginPath(); ctx.arc(0,0,S*0.7,0,Math.PI*2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(-S*0.3,-S*0.1,S*0.15,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(S*0.3,-S*0.1,S*0.15,0,Math.PI*2); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(0,-S*0.7); ctx.lineTo(0,-S*0.3);
+    ctx.moveTo(-S*0.4,-S*0.5); ctx.lineTo(-S*0.2,-S*0.3);
+    ctx.moveTo(S*0.4,-S*0.5); ctx.lineTo(S*0.2,-S*0.3);
+    ctx.stroke();
+    return;
+  }
+  if (ab==='tsunade_heal'){
+    const th=S*0.3;
+    ctx.beginPath();
+    ctx.moveTo(-th,-S); ctx.lineTo(th,-S); ctx.lineTo(th,-th);
+    ctx.lineTo(S,-th); ctx.lineTo(S,th); ctx.lineTo(th,th);
+    ctx.lineTo(th,S); ctx.lineTo(-th,S); ctx.lineTo(-th,th);
+    ctx.lineTo(-S,th); ctx.lineTo(-S,-th); ctx.lineTo(-th,-th);
+    ctx.closePath(); ctx.fill();
+    return;
+  }
+  if (ab==='flying_thunder'){
+    // Kunai
+    ctx.beginPath();
+    ctx.moveTo(0,-S); ctx.lineTo(S*0.3,0);
+    ctx.lineTo(S*0.15,S*0.2); ctx.lineTo(0,S*0.1);
+    ctx.lineTo(-S*0.15,S*0.2); ctx.lineTo(-S*0.3,0);
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(0,S*0.1); ctx.lineTo(0,S*0.7);
+    ctx.stroke();
+    ctx.beginPath(); ctx.arc(0,S*0.75,S*0.12,0,Math.PI*2); ctx.fill();
+    return;
+  }
+  if (ab==='wood_release'){
+    // Wood grain
+    for (let i=-2;i<=2;i++){
+      ctx.beginPath();
+      ctx.moveTo(i*S*0.3, -S);
+      ctx.bezierCurveTo(i*S*0.3+S*0.2, -S*0.3, i*S*0.3-S*0.2, S*0.3, i*S*0.3, S);
+      ctx.stroke();
+    }
+    return;
+  }
+  if (ab==='shadow_possess'){
+    // Shadow hand
+    ctx.beginPath();
+    ctx.moveTo(-S*0.6,S*0.6); ctx.lineTo(S*0.6,S*0.6);
+    ctx.stroke();
+    ctx.beginPath(); ctx.arc(-S*0.3,S*0.2,S*0.15,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(S*0.3,S*0.2,S*0.15,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(0,S*0.15,S*0.15,0,Math.PI*2); ctx.fill();
+    return;
+  }
+  if (ab==='expansion'){
+    for (let i=1;i<=3;i++){
+      ctx.beginPath(); ctx.arc(0,0,S*i/3,0,Math.PI*2); ctx.stroke();
+    }
+    return;
+  }
+  if (ab==='rotation'){
+    for (let a=0;a<Math.PI*4;a+=0.2){
+      const rr = a/(Math.PI*4)*S;
+      const x = Math.cos(a)*rr, y = Math.sin(a)*rr;
+      if (a===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    return;
+  }
+
+  // === ORIGINAL SYMBOLS ===
   if (['basic','sturdy','heavy','tank','golem','bear','adamant','fortress','ironhide','turtle','rhino','bulwark'].includes(ab)){
     ctx.beginPath();
     for(let i=0;i<6;i++){const a=i/6*Math.PI*2-Math.PI/2;const x=Math.cos(a)*S,y=Math.sin(a)*S; if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
@@ -830,8 +1091,6 @@ function drawBallSymbol(ab, r, t){
     for(let i=0;i<6;i++){
       const a=i/6*Math.PI*2;
       ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(Math.cos(a)*S,Math.sin(a)*S); ctx.stroke();
-      const bx=Math.cos(a)*S*0.62,by=Math.sin(a)*S*0.62;
-      for(const da of [0.6,-0.6]){ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(bx+Math.cos(a+da)*S*0.28,by+Math.sin(a+da)*S*0.28);ctx.stroke();}
     }
     return;
   }
@@ -862,7 +1121,6 @@ function drawBallSymbol(ab, r, t){
     return;
   }
   if (['cyclone','jitter','vortex','singularity'].includes(ab)){
-    ctx.beginPath();
     for(let a=0;a<Math.PI*4;a+=0.15){const rr=a/(Math.PI*4)*S; const x=Math.cos(a+t*2)*rr,y=Math.sin(a+t*2)*rr; if(a===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
     ctx.stroke();
     return;
@@ -919,7 +1177,7 @@ function drawBallSymbol(ab, r, t){
     }
     return;
   }
-  if (['blaster','sniper','falcon','cluster','shaman2'].includes(ab)){
+  if (['blaster','sniper','cluster'].includes(ab)){
     ctx.beginPath(); ctx.arc(0,0,S*0.7,0,Math.PI*2); ctx.stroke();
     ctx.beginPath(); ctx.arc(0,0,S*0.2,0,Math.PI*2); ctx.fill();
     for(let i=0;i<4;i++){
@@ -928,15 +1186,7 @@ function drawBallSymbol(ab, r, t){
     }
     return;
   }
-  if (['giant','titan'].includes(ab)){
-    ctx.beginPath();
-    ctx.moveTo(-S*0.8,S*0.3); ctx.lineTo(-S*0.8,-S*0.35);
-    ctx.lineTo(-S*0.35,S*0); ctx.lineTo(0,-S*0.55);
-    ctx.lineTo(S*0.35,S*0); ctx.lineTo(S*0.8,-S*0.35);
-    ctx.lineTo(S*0.8,S*0.3);
-    ctx.closePath(); ctx.stroke();
-    return;
-  }
+  // Default
   ctx.beginPath(); ctx.arc(0,0,S*0.4,0,Math.PI*2); ctx.fill();
 }
 
@@ -967,6 +1217,10 @@ class Ball {
     this.stacks=0; this.hitCount=0; this.abilityDisabled=0;
     this.alive=true; this.outside=false; this.deathTime=0;
     this.lastBounceTime=0;
+    this.kamuiActive=0;    // Naruto: Obito
+    this.susanooActive=0;  // Naruto: Madara
+    this.eightGatesActive=0; // Naruto: Rock Lee
+    this.flyingThunderCd=0;
     // Passive stat mods
     if (this.ability === 'sturdy') this.defenseStat *= 1.30;
     if (this.ability === 'swift')  this.speedMul *= 1.35;
@@ -1000,9 +1254,15 @@ class Ball {
     if (this.invisible>0) this.invisible -= dt;
     if (this.abilityCd>0) this.abilityCd -= dt;
     if (this.abilityDisabled>0) this.abilityDisabled -= dt;
+    if (this.kamuiActive>0) this.kamuiActive -= dt;
+    if (this.susanooActive>0) this.susanooActive -= dt;
+    if (this.eightGatesActive>0) this.eightGatesActive -= dt;
+    if (this.flyingThunderCd>0) this.flyingThunderCd -= dt;
     if (this.poisonTimer>0){ this.poisonTimer -= dt; this.hp -= 25*dt/4; if (Math.random()<0.4) burst(this.x,this.y,1,'#9dff4d',60,2.5); if (this.hp<=0){ this.die(); return; } }
     if (this.burnTimer>0){ this.burnTimer -= dt; this.hp -= 16*dt; if (Math.random()<0.5) burst(this.x,this.y,1,'#ff4400',80,3); if (this.hp<=0){ this.die(); return; } }
     if (this.bleedTimer>0){ this.bleedTimer -= dt; this.hp -= 20*dt/3; if (Math.random()<0.4) burst(this.x,this.y,1,'#dc143c',70,2.5); if (this.hp<=0){ this.die(); return; } }
+    // Eight gates self damage
+    if (this.eightGatesActive>0){ this.hp -= 3*dt; if (this.hp<=0){ this.die(); return; } }
 
     if (this.abilityDisabled <= 0) this.applyAbilityPassive(dt, enemy);
 
@@ -1046,7 +1306,7 @@ class Ball {
         if (this.ability==='bouncer' || this.ability==='ram') rest = 1.05;
         this.vx -= (1+rest)*dot*nx; this.vy -= (1+rest)*dot*ny;
         const enemy = (this === G.player) ? G.enemy : G.player;
-        const smartChance = (this.ability==='ram') ? 0.85 : 0.50;
+        const smartChance = (this.ability==='ram' || this.ability==='chidori' || this.ability==='rasengan') ? 0.75 : 0.50;
         if (enemy && enemy.alive && Math.random() < smartChance){
           const edx = enemy.x + enemy.vx*0.2 - this.x;
           const edy = enemy.y + enemy.vy*0.2 - this.y;
@@ -1069,6 +1329,187 @@ class Ball {
   applyAbilityPassive(dt, enemy){
     const ab = this.ability;
     const enemies = enemy ? [enemy] : [];
+
+    // === NARUTO ABILITIES ===
+    // SHARINGAN: periodic dodge buff (handled in onTakeDamage)
+    // BYAKUGAN: pierce DEF (handled in dealDamageTo)
+    // RASENGAN: onHit
+    // CHIDORI: onHit
+
+    // AMATERASU: leave eternal black flame trail
+    if (ab==='amaterasu' && this.abilityCd<=0){
+      G.hazards.push(new Hazard(this.x, this.y, this, 20, 5, '#0a0a0a', this.r*0.9));
+      this.triggerAbility(0.3);
+    }
+
+    // SUSANOO: periodic invulnerability + reflect
+    if (ab==='susanoo' && this.abilityCd<=0){
+      this.susanooActive = 2.5;
+      this.triggerAbility(9);
+      this.showFloatText('SUSANOO!', '#a020a0');
+      Sound.jutsu();
+      burst(this.x, this.y, 30, '#a020a0', 320, 5);
+      G.flash = Math.min(0.5, G.flash + 0.3);
+      G.flashColor = '#a020a0';
+    }
+
+    // EIGHT GATES: boost speed + atk, self-damage
+    if (ab==='eight_gates' && this.abilityCd<=0 && this.hp > this.maxHp*0.3){
+      this.eightGatesActive = 4;
+      const prevSpd = this.speedMul;
+      const prevAtk = this.attackStat;
+      this.speedMul *= 1.6;
+      this.attackStat *= 1.4;
+      this.triggerAbility(14);
+      this.showFloatText('8 GATES!', '#00cc00');
+      Sound.jutsu();
+      burst(this.x, this.y, 40, '#00cc00', 400, 5);
+      G.flash = Math.min(0.5, G.flash + 0.3);
+      G.flashColor = '#00cc00';
+      const self = this;
+      setTimeout(() => {
+        if (self.alive){ self.speedMul = self.speedMul / 1.6; self.attackStat = self.attackStat / 1.4; }
+      }, 4000);
+    }
+
+    // SAND SHIELD: auto regenerating shield
+    if (ab==='sand_shield' && this.shield <= 0 && this.abilityCd <= 0){
+      this.shield = 4;
+      this.triggerAbility(6);
+      this.showFloatText('SAND SHIELD!', '#cc8844');
+      Sound.jutsu();
+      burst(this.x, this.y, 20, '#cc8844', 240, 4);
+    }
+
+    // EIGHT TAILS: multi-hit AoE
+    if (ab==='eight_tails' && this.abilityCd<=0 && enemy && enemy.alive){
+      const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
+      if (d < 180*SCALE){
+        for (let i=0;i<4;i++) this.dealDamageTo(enemy, 6, true);
+        burst(enemy.x, enemy.y, 20, '#cc3333', 280, 4);
+        this.showFloatText('8 TAILS!', '#cc3333');
+        Sound.jutsu();
+      }
+      this.triggerAbility(1.6);
+    }
+
+    // KAMUI: phase through attacks periodically
+    if (ab==='kamui' && this.abilityCd<=0){
+      this.kamuiActive = 2;
+      this.triggerAbility(10);
+      this.showFloatText('KAMUI!', '#6a3a9a');
+      Sound.jutsu();
+      burst(this.x, this.y, 24, '#6a3a9a', 280, 4);
+    }
+
+    // SHINRA TENSEI: AoE push blast
+    if (ab==='shinra_tensei' && this.abilityCd<=0 && enemy && enemy.alive){
+      const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
+      if (d < 200*SCALE){
+        this.dealDamageTo(enemy, 18, true);
+        const ddx = enemy.x-this.x, ddy = enemy.y-this.y, dl = Math.hypot(ddx,ddy)||1;
+        enemy.vx += (ddx/dl)*700*SCALE;
+        enemy.vy += (ddy/dl)*700*SCALE;
+        burst(this.x, this.y, 40, '#cc5500', 450, 6);
+        this.showFloatText('SHINRA TENSEI!', '#cc5500');
+        G.shake = Math.min(35, G.shake + 22);
+        G.flash = 0.55; G.flashColor = '#cc5500';
+        Sound.jutsu();
+      }
+      this.triggerAbility(4);
+    }
+
+    // PAPER DANCE: shield + heal
+    if (ab==='paper_dance' && this.abilityCd<=0){
+      this.shield = Math.max(this.shield, 3);
+      this.hp = Math.min(this.maxHp, this.hp + 8);
+      this.triggerAbility(4);
+      this.showFloatText('PAPER!', '#6a6aba');
+      burst(this.x, this.y, 18, '#6a6aba', 220, 3.5);
+    }
+
+    // SAGE MODE: regen + damage boost passive
+    if (ab==='sage_mode'){
+      if (this.hp < this.maxHp) this.hp = Math.min(this.maxHp, this.hp + 4*dt);
+      // Attack boost handled in dealDamageTo via ability check
+    }
+
+    // TSUNADE HEAL: massive regen
+    if (ab==='tsunade_heal'){
+      if (this.hp < this.maxHp) this.hp = Math.min(this.maxHp, this.hp + 7*dt);
+    }
+
+    // FLYING THUNDER: teleport to enemy + damage
+    if (ab==='flying_thunder' && this.abilityCd<=0 && enemy && enemy.alive){
+      const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
+      if (d > 100*SCALE && d < 400*SCALE){
+        burst(this.x, this.y, 20, '#ffdd33', 300, 4);
+        this.x = enemy.x - 30*SCALE;
+        this.y = enemy.y;
+        burst(this.x, this.y, 20, '#ffdd33', 300, 4);
+        this.dealDamageTo(enemy, 15, true);
+        this.showFloatText('FTG!', '#ffdd33');
+        Sound.jutsu();
+      }
+      this.triggerAbility(6);
+    }
+
+    // WOOD RELEASE: trap in wood
+    if (ab==='wood_release' && this.abilityCd<=0 && enemy && enemy.alive){
+      const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
+      if (d < 250*SCALE){
+        enemy.sticky = Math.max(enemy.sticky, 1.5);
+        this.dealDamageTo(enemy, 8, true);
+        burst(enemy.x, enemy.y, 20, '#8a5a2a', 260, 4);
+        this.showFloatText('WOOD!', '#8a5a2a');
+        Sound.jutsu();
+      }
+      this.triggerAbility(5);
+    }
+
+    // SHADOW POSSESSION: immobilize
+    if (ab==='shadow_possess' && this.abilityCd<=0 && enemy && enemy.alive){
+      const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
+      if (d < 250*SCALE){
+        enemy.freeze = Math.max(enemy.freeze, 1.5);
+        this.dealDamageTo(enemy, 6, true);
+        burst(enemy.x, enemy.y, 14, '#2a4a2a', 220, 4);
+        this.showFloatText('SHADOW!', '#2a4a2a');
+      }
+      this.triggerAbility(5);
+    }
+
+    // EXPANSION: grow + push (passive growth)
+    if (ab==='expansion' && this.growth<1){
+      this.growth = Math.min(1, this.growth + dt/8);
+    }
+
+    // ROTATION: reflect + AoE
+    if (ab==='rotation' && this.abilityCd<=0){
+      for (const e of enemies){
+        if (!e.alive) continue;
+        const d = Math.hypot(e.x-this.x, e.y-this.y);
+        if (d < this.r*2.5){
+          this.dealDamageTo(e, 8, true);
+          const ddx = e.x-this.x, ddy = e.y-this.y, dl = Math.hypot(ddx,ddy)||1;
+          e.vx += (ddx/dl)*300*SCALE;
+          e.vy += (ddy/dl)*300*SCALE;
+        }
+      }
+      // Remove projectiles
+      for (let i = G.projectiles.length-1; i >= 0; i--){
+        const pr = G.projectiles[i];
+        const d = Math.hypot(pr.x-this.x, pr.y-this.y);
+        if (d < this.r*2 && pr.owner !== this){
+          burst(pr.x, pr.y, 8, '#ccaabb', 200, 3);
+          G.projectiles.splice(i, 1);
+        }
+      }
+      burst(this.x, this.y, 12, '#ccaabb', 260, 4);
+      this.triggerAbility(1.2);
+    }
+
+    // === ORIGINAL ABILITIES (unchanged essentials) ===
     if (ab==='healer' && this.hp<this.maxHp) this.hp = Math.min(this.maxHp, this.hp+6*dt);
     if (ab==='druid' && this.hp<this.maxHp) this.hp = Math.min(this.maxHp, this.hp+8*dt);
     if (ab==='acolyte' && this.hp<this.maxHp) this.hp = Math.min(this.maxHp, this.hp+3*dt);
@@ -1246,6 +1687,121 @@ class Ball {
 
   onHit(target, damage){
     const ab = this.ability;
+
+    // === NARUTO ONHIT ===
+    if (ab==='rasengan'){
+      // Extra spiral AoE damage
+      this.dealDamageTo(target, 12, true);
+      burst(this.x, this.y, 30, '#ff9900', 400, 5);
+      burst(target.x, target.y, 20, '#ffdd33', 350, 4);
+      this.showFloatText('RASENGAN!', '#ff9900');
+      G.shake = Math.min(30, G.shake + 15);
+      G.flash = Math.min(0.5, G.flash + 0.3);
+      G.flashColor = '#ff9900';
+      Sound.jutsu();
+    }
+
+    if (ab==='chidori'){
+      // Pierce shield + lightning burst
+      target.shield = 0;
+      this.dealDamageTo(target, 15, true);
+      burst(target.x, target.y, 30, '#4a4aff', 420, 5);
+      burst(target.x, target.y, 15, '#ffffff', 300, 4);
+      this.showFloatText('CHIDORI!', '#4a4aff');
+      G.shake = Math.min(30, G.shake + 15);
+      G.flash = Math.min(0.5, G.flash + 0.3);
+      G.flashColor = '#4a4aff';
+      Sound.jutsu();
+    }
+
+    if (ab==='sharingan'){
+      // Small damage boost on hit
+      this.dealDamageTo(target, 5, true);
+      this.showFloatText('COPY!', '#c02020');
+    }
+
+    if (ab==='byakugan'){
+      this.showFloatText('GENTLE FIST!', '#d0d0ff');
+      burst(target.x, target.y, 12, '#d0d0ff', 240, 4);
+    }
+
+    if (ab==='amaterasu'){
+      target.burnTimer = Math.max(target.burnTimer, 8);
+      burst(target.x, target.y, 20, '#0a0a0a', 280, 5);
+      this.showFloatText('AMATERASU!', '#0a0a0a');
+    }
+
+    if (ab==='sakura_punch'){
+      // Massive knockback + extra damage
+      if (!target.noKnockback){
+        const dx = target.x-this.x, dy = target.y-this.y, l = Math.hypot(dx,dy)||1;
+        target.vx += (dx/l)*600*SCALE;
+        target.vy += (dy/l)*600*SCALE;
+      }
+      this.dealDamageTo(target, 10, true);
+      burst(target.x, target.y, 20, '#ff88cc', 320, 5);
+      this.showFloatText('SAKURA PUNCH!', '#ff88cc');
+      G.shake = Math.min(28, G.shake + 14);
+      Sound.hit(0.9);
+    }
+
+    if (ab==='eight_tails'){
+      this.dealDamageTo(target, 6, true);
+      burst(target.x, target.y, 14, '#cc3333', 240, 4);
+      this.showFloatText('HACHIBI!', '#cc3333');
+    }
+
+    if (ab==='kamui'){
+      this.dealDamageTo(target, 8, true);
+      burst(target.x, target.y, 16, '#6a3a9a', 260, 4);
+      this.showFloatText('KAMUI!', '#6a3a9a');
+    }
+
+    if (ab==='paper_dance'){
+      burst(target.x, target.y, 12, '#6a6aba', 220, 4);
+      this.showFloatText('PAPER CUT!', '#6a6aba');
+    }
+
+    if (ab==='flying_thunder'){
+      this.dealDamageTo(target, 12, true);
+      burst(target.x, target.y, 20, '#ffdd33', 320, 4);
+      this.showFloatText('HIRAISHIN!', '#ffdd33');
+      Sound.jutsu();
+    }
+
+    if (ab==='wood_release'){
+      target.sticky = Math.max(target.sticky, 1);
+      burst(target.x, target.y, 16, '#8a5a2a', 240, 4);
+      this.showFloatText('MOKUTON!', '#8a5a2a');
+    }
+
+    if (ab==='shadow_possess'){
+      target.freeze = Math.max(target.freeze, 1.2);
+      burst(target.x, target.y, 12, '#2a4a2a', 200, 4);
+      this.showFloatText('KAGEMANE!', '#2a4a2a');
+    }
+
+    if (ab==='expansion'){
+      if (!target.noKnockback){
+        const dx = target.x-this.x, dy = target.y-this.y, l = Math.hypot(dx,dy)||1;
+        target.vx += (dx/l)*500*SCALE;
+        target.vy += (dy/l)*500*SCALE;
+      }
+      this.showFloatText('BAIKA!', '#aa6622');
+    }
+
+    if (ab==='rotation'){
+      this.dealDamageTo(target, 5, true);
+      if (!target.noKnockback){
+        const dx = target.x-this.x, dy = target.y-this.y, l = Math.hypot(dx,dy)||1;
+        target.vx += (dx/l)*350*SCALE;
+        target.vy += (dy/l)*350*SCALE;
+      }
+      burst(this.x, this.y, 16, '#ccaabb', 280, 4);
+      this.showFloatText('KAITEN!', '#ccaabb');
+    }
+
+    // === ORIGINAL ONHIT (abbreviated) ===
     if (ab==='vampire' || ab==='marauder' || ab==='leech' || ab==='absorber'){
       const rate = ab==='vampire'?0.45:(ab==='marauder'?0.30:0.25);
       const heal = damage * rate;
@@ -1274,8 +1830,6 @@ class Ball {
     if (ab==='freezer') target.slow = Math.max(target.slow, 2.5);
     if (ab==='ice'){ target.freeze = Math.max(target.freeze, 1.5); burst(target.x,target.y,16,'#80ffff',220,4); this.showFloatText('FREEZE!', '#80ffff'); }
     if (ab==='frost'){ target.freeze = Math.max(target.freeze, 1.0); burst(target.x,target.y,20,'#b0e0e6',260,4); this.showFloatText('FROST!', '#b0e0e6'); }
-    if (ab==='glacier'){ target.freeze = Math.max(target.freeze, 0.8); }
-    if (ab==='blizzard'){ target.freeze = Math.max(target.freeze, 0.5); }
     if (ab==='static'){ target.freeze = Math.max(target.freeze, 0.6); burst(target.x,target.y,12,'#fffacd',220,3.5); this.showFloatText('ZAP!', '#fffacd'); }
     if (ab==='plasma'){ target.burnTimer = Math.max(target.burnTimer, 1.5); target.slow = Math.max(target.slow, 1.5); this.showFloatText('PLASMA!', '#da70d6'); }
     if (ab==='poison'){ target.poisonTimer = Math.max(target.poisonTimer, 4); burst(target.x,target.y,10,'#9dff4d',150,3); this.showFloatText('POISON!', '#9dff4d'); }
@@ -1310,6 +1864,7 @@ class Ball {
     if (ab==='priest'){ this.hp = Math.min(this.maxHp, this.hp+8); this.showFloatText('+8', '#f0e68c'); }
     if (ab==='cleric'){ this.hp = Math.min(this.maxHp, this.hp+5); this.showFloatText('+5', '#fffacd'); }
     if (ab==='mender'){ this.hp = Math.min(this.maxHp, this.hp+6); this.showFloatText('+6', '#98fb98'); }
+    if (ab==='tsunade_heal'){ this.hp = Math.min(this.maxHp, this.hp+12); this.showFloatText('+12', '#ffbb88'); }
     if (ab==='fire' || ab==='magma' || ab==='dragon' || ab==='inferno' || ab==='blaze'){
       target.burnTimer = Math.max(target.burnTimer, ab==='dragon'?2.5:(ab==='inferno'?3:2));
       this.showFloatText('BURN!', '#ff4400');
@@ -1323,21 +1878,37 @@ class Ball {
       this.dealDamageTo(target, 8, true); this.showFloatText('RAM!', '#a0522d');
     }
     if (ab==='eagle' || ab==='falcon'){ this.dealDamageTo(target, 4, true); }
-    if (ab==='prophet'){ this.showFloatText('SEE!', '#dc143c'); }
     if (ab==='shark' && target.hp < target.maxHp*0.35){ this.dealDamageTo(target, 15, true); this.showFloatText('CHOMP!', '#4682b4'); }
     if (ab==='grace' && !target.alive){ this.hp = Math.min(this.maxHp, this.hp+30); this.showFloatText('+30', '#f0f8ff'); }
-    if (ab==='dragon'){ target.burnTimer = Math.max(target.burnTimer, 3); }
   }
 
   onTakeDamage(amount, source){
     const ab = this.ability;
     let dmg = amount;
+
+    // KAMUI — invincibility
+    if (this.kamuiActive > 0){
+      burst(this.x, this.y, 12, '#6a3a9a', 200, 3);
+      this.showFloatText('PHASE!', '#6a3a9a');
+      return { dodged: true, finalDamage: 0 };
+    }
+    // SUSANOO — invulnerability + reflect
+    if (this.susanooActive > 0){
+      const reflect = amount * 0.8;
+      if (source && source.alive) this.dealDamageTo(source, reflect, true);
+      burst(this.x, this.y, 16, '#a020a0', 280, 4);
+      this.showFloatText('SUSANOO!', '#a020a0');
+      return { dodged: true, finalDamage: 0 };
+    }
+
     if (ab==='ghost' && Math.random()<0.28){ burst(this.x,this.y,12,'#c0c0ff',200,3); this.showFloatText('DODGE!', '#c0c0ff'); return { dodged:true, finalDamage:0 }; }
     if (ab==='oracle' && Math.random()<0.40){ burst(this.x,this.y,12,'#ffd700',200,3); this.showFloatText('FORESAW!', '#ffd700'); return { dodged:true, finalDamage:0 }; }
     if (ab==='fox' && Math.random()<0.35){ burst(this.x,this.y,12,'#ff6347',200,3); this.showFloatText('DODGE!', '#ff6347'); return { dodged:true, finalDamage:0 }; }
+    if (ab==='sharingan' && Math.random()<0.25){ burst(this.x,this.y,12,'#c02020',200,3); this.showFloatText('SHARINGAN!', '#c02020'); return { dodged:true, finalDamage:0 }; }
     if (ab==='guardian') dmg *= 0.80;
     if (ab==='bulwark' || ab==='bastion') dmg = Math.min(dmg, 12);
     if (ab==='ghostwalk' && this.hp < this.maxHp*0.4) dmg *= 0.70;
+    if (ab==='susanoo') dmg *= 0.85;
     if (ab==='reflector' && source && source.alive){
       const reflect = amount*0.55;
       this.dealDamageTo(source, reflect, true);
@@ -1357,6 +1928,14 @@ class Ball {
     const res = target.onTakeDamage(dmg, this);
     if (res.dodged) return;
     dmg = res.finalDamage;
+
+    // BYAKUGAN — pierce DEF (damage unmitigated)
+    if (this.ability === 'byakugan' && !isAbility){
+      dmg = amount * 1.5;
+    }
+    // SAGE MODE — damage boost
+    if (this.ability === 'sage_mode') dmg *= 1.25;
+
     if ((this.ability==='ninja'||this.ability==='assassin') && Math.random()<(this.ability==='assassin'?0.40:0.30)){
       dmg *= 2; burst(target.x,target.y,14,'#a0a0b0',280,4.5); this.showFloatText('CRIT!', '#ff3d7f');
     }
@@ -1461,14 +2040,54 @@ class Ball {
     const pulse = this.dashTime>0 ? 1.07 : 1;
     const alpha = this.invisible>0 ? 0.35 : 1;
     const meta = ABILITY_META[this.ability] || {};
+
+    // Naruto active effects visuals
+    if (this.kamuiActive > 0){
+      ctx.save();
+      ctx.globalAlpha = 0.5 + Math.sin(performance.now()/80)*0.3;
+      ctx.strokeStyle = '#6a3a9a'; ctx.lineWidth = 3*SCALE;
+      ctx.beginPath();
+      for (let a=0;a<Math.PI*4;a+=0.2){
+        const rr = a/(Math.PI*4)*(this.r+12*SCALE);
+        const x = this.x + Math.cos(a+performance.now()/200)*rr;
+        const y = this.y + Math.sin(a+performance.now()/200)*rr;
+        if (a===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      }
+      ctx.stroke(); ctx.restore();
+    }
+    if (this.susanooActive > 0){
+      ctx.save();
+      ctx.globalAlpha = 0.55 + Math.sin(performance.now()/120)*0.2;
+      ctx.strokeStyle = '#a020a0'; ctx.lineWidth = 4*SCALE;
+      ctx.shadowBlur = 24; ctx.shadowColor = '#a020a0';
+      ctx.beginPath(); ctx.arc(this.x, this.y, this.r + 14*SCALE, 0, Math.PI*2); ctx.stroke();
+      // Diamond shield
+      ctx.beginPath();
+      ctx.moveTo(this.x, this.y - this.r - 18*SCALE);
+      ctx.lineTo(this.x + this.r + 18*SCALE, this.y);
+      ctx.lineTo(this.x, this.y + this.r + 18*SCALE);
+      ctx.lineTo(this.x - this.r - 18*SCALE, this.y);
+      ctx.closePath(); ctx.stroke();
+      ctx.restore();
+    }
+    if (this.eightGatesActive > 0){
+      ctx.save();
+      ctx.globalAlpha = 0.6;
+      for (let i=0;i<3;i++){
+        ctx.strokeStyle = i===0?'#00cc00':i===1?'#66ff66':'#ccffcc';
+        ctx.lineWidth = 2*SCALE;
+        ctx.beginPath(); ctx.arc(this.x, this.y, this.r + (10+i*6)*SCALE, 0, Math.PI*2); ctx.stroke();
+      }
+      ctx.restore();
+    }
+
     if (meta.active && this.abilityCd <= 0 && this.abilityDisabled <= 0){
       ctx.save();
       ctx.globalAlpha = (0.35 + Math.sin(performance.now()/180)*0.15) * alpha;
       ctx.strokeStyle = meta.color; ctx.lineWidth = 1.5*SCALE;
       ctx.setLineDash([4, 6]);
       ctx.beginPath(); ctx.arc(this.x, this.y, this.r + 8*SCALE, 0, Math.PI*2); ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.restore();
+      ctx.setLineDash([]); ctx.restore();
     }
     if (this.abilityDisabled > 0){
       ctx.save();
@@ -1723,7 +2342,7 @@ function update(dt){
       const d = Math.hypot(ball.x-h.x, ball.y-h.y);
       if (d < h.r + ball.r*0.5){
         if (h.color==='#32cd32'||h.color==='#808000') ball.poisonTimer = Math.max(ball.poisonTimer, 0.5);
-        if (h.color==='#ff4400'||h.color==='#ff4500'||h.color==='#8b0000'||h.color==='#ff2400'||h.color==='#da70d6') ball.burnTimer = Math.max(ball.burnTimer, 0.6);
+        if (h.color==='#ff4400'||h.color==='#ff4500'||h.color==='#8b0000'||h.color==='#ff2400'||h.color==='#da70d6'||h.color==='#0a0a0a') ball.burnTimer = Math.max(ball.burnTimer, 0.6);
         if (h.color==='#2e8b57'||h.color==='#2f4f4f'||h.color==='#88aa00') ball.sticky = Math.max(ball.sticky, 0.4);
         h.owner.dealDamageTo(ball, h.dmg*dt, true);
       }
@@ -1850,6 +2469,9 @@ function buildStatusHTML(ball){
       parts.push('<div class="status-badge" style="color:'+s.color+';border-color:'+s.color+';box-shadow:0 0 12px '+s.color+'55">'+s.icon+'<div class="cd">'+t+'s</div></div>');
     }
   }
+  if (ball.kamuiActive > 0) parts.push('<div class="status-badge" style="color:#6a3a9a;border-color:#6a3a9a;box-shadow:0 0 12px #6a3a9a55">◎<div class="cd">'+ball.kamuiActive.toFixed(1)+'s</div></div>');
+  if (ball.susanooActive > 0) parts.push('<div class="status-badge" style="color:#a020a0;border-color:#a020a0;box-shadow:0 0 12px #a020a055">⛨<div class="cd">'+ball.susanooActive.toFixed(1)+'s</div></div>');
+  if (ball.eightGatesActive > 0) parts.push('<div class="status-badge" style="color:#00cc00;border-color:#00cc00;box-shadow:0 0 12px #00cc0055">⚡<div class="cd">'+ball.eightGatesActive.toFixed(1)+'s</div></div>');
   if (ball.maxDashCharges > 1){
     parts.push('<div class="status-badge" style="color:#ffd93d;border-color:#ffd93d;box-shadow:0 0 12px #ffd93d55">⚔<div class="cd">'+ball.dashCharges+'/'+ball.maxDashCharges+'</div></div>');
   }
@@ -1897,6 +2519,7 @@ const overlay = document.getElementById('overlay');
 const screens = {
   menu: document.getElementById('scr-menu'),
   howto: document.getElementById('scr-howto'),
+  naruto: document.getElementById('scr-naruto'),
   balls: document.getElementById('scr-balls'),
   select: document.getElementById('scr-select'),
   'tourney-select': document.getElementById('scr-tourney-select'),
@@ -1940,12 +2563,10 @@ function initTournamentSelect(){
   updateTourneyStartBtn();
   document.getElementById('tourneySearch').value = '';
 }
-
 function toggleTourneyPick(def){
   const idx = T.participants.findIndex(p => p.id === def.id);
-  if (idx >= 0){
-    T.participants.splice(idx, 1);
-  } else {
+  if (idx >= 0){ T.participants.splice(idx, 1); }
+  else {
     if (T.participants.length < 8) T.participants.push(def);
     else { Sound.tone(140, 0.14, 'square', 0.09); return; }
   }
@@ -1954,7 +2575,6 @@ function toggleTourneyPick(def){
   renderTournamentGrid(document.getElementById('tourneySearch').value);
   updateTourneyStartBtn();
 }
-
 function renderTourneySlots(){
   const wrap = document.getElementById('tourneySlots');
   wrap.innerHTML = '';
@@ -1978,7 +2598,6 @@ function renderTourneySlots(){
   }
   document.getElementById('tourneyCount').textContent = T.participants.length + ' / 8 terpilih';
 }
-
 function renderTournamentGrid(filter){
   const grid = document.getElementById('tourneyGrid');
   grid.innerHTML = '';
@@ -1990,11 +2609,9 @@ function renderTournamentGrid(filter){
     grid.appendChild(card);
   });
 }
-
 function updateTourneyStartBtn(){
   document.getElementById('tourneyStartBtn').disabled = T.participants.length !== 8;
 }
-
 function startTournament(){
   if (T.participants.length !== 8) return;
   const p = T.participants.slice();
@@ -2003,16 +2620,11 @@ function startTournament(){
     [[null,null],[null,null]],
     [[null,null]]
   ];
-  T.currentRound = 0;
-  T.currentMatch = 0;
-  T.results = [];
-  T.champion = null;
-  T.lastResult = null;
-  T.active = true;
-  T.phase = 'bracket';
+  T.currentRound = 0; T.currentMatch = 0;
+  T.results = []; T.champion = null; T.lastResult = null;
+  T.active = true; T.phase = 'bracket';
   showBracket();
 }
-
 function showBracket(){
   Sound.ui();
   showScreen('bracket');
@@ -2051,7 +2663,6 @@ function showBracket(){
     });
     wrap.appendChild(col);
   });
-  // Update next match info
   const info = document.getElementById('nextMatchInfo');
   const cur = T.rounds[T.currentRound] && T.rounds[T.currentRound][T.currentMatch];
   if (cur && cur[0] && cur[1]){
@@ -2071,50 +2682,35 @@ function showBracket(){
   }
   document.getElementById('nextMatchBtn').style.display = 'block';
 }
-
 function runTournamentMatch(){
   if (!T.active || T.phase !== 'bracket') return;
   const cur = T.rounds[T.currentRound][T.currentMatch];
   if (!cur || !cur[0] || !cur[1]) return;
   T.phase = 'match';
-  G.playerDef = cur[0];
-  G.enemyDef = cur[1];
+  G.playerDef = cur[0]; G.enemyDef = cur[1];
   startGame(cur[0], cur[1]);
 }
-
 function advanceTournament(winnerDef){
   const r = T.currentRound;
   const m = T.currentMatch;
   const match = T.rounds[r][m];
   const loserDef = match[0] === winnerDef ? match[1] : match[0];
-
-  // Store in next round
   if (r + 1 < T.rounds.length){
     const nextSlot = Math.floor(m / 2);
     const nextSide = m % 2;
     T.rounds[r+1][nextSlot][nextSide] = winnerDef;
   }
-
   T.results.push({ round:r, match:m, winner:winnerDef, loser:loserDef });
   T.lastResult = { winner: winnerDef, loser: loserDef };
-
   T.currentMatch++;
-  if (T.currentMatch >= T.rounds[r].length){
-    T.currentRound++;
-    T.currentMatch = 0;
-  }
-
+  if (T.currentMatch >= T.rounds[r].length){ T.currentRound++; T.currentMatch = 0; }
   if (T.currentRound >= T.rounds.length){
-    T.champion = winnerDef;
-    T.phase = 'champion';
-    showChampion();
-    return;
+    T.champion = winnerDef; T.phase = 'champion';
+    showChampion(); return;
   }
-
   T.phase = 'bracket';
   showBracket();
 }
-
 function showChampion(){
   const c = T.champion;
   const orb = document.getElementById('championOrb');
@@ -2135,13 +2731,15 @@ function showChampion(){
 }
 
 /* ============================================================
-   20. BALL GRIDS (shared)
+   20. GRIDS
    ============================================================ */
 function makeBallCard(def){
   const card = document.createElement('div');
   card.className = 'ball-card';
   const meta = ABILITY_META[def.ability] || { icon:'·', color:'#888' };
+  const isNaruto = NARUTO_IDS.includes(def.id);
   card.innerHTML =
+    (isNaruto ? '<div style="position:absolute;top:2px;left:4px;font-size:10px">🍥</div>' : '') +
     '<div class="orb" style="background:radial-gradient(circle at 35% 30%,'+def.light+','+def.color+');box-shadow:0 0 12px '+def.color+'"></div>'+
     '<div class="nm">'+def.name+'</div>'+
     '<div class="ab" style="color:'+meta.color+'">'+meta.icon+' '+abilityLabel(def.ability)+'</div>'+
@@ -2157,6 +2755,15 @@ function renderAllBallsGrid(filter){
   const grid = document.getElementById('allBallsGrid');
   grid.innerHTML = '';
   filterBalls(filter).forEach(def => {
+    const card = makeBallCard(def);
+    card.title = def.desc + ' — HP '+def.hp+' · ATK '+def.atk.toFixed(2)+' · DEF '+def.def.toFixed(2);
+    grid.appendChild(card);
+  });
+}
+function renderNarutoGrid(){
+  const grid = document.getElementById('narutoGrid');
+  grid.innerHTML = '';
+  BALLS.filter(b => NARUTO_IDS.includes(b.id)).forEach(def => {
     const card = makeBallCard(def);
     card.title = def.desc + ' — HP '+def.hp+' · ATK '+def.atk.toFixed(2)+' · DEF '+def.def.toFixed(2);
     grid.appendChild(card);
@@ -2197,7 +2804,6 @@ function updatePicked(def){
    21. GAME OVER
    ============================================================ */
 function showGameOver(){
-  // === TOURNAMENT MODE ===
   if (T.active){
     const playerWon = G.player.alive && !G.enemy.alive;
     const winnerDef = playerWon ? G.playerDef : G.enemyDef;
@@ -2207,8 +2813,6 @@ function showGameOver(){
     setTimeout(() => advanceTournament(winnerDef), 1300);
     return;
   }
-
-  // Normal game over
   G.mode = 'over';
   document.getElementById('hud').classList.add('hidden');
   const p = G.player, e = G.enemy;
@@ -2248,6 +2852,7 @@ document.querySelectorAll('[data-act]').forEach(btn => {
     const act = btn.getAttribute('data-act');
     if (act === 'play'){ renderSelectGrid(); updatePicked(BALL_MAP[selectedBallId]); showScreen('select'); }
     if (act === 'howto') showScreen('howto');
+    if (act === 'naruto'){ renderNarutoGrid(); showScreen('naruto'); }
     if (act === 'balls'){ renderAllBallsGrid(); showScreen('balls'); }
     if (act === 'back') showScreen('menu');
     if (act === 'resume') resumeGame();
@@ -2256,7 +2861,6 @@ document.querySelectorAll('[data-act]').forEach(btn => {
     if (act === 'tournament'){ initTournamentSelect(); showScreen('tourney-select'); }
   });
 });
-
 document.getElementById('fightBtn').addEventListener('click', () => {
   Sound.ui();
   T.active = false;
@@ -2265,16 +2869,22 @@ document.getElementById('fightBtn').addEventListener('click', () => {
   G.playerDef = pDef; G.enemyDef = eDef;
   startGame(pDef, eDef);
 });
-
 document.getElementById('searchBalls').addEventListener('input', e => renderAllBallsGrid(e.target.value));
 document.getElementById('searchSelect').addEventListener('input', e => renderSelectGrid(e.target.value));
 document.getElementById('tourneySearch').addEventListener('input', e => renderTournamentGrid(e.target.value));
 
-// Tournament buttons
 document.getElementById('tourneyRandomBtn').addEventListener('click', () => {
   Sound.ui();
   const shuffled = BALLS.slice().sort(() => Math.random() - 0.5);
   T.participants = shuffled.slice(0, 8);
+  renderTourneySlots();
+  renderTournamentGrid(document.getElementById('tourneySearch').value);
+  updateTourneyStartBtn();
+});
+document.getElementById('tourneyNarutoBtn').addEventListener('click', () => {
+  Sound.ui();
+  const narutoBalls = BALLS.filter(b => NARUTO_IDS.includes(b.id)).sort(() => Math.random() - 0.5);
+  T.participants = narutoBalls.slice(0, 8);
   renderTourneySlots();
   renderTournamentGrid(document.getElementById('tourneySearch').value);
   updateTourneyStartBtn();
@@ -2294,7 +2904,6 @@ document.getElementById('nextMatchBtn').addEventListener('click', () => {
   Sound.ui();
   runTournamentMatch();
 });
-
 function pickRandomEnemy(playerDef){
   const pool = BALLS.filter(b => b.id !== playerDef.id);
   return pool[Math.floor(Math.random() * pool.length)];
