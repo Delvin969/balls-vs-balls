@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
-<title>Ball vs Ball — 150 Balls (Naruto Edition)</title>
+<title>Ball vs Ball — 170 Balls (Naruto + Dragon Ball)</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{height:100%;overflow:hidden;background:#04020e;font-family:'Segoe UI',system-ui,sans-serif;color:#fff;-webkit-user-select:none;user-select:none;touch-action:none;}
-canvas{position:fixed;inset:0;display:block;}
+canvas{position:fixed;inset:0;display:block;image-rendering:-webkit-optimize-contrast;}
 #hud{position:fixed;inset:0;pointer-events:none;z-index:10;transition:opacity .3s;}
 #hud.hidden{opacity:0;}
 .hp-row{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:12px 16px;gap:8px;}
@@ -37,7 +37,7 @@ canvas{position:fixed;inset:0;display:block;}
 .status-badge .cd{position:absolute;bottom:-9px;left:50%;transform:translateX(-50%);font-size:8px;font-weight:900;letter-spacing:.5px;color:#fff;background:rgba(0,0,0,.65);padding:1px 4px;border-radius:4px;font-variant-numeric:tabular-nums;white-space:nowrap;}
 #overlay{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 45%,rgba(30,10,70,.75),rgba(3,1,12,.94));backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);padding:14px;overflow-y:auto;}
 #overlay.hidden{display:none;}
-.screen{display:none;flex-direction:column;align-items:center;width:100%;max-width:800px;padding:8px 0;}
+.screen{display:none;flex-direction:column;align-items:center;width:100%;max-width:820px;padding:8px 0;}
 .screen.active{display:flex;animation:fadeUp .3s ease-out;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
 h1.logo{font-size:clamp(30px,8vw,52px);font-weight:900;letter-spacing:4px;line-height:1;text-align:center;margin-bottom:6px;background:linear-gradient(90deg,#5fe6ff,#a25bff,#ff5f9e,#ffd93d);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 22px rgba(162,91,255,.85));}
@@ -54,7 +54,7 @@ h2.title{font-size:clamp(22px,5.5vw,30px);font-weight:900;letter-spacing:3px;mar
 .card ul{list-style:none;}
 .card li{margin-bottom:5px;}
 .card .k{display:inline-block;padding:1px 7px;border-radius:5px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);font-weight:700;font-size:11px;margin:0 2px;}
-.ball-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:6px;width:100%;max-height:50vh;overflow-y:auto;padding:4px;margin-bottom:14px;}
+.ball-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:6px;width:100%;max-height:52vh;overflow-y:auto;padding:4px;margin-bottom:14px;}
 .ball-grid::-webkit-scrollbar{width:6px;}
 .ball-grid::-webkit-scrollbar-thumb{background:rgba(162,91,255,.5);border-radius:3px;}
 .ball-card{border-radius:11px;padding:6px 4px 5px;cursor:pointer;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.13);transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative;}
@@ -153,12 +153,13 @@ h2.title{font-size:clamp(22px,5.5vw,30px);font-weight:900;letter-spacing:3px;mar
 <div id="overlay">
   <div class="screen active" id="scr-menu">
     <h1 class="logo">BALL <span>VS</span> BALL</h1>
-    <p class="sub">150 Bola · 150 Kemampuan · Naruto Edition</p>
+    <p class="sub">170 Bola · 170 Kemampuan · Anime Edition</p>
     <button class="btn primary" data-act="play">⚔ PERTARUNGAN 1v1</button>
     <button class="btn primary" data-act="tournament" style="background:linear-gradient(100deg,rgba(255,180,0,.85),rgba(255,80,0,.85));box-shadow:0 0 30px rgba(255,180,0,.6);">🏆 TURNAMEN 8 BOLA</button>
-    <button class="btn" data-act="naruto" style="background:linear-gradient(100deg,rgba(255,140,0,.4),rgba(200,50,50,.4));border-color:rgba(255,140,0,.7);">🍥 BOLA NARUTO</button>
+    <button class="btn" data-act="naruto" style="background:linear-gradient(100deg,rgba(255,140,0,.4),rgba(200,50,50,.4));border-color:rgba(255,140,0,.7);">🍥 BOLA NARUTO (20)</button>
+    <button class="btn" data-act="dragonball" style="background:linear-gradient(100deg,rgba(255,200,0,.35),rgba(255,100,0,.35));border-color:rgba(255,200,0,.8);">🐉 BOLA DRAGON BALL (20)</button>
     <button class="btn" data-act="howto">? CARA MAIN</button>
-    <button class="btn" data-act="balls">📖 DAFTAR BOLA (150)</button>
+    <button class="btn" data-act="balls">📖 DAFTAR BOLA (170)</button>
     <div style="margin-top:10px;font-size:11px;letter-spacing:2px;opacity:.6" id="bestInfo">—</div>
   </div>
 
@@ -167,10 +168,10 @@ h2.title{font-size:clamp(22px,5.5vw,30px);font-weight:900;letter-spacing:3px;mar
     <div class="card">
       <ul>
         <li>Bola bergerak <b>lurus</b> dan <b>memantul</b> di dinding arena.</li>
-        <li><b>150 bola = 150 kemampuan berbeda.</b> 20 di antaranya bertema Naruto Shippuden.</li>
+        <li><b>170 bola = 170 kemampuan berbeda.</b> 40 di antaranya bertema anime (Naruto + Dragon Ball).</li>
         <li><b>ATK</b> = damage yang diberikan. <b>DEF</b> = damage yang dikurangi.</li>
         <li><b>Hanya yang menabrak yang memberi damage!</b></li>
-        <li><b>NARUTO BALLS:</b> 🍥 NARUTO · ⚡ SASUKE · 👁 KAKASHI · ◈ HINATA · 🔥 ITACHI · ⛨ MADARA · ✊ SAKURA · ⚡ ROCK LEE · ◈ GAARA · 🐙 KILLER BEE · ◎ OBITO · ✹ PAIN · ✧ KONAN · ✿ JIRAIYA · ✚ TSUNADE · ✧ MINATO · ♣ YAMATO · ◐ SHIKAMARU · ◎ CHOJI · ✺ NEJI</li>
+        <li><b>DRAGON BALL:</b> 🐉 GOKU · VEGETA · GOHAN · PICCOLO · FRIEZA · CELL · BUU · TRUNKS · KRILLIN · VEGITO · GOGETA · BEERUS · WHIS · BROLY · GOKU BLACK · HIT · JIREN · ANDROID 18 · GOTENKS · MASTER ROSHI</li>
         <li><b>TURNAMEN:</b> Pilih 8 bola, tonton bracket sampai juara. 🏆</li>
       </ul>
     </div>
@@ -184,8 +185,15 @@ h2.title{font-size:clamp(22px,5.5vw,30px);font-weight:900;letter-spacing:3px;mar
     <button class="btn" data-act="back">← KEMBALI</button>
   </div>
 
+  <div class="screen" id="scr-dragonball">
+    <h2 class="title">🐉 BOLA DRAGON BALL</h2>
+    <p class="sub" style="margin-bottom:12px;">20 karakter Dragon Ball dengan kekuatan Ki yang menggelegar</p>
+    <div class="ball-grid" id="dragonBallGrid"></div>
+    <button class="btn" data-act="back">← KEMBALI</button>
+  </div>
+
   <div class="screen" id="scr-balls">
-    <h2 class="title">DAFTAR BOLA (150)</h2>
+    <h2 class="title">DAFTAR BOLA (170)</h2>
     <input type="text" class="search-bar" id="searchBalls" placeholder="🔍 Cari nama bola atau kemampuan..."/>
     <div class="ball-grid" id="allBallsGrid"></div>
     <button class="btn" data-act="back">← KEMBALI</button>
@@ -215,6 +223,7 @@ h2.title{font-size:clamp(22px,5.5vw,30px);font-weight:900;letter-spacing:3px;mar
     <div class="ball-grid" id="tourneyGrid"></div>
     <button class="btn" id="tourneyRandomBtn">🎲 ACAK 8 BOLA</button>
     <button class="btn" id="tourneyNarutoBtn" style="background:rgba(255,140,0,.2);border-color:rgba(255,140,0,.5)">🍥 8 NARUTO RANDOM</button>
+    <button class="btn" id="tourneyDBBtn" style="background:rgba(255,200,0,.2);border-color:rgba(255,200,0,.5)">🐉 8 DRAGON BALL RANDOM</button>
     <button class="btn ghost" id="tourneyClearBtn">✖ KOSONGKAN</button>
     <button class="btn primary" id="tourneyStartBtn" disabled>🏆 MULAI TURNAMEN</button>
     <button class="btn ghost" data-act="back">← KEMBALI</button>
@@ -271,24 +280,29 @@ h2.title{font-size:clamp(22px,5.5vw,30px);font-weight:900;letter-spacing:3px;mar
 'use strict';
 
 /* ============================================================
-   1. CANVAS
+   1. CANVAS + HI-DPI (4K-ready)
    ============================================================ */
 const canvas = document.getElementById('game');
-const ctx = canvas.getContext('2d');
+const ctx = canvas.getContext('2d', { alpha: false });
 let W=0,H=0,DPR=1,SCALE=1,bgGrad=null;
 const arena = { cx:0, cy:0, r:260 };
 
 function resize(){
-  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  // Support high DPI up to 3x for crisp 4K feel
+  DPR = Math.min(window.devicePixelRatio || 1, 3);
   W = window.innerWidth; H = window.innerHeight;
   canvas.width = Math.floor(W*DPR); canvas.height = Math.floor(H*DPR);
   canvas.style.width = W+'px'; canvas.style.height = H+'px';
   ctx.setTransform(DPR,0,0,DPR,0,0);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
   arena.cx = W/2; arena.cy = H/2;
   arena.r = Math.max(120, Math.min(W,H)*0.36);
   SCALE = Math.max(0.55, Math.min(W,H)/800);
   bgGrad = ctx.createLinearGradient(0,0,W,H);
-  bgGrad.addColorStop(0,'#050318'); bgGrad.addColorStop(0.45,'#0d0530'); bgGrad.addColorStop(1,'#03010f');
+  bgGrad.addColorStop(0,'#050318');
+  bgGrad.addColorStop(0.45,'#0d0530');
+  bgGrad.addColorStop(1,'#03010f');
 }
 window.addEventListener('resize', resize);
 window.addEventListener('orientationchange', ()=>setTimeout(resize,120));
@@ -321,6 +335,8 @@ const Sound = {
   bounce(){ this.tone(200,0.06,'triangle',0.05,140); },
   ability(){ this.tone(900,0.1,'sine',0.07); this.tone(1400,0.1,'sine',0.05); },
   jutsu(){ this.tone(500,0.15,'sawtooth',0.1,900); this.noise(0.2,0.08,1500,1.5); },
+  ki(){ this.tone(200,0.25,'sawtooth',0.13,1800); this.noise(0.3,0.08,2200,2.5); },
+  beam(){ this.tone(180,0.4,'sawtooth',0.15,60); this.noise(0.5,0.12,400,0.8); },
   win(){ [523,659,784,1047,1319].forEach((f,i)=>setTimeout(()=>this.tone(f,0.3,'triangle',0.13),i*100)); },
   lose(){ [392,330,262,175].forEach((f,i)=>setTimeout(()=>this.tone(f,0.32,'sawtooth',0.1),i*130)); },
   ui(){ this.tone(560,0.06,'sine',0.07); }
@@ -332,12 +348,13 @@ const Sound = {
 const rand = (a,b)=>a+Math.random()*(b-a);
 const clamp = (v,a,b)=> v<a?a:(v>b?b:v);
 const fmtTime = s => { const m=Math.floor(s/60),ss=Math.floor(s%60); return m+':'+(ss<10?'0':'')+ss; };
-const MAX_PARTICLES = 320;
-const MAX_DAMAGE_NUMS = 60;
-const MAX_FLOATING_TEXTS = 40;
+const MAX_PARTICLES = 380;
+const MAX_DAMAGE_NUMS = 70;
+const MAX_FLOATING_TEXTS = 50;
+const MAX_BEAMS = 12;
 
 /* ============================================================
-   4. BALLS — 150 unique abilities (130 original + 20 Naruto)
+   4. BALLS — 130 original + 20 Naruto + 20 Dragon Ball = 170
    ============================================================ */
 const BALL_DEFS = [
   // ===== ORIGINAL 130 =====
@@ -482,7 +499,7 @@ const BALL_DEFS = [
   ['falcon','FALCON','#cd853f',80,22,1.15,1.15,0.95,8,'falcon','Fast + vision.'],
   ['phoenix','PHOENIX','#ff5500',65,22,1.05,1.20,0.95,9,'phoenix','Reborn + fire.'],
 
-  // ===== 20 NARUTO SHIPPUDEN BALLS =====
+  // ===== 20 NARUTO SHIPPUDEN =====
   ['naruto','NARUTO','#ff9900',95,22,1.05,1.20,1.00,9,'rasengan','Rasengan — bonus spiral AoE damage saat hit.'],
   ['sasuke','SASUKE','#1a1a4d',85,22,1.10,1.30,0.90,9,'chidori','Chidori — pierce shield + lightning burst.'],
   ['kakashi','KAKASHI','#3a3a5a',95,22,1.05,1.15,1.05,8,'sharingan','Sharingan — dodge + tiru kemampuan musuh.'],
@@ -502,10 +519,32 @@ const BALL_DEFS = [
   ['yamato','YAMATO','#8a5a2a',95,23,0.95,1.00,1.20,7,'wood_release','Wood Release — jebak musuh di kayu.'],
   ['shikamaru','SHIKAMARU','#2a4a2a',85,22,1.00,1.00,1.10,7,'shadow_possess','Shadow Possession — imobilisasi musuh.'],
   ['choji','CHOJI','#aa6622',130,26,0.80,1.10,1.25,7,'expansion','Expansion Jutsu — membesar + push besar.'],
-  ['neji','NEJI','#ccaabb',90,22,1.05,1.15,1.05,8,'rotation','Rotation — reflect proyektil + AoE.']
+  ['neji','NEJI','#ccaabb',90,22,1.05,1.15,1.05,8,'rotation','Rotation — reflect proyektil + AoE.'],
+
+  // ===== 20 DRAGON BALL =====
+  ['goku','GOKU','#ff8800',100,23,1.10,1.25,1.00,9,'kamehameha','Kamehameha — charge 2s lalu beam raksasa.'],
+  ['vegeta','VEGETA','#2050ff',95,23,1.10,1.30,1.00,9,'final_flash','Final Flash — blast besar + knockback kuat.'],
+  ['gohan','GOHAN','#8844ff',90,22,1.05,1.20,1.05,8,'masenko','Masenko — damage naik saat HP rendah.'],
+  ['piccolo','PICCOLO','#44aa44',95,23,1.00,1.15,1.15,8,'special_beam','Special Beam Cannon — pierce shield + DEF.'],
+  ['frieza','FRIEZA','#ddddff',70,22,1.15,1.35,0.85,9,'death_beam','Death Beam — laser cepat, crit 45%.'],
+  ['cell','CELL','#22aa22',90,23,1.00,1.20,1.10,8,'absorb','Absorb — mencuri 50% damage jadi HP.'],
+  ['buu','BUU','#ff88dd',110,25,0.90,1.05,1.25,7,'candy_beam','Candy Beam — kecilkan + slow musuh.'],
+  ['trunks','TRUNKS','#6677cc',90,22,1.15,1.20,1.00,8,'sword_slash','Sword Slash — bleed besar + fast attack.'],
+  ['krillin','KRILLIN','#ffaa44',80,21,1.05,1.15,0.95,7,'destructo_disk','Destructo Disk — homing blade crit 100%.'],
+  ['vegito','VEGITO','#3355ff',95,24,1.10,1.30,1.10,9,'spirit_sword','Spirit Sword — AoE spirit blade sweep.'],
+  ['gogeta','GOGETA','#ff4444',95,24,1.15,1.35,1.00,10,'big_bang_kame','Big Bang Kamehameha — blast masif.'],
+  ['beerus','BEERUS','#aa44dd',80,23,1.10,1.45,1.00,10,'hakai','Hakai — 20% insta-kill chance jika HP<30%.'],
+  ['whis','WHIS','#88ddff',85,22,1.00,1.10,1.30,8,'time_rewind','Time Rewind — heal balik damage 3s.'],
+  ['broly','BROLY','#44cc44',110,26,1.05,1.30,1.10,9,'legendary_ssj','Legendary SSJ — grow + rage damage.'],
+  ['goku_black','GOKU BLACK','#cc44aa',80,22,1.10,1.35,0.90,9,'black_kame','Black Kamehameha — pink beam + burn.'],
+  ['hit','HIT','#8844dd',85,22,1.05,1.25,1.05,8,'time_skip','Time Skip — freeze musuh 2 detik.'],
+  ['jiren','JIREN','#cc4444',110,25,1.00,1.25,1.30,9,'ultimate_battle','Ultimate Battle — kebal knockback + DEF tinggi.'],
+  ['android18','ANDROID 18','#ffdd66',90,22,1.05,1.15,1.25,8,'infinite_energy','Infinite Energy — shield regen terus.'],
+  ['gotenks','GOTENKS','#ffff44',75,22,1.15,1.15,0.95,8,'ghost_kamikaze','Super Ghost Kamikaze — 5 ghost proyektil.'],
+  ['roshi','MASTER ROSHI','#ffaa66',85,23,1.00,1.05,1.15,7,'kame_master','Kamehameha Master — counter + reflect.']
 ];
 
-if (BALL_DEFS.length !== 150) console.warn('Ball count:', BALL_DEFS.length);
+if (BALL_DEFS.length !== 170) console.warn('Ball count:', BALL_DEFS.length);
 
 const BALLS = BALL_DEFS.map(d => ({
   id:d[0], name:d[1], color:d[2],
@@ -514,14 +553,14 @@ const BALLS = BALL_DEFS.map(d => ({
 }));
 function lighten(hex){
   const n = parseInt(hex.slice(1),16);
-  const r = Math.min(255,(n>>16)+100), g = Math.min(255,((n>>8)&255)+100), b = Math.min(255,(n&255)+100);
+  const r = Math.min(255,(n>>16)+110), g = Math.min(255,((n>>8)&255)+110), b = Math.min(255,(n&255)+110);
   return '#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);
 }
 const BALL_MAP = {};
 BALLS.forEach(b => BALL_MAP[b.id]=b);
 
-// Naruto-only balls for filter
 const NARUTO_IDS = ['naruto','sasuke','kakashi','hinata','itachi','madara','sakura','rocklee','gaara','killerbee','obito','pain','konan','jiraya','tsunade','minato','yamato','shikamaru','choji','neji'];
+const DB_IDS = ['goku','vegeta','gohan','piccolo','frieza','cell','buu','trunks','krillin','vegito','gogeta','beerus','whis','broly','goku_black','hit','jiren','android18','gotenks','roshi'];
 
 /* ============================================================
    5. ABILITY META
@@ -667,8 +706,7 @@ const ABILITY_META = {
   cobra:{label:'COBRA',icon:'☠',color:'#4b0082'},
   falcon:{label:'FALCON',icon:'⊕',color:'#cd853f'},
   phoenix:{label:'REBORN',icon:'✵',color:'#ff5500',active:true},
-
-  // ===== NARUTO =====
+  // === NARUTO ===
   rasengan:{label:'RASENGAN',icon:'🌀',color:'#ff9900'},
   chidori:{label:'CHIDORI',icon:'⚡',color:'#4a4aff'},
   sharingan:{label:'SHARINGAN',icon:'◉',color:'#c02020'},
@@ -688,7 +726,28 @@ const ABILITY_META = {
   wood_release:{label:'WOOD',icon:'♣',color:'#8a5a2a',active:true},
   shadow_possess:{label:'SHADOW POSS',icon:'◐',color:'#2a4a2a',active:true},
   expansion:{label:'EXPANSION',icon:'◎',color:'#aa6622'},
-  rotation:{label:'ROTATION',icon:'✺',color:'#ccaabb',active:true}
+  rotation:{label:'ROTATION',icon:'✺',color:'#ccaabb',active:true},
+  // === DRAGON BALL ===
+  kamehameha:{label:'KAMEHAMEHA',icon:'🌀',color:'#44ccff',active:true},
+  final_flash:{label:'FINAL FLASH',icon:'⚡',color:'#2050ff',active:true},
+  masenko:{label:'MASENKO',icon:'✦',color:'#8844ff'},
+  special_beam:{label:'SPECIAL BEAM',icon:'⊕',color:'#44aa44',active:true},
+  death_beam:{label:'DEATH BEAM',icon:'†',color:'#ddddff',active:true},
+  absorb:{label:'ABSORB',icon:'Ψ',color:'#22aa22'},
+  candy_beam:{label:'CANDY BEAM',icon:'◈',color:'#ff88dd',active:true},
+  sword_slash:{label:'SWORD SLASH',icon:'✂',color:'#6677cc'},
+  destructo_disk:{label:'DESTRUCTO',icon:'◎',color:'#ffaa44',active:true},
+  spirit_sword:{label:'SPIRIT SWORD',icon:'⚔',color:'#3355ff',active:true},
+  big_bang_kame:{label:'BIG BANG KAME',icon:'✹',color:'#ff4444',active:true},
+  hakai:{label:'HAKAI',icon:'☠',color:'#aa44dd',active:true},
+  time_rewind:{label:'TIME REWIND',icon:'⌛',color:'#88ddff'},
+  legendary_ssj:{label:'LEGENDARY SSJ',icon:'★',color:'#44cc44',active:true},
+  black_kame:{label:'BLACK KAME',icon:'✹',color:'#cc44aa',active:true},
+  time_skip:{label:'TIME SKIP',icon:'⏸',color:'#8844dd',active:true},
+  ultimate_battle:{label:'ULTIMATE',icon:'⛨',color:'#cc4444'},
+  infinite_energy:{label:'INFINITE',icon:'∞',color:'#ffdd66',active:true},
+  ghost_kamikaze:{label:'GHOST KAME',icon:'☁',color:'#ffff44',active:true},
+  kame_master:{label:'KAME MASTER',icon:'✧',color:'#ffaa66',active:true}
 };
 
 /* ============================================================
@@ -697,7 +756,7 @@ const ABILITY_META = {
 const G = {
   mode:'menu', playerDef:null, enemyDef:null,
   player:null, enemy:null,
-  particles:[], projectiles:[], hazards:[], powerups:[], damageNums:[], floatTexts:[],
+  particles:[], projectiles:[], hazards:[], powerups:[], damageNums:[], floatTexts:[], beams:[],
   score:0, combo:0, comboTimer:0, maxCombo:1,
   elapsed:0, shake:0, flash:0, flashColor:'#ffffff',
   timeScale:1, slowmo:0, ending:false, endTimer:0,
@@ -705,9 +764,9 @@ const G = {
 };
 
 const T = {
-  active: false, phase: 'select', participants: [],
-  rounds: [], currentRound: 0, currentMatch: 0,
-  results: [], lastResult: null, champion: null
+  active:false, phase:'select', participants:[],
+  rounds:[], currentRound:0, currentMatch:0,
+  results:[], lastResult:null, champion:null
 };
 
 /* ============================================================
@@ -743,7 +802,7 @@ class Particle {
   draw(){ const a=Math.max(0,this.life/this.maxLife); ctx.globalAlpha=a; ctx.fillStyle=this.color; ctx.beginPath(); ctx.arc(this.x,this.y,Math.max(0.4,this.size*a),0,Math.PI*2); ctx.fill(); }
 }
 class Projectile {
-  constructor(x,y,vx,vy,owner,dmg,color,homing){ this.x=x;this.y=y;this.vx=vx;this.vy=vy;this.owner=owner;this.dmg=dmg;this.color=color;this.r=7*SCALE;this.life=3;this.homing=homing||false; }
+  constructor(x,y,vx,vy,owner,dmg,color,homing,size){ this.x=x;this.y=y;this.vx=vx;this.vy=vy;this.owner=owner;this.dmg=dmg;this.color=color;this.r=(size||7)*SCALE;this.life=3;this.homing=homing||false;this.trail=[]; }
   update(dt,target){
     if (this.homing && target && target.alive){
       const dx=target.x-this.x, dy=target.y-this.y, d=Math.hypot(dx,dy)||1;
@@ -751,9 +810,63 @@ class Projectile {
       const sp=Math.hypot(this.vx,this.vy), max=600*SCALE;
       if (sp>max){ this.vx=this.vx/sp*max; this.vy=this.vy/sp*max; }
     }
+    // Trail
+    this.trail.push({x:this.x, y:this.y});
+    if (this.trail.length > 6) this.trail.shift();
     this.x+=this.vx*dt; this.y+=this.vy*dt; this.life-=dt;
   }
-  draw(){ ctx.save(); ctx.shadowBlur=18; ctx.shadowColor=this.color; ctx.fillStyle=this.color; ctx.beginPath(); ctx.arc(this.x,this.y,this.r,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=0.6; ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(this.x,this.y,this.r*0.4,0,Math.PI*2); ctx.fill(); ctx.restore(); }
+  draw(){
+    // Trail
+    ctx.globalCompositeOperation = 'lighter';
+    for (let i=0;i<this.trail.length;i++){
+      const p = this.trail[i];
+      const f = i/this.trail.length;
+      ctx.globalAlpha = f*0.5;
+      ctx.fillStyle = this.color;
+      ctx.beginPath(); ctx.arc(p.x, p.y, this.r*f*0.8, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+    // Body with multi-layer glow
+    ctx.save();
+    ctx.shadowBlur = 24; ctx.shadowColor = this.color;
+    const g = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.r);
+    g.addColorStop(0, '#fff'); g.addColorStop(0.35, this.color); g.addColorStop(1, this.color);
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(this.x,this.y,this.r,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+}
+class Beam {
+  constructor(x1,y1,x2,y2,owner,dmg,color,width,life){
+    this.x1=x1;this.y1=y1;this.x2=x2;this.y2=y2;
+    this.owner=owner;this.dmg=dmg;this.color=color;
+    this.width=width;this.life=life;this.maxLife=life;
+    this.hitSet = new Set();
+  }
+  update(dt){ this.life -= dt; }
+  draw(){
+    const a = clamp(this.life/this.maxLife, 0, 1);
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = a;
+    ctx.shadowBlur = 40; ctx.shadowColor = this.color;
+    // Outer glow
+    ctx.strokeStyle = this.color;
+    ctx.lineWidth = this.width * 1.6;
+    ctx.globalAlpha = a * 0.4;
+    ctx.beginPath(); ctx.moveTo(this.x1,this.y1); ctx.lineTo(this.x2,this.y2); ctx.stroke();
+    // Mid layer
+    ctx.globalAlpha = a * 0.85;
+    ctx.lineWidth = this.width;
+    ctx.beginPath(); ctx.moveTo(this.x1,this.y1); ctx.lineTo(this.x2,this.y2); ctx.stroke();
+    // Inner white core
+    ctx.strokeStyle = '#ffffff';
+    ctx.globalAlpha = a;
+    ctx.lineWidth = this.width * 0.4;
+    ctx.beginPath(); ctx.moveTo(this.x1,this.y1); ctx.lineTo(this.x2,this.y2); ctx.stroke();
+    ctx.restore();
+  }
 }
 class Hazard {
   constructor(x,y,owner,dmg,life,color,r){ this.x=x;this.y=y;this.owner=owner;this.dmg=dmg;this.life=life;this.maxLife=life;this.color=color;this.r=r;this.tick=0; }
@@ -817,9 +930,166 @@ function drawBallSymbol(ab, r, t){
   ctx.strokeStyle='rgba(255,255,255,0.92)';
   ctx.fillStyle='rgba(255,255,255,0.92)';
 
+  // === DRAGON BALL SYMBOLS (higher detail) ===
+  if (ab==='kamehameha' || ab==='big_bang_kame' || ab==='black_kame' || ab==='kame_master'){
+    // Kame wave — hand pose + energy
+    ctx.beginPath();
+    ctx.arc(-S*0.4, 0, S*0.5, 0, Math.PI*2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(S*0.4, 0, S*0.5, 0, Math.PI*2);
+    ctx.stroke();
+    // Energy core
+    for (let i=0;i<3;i++){
+      ctx.beginPath(); ctx.arc(0, 0, S*(0.25+i*0.15), 0, Math.PI*2); ctx.stroke();
+    }
+    return;
+  }
+  if (ab==='final_flash'){
+    // Lightning bolt from hands
+    ctx.beginPath();
+    ctx.moveTo(-S*0.7,-S*0.5); ctx.lineTo(-S*0.2,-S*0.1);
+    ctx.lineTo(-S*0.4,S*0.1); ctx.lineTo(S*0.1,S*0.5);
+    ctx.moveTo(S*0.4,-S*0.6); ctx.lineTo(S*0.15,-S*0.15);
+    ctx.lineTo(S*0.5,S*0.1); ctx.lineTo(S*0.3,S*0.6);
+    ctx.stroke();
+    ctx.beginPath(); ctx.arc(0,0,S*0.3,0,Math.PI*2); ctx.fill();
+    return;
+  }
+  if (ab==='masenko'){
+    // Two-handed pose
+    ctx.beginPath();
+    ctx.arc(0, -S*0.3, S*0.45, 0, Math.PI*2); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(-S*0.5, S*0.2); ctx.lineTo(-S*0.2, S*0.7);
+    ctx.moveTo(S*0.5, S*0.2); ctx.lineTo(S*0.2, S*0.7);
+    ctx.stroke();
+    return;
+  }
+  if (ab==='special_beam' || ab==='destructo_disk'){
+    // Spiral drill
+    ctx.beginPath();
+    for (let a=0;a<Math.PI*5;a+=0.15){
+      const rr = a/(Math.PI*5)*S;
+      const x = Math.cos(a)*rr, y = Math.sin(a)*rr;
+      if (a===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    ctx.beginPath(); ctx.arc(0,0,S*0.85,0,Math.PI*2); ctx.stroke();
+    return;
+  }
+  if (ab==='death_beam' || ab==='time_skip'){
+    // Pointed fingers
+    ctx.beginPath();
+    ctx.moveTo(S*0.8,0); ctx.lineTo(-S*0.4,-S*0.35);
+    ctx.lineTo(-S*0.4,S*0.35); ctx.closePath(); ctx.stroke();
+    ctx.beginPath(); ctx.arc(S*0.35,0,S*0.12,0,Math.PI*2); ctx.fill();
+    return;
+  }
+  if (ab==='absorb'){
+    // Two dots (Cell spots)
+    ctx.beginPath(); ctx.arc(-S*0.35,-S*0.2,S*0.25,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(S*0.35,-S*0.2,S*0.25,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(0,S*0.4,S*0.25,0,Math.PI*2); ctx.fill();
+    return;
+  }
+  if (ab==='candy_beam'){
+    // Candy swirl
+    ctx.beginPath();
+    for (let a=0;a<Math.PI*4;a+=0.15){
+      const rr = a/(Math.PI*4)*S*0.85;
+      const x = Math.cos(a+t)*rr, y = Math.sin(a+t)*rr;
+      if (a===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    ctx.beginPath(); ctx.arc(0,0,S*0.25,0,Math.PI*2); ctx.fill();
+    return;
+  }
+  if (ab==='sword_slash'){
+    // Sword slash
+    ctx.beginPath();
+    ctx.moveTo(-S*0.8,-S*0.8); ctx.lineTo(S*0.6,S*0.6);
+    ctx.moveTo(-S*0.8,S*0.8); ctx.lineTo(S*0.6,-S*0.6);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(S*0.6,S*0.6); ctx.lineTo(S*0.8,S*0.4);
+    ctx.stroke();
+    return;
+  }
+  if (ab==='spirit_sword' || ab==='ultimate_battle'){
+    // Crossed swords
+    ctx.beginPath();
+    ctx.moveTo(-S*0.7,-S*0.7); ctx.lineTo(S*0.7,S*0.7);
+    ctx.moveTo(-S*0.7,S*0.7); ctx.lineTo(S*0.7,-S*0.7);
+    ctx.stroke();
+    ctx.beginPath(); ctx.arc(0,0,S*0.2,0,Math.PI*2); ctx.fill();
+    return;
+  }
+  if (ab==='hakai'){
+    // Destruction aura
+    ctx.beginPath();
+    for (let i=0;i<8;i++){
+      const a = i/8*Math.PI*2;
+      ctx.moveTo(Math.cos(a)*S*0.5, Math.sin(a)*S*0.5);
+      ctx.lineTo(Math.cos(a)*S, Math.sin(a)*S);
+    }
+    ctx.stroke();
+    ctx.beginPath(); ctx.arc(0,0,S*0.35,0,Math.PI*2); ctx.fill();
+    return;
+  }
+  if (ab==='time_rewind'){
+    // Clock with rewind arrow
+    ctx.beginPath(); ctx.arc(0,0,S*0.75,0,Math.PI*2); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(0,0); ctx.lineTo(0,-S*0.5);
+    ctx.moveTo(0,0); ctx.lineTo(S*0.35,S*0.2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(-S*0.85,-S*0.2); ctx.lineTo(-S*0.7,0);
+    ctx.lineTo(-S*0.5,-S*0.15);
+    ctx.stroke();
+    return;
+  }
+  if (ab==='legendary_ssj'){
+    // Flaming aura
+    for (let i=0;i<3;i++){
+      ctx.beginPath();
+      ctx.moveTo(0,S*(1-i*0.3));
+      ctx.bezierCurveTo(-S*(0.5+i*0.1),S*0.4, -S*(0.4+i*0.1),-S*0.3, 0,-S*(1-i*0.15));
+      ctx.bezierCurveTo(S*(0.4+i*0.1),-S*0.3, S*(0.5+i*0.1),S*0.4, 0,S*(1-i*0.3));
+      ctx.stroke();
+    }
+    return;
+  }
+  if (ab==='infinite_energy'){
+    // Infinity symbol
+    ctx.beginPath();
+    ctx.moveTo(-S*0.3,0);
+    ctx.bezierCurveTo(-S*0.9,-S*0.6,-S*0.9,S*0.6,-S*0.3,0);
+    ctx.bezierCurveTo(S*0.3,-S*0.6,S*0.9,S*0.6,S*0.3,0);
+    ctx.stroke();
+    return;
+  }
+  if (ab==='ghost_kamikaze'){
+    // Ghost silhouette
+    ctx.beginPath();
+    ctx.moveTo(-S*0.6,-S*0.3);
+    ctx.bezierCurveTo(-S*0.6,-S*0.9,S*0.6,-S*0.9,S*0.6,-S*0.3);
+    ctx.lineTo(S*0.6,S*0.5);
+    ctx.lineTo(S*0.3,S*0.3);
+    ctx.lineTo(0,S*0.5);
+    ctx.lineTo(-S*0.3,S*0.3);
+    ctx.lineTo(-S*0.6,S*0.5);
+    ctx.closePath(); ctx.fill();
+    // Eyes
+    ctx.fillStyle = '#000';
+    ctx.beginPath(); ctx.arc(-S*0.25,-S*0.35,S*0.1,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(S*0.25,-S*0.35,S*0.1,0,Math.PI*2); ctx.fill();
+    return;
+  }
+
   // === NARUTO SYMBOLS ===
   if (ab==='rasengan'){
-    // Spiral
     ctx.beginPath();
     for (let a=0;a<Math.PI*6;a+=0.12){
       const rr = a/(Math.PI*6)*S*0.95;
@@ -830,7 +1100,6 @@ function drawBallSymbol(ab, r, t){
     return;
   }
   if (ab==='chidori'){
-    // Lightning
     ctx.beginPath();
     ctx.moveTo(S*0.3,-S); ctx.lineTo(-S*0.4,S*0.1); ctx.lineTo(S*0.15,S*0.1);
     ctx.lineTo(-S*0.3,S); ctx.lineTo(S*0.4,-S*0.15); ctx.lineTo(-S*0.1,-S*0.15);
@@ -838,7 +1107,6 @@ function drawBallSymbol(ab, r, t){
     return;
   }
   if (ab==='sharingan'){
-    // Red eye with 3 tomoe
     ctx.beginPath(); ctx.arc(0,0,S*0.85,0,Math.PI*2); ctx.stroke();
     ctx.beginPath(); ctx.arc(0,0,S*0.32,0,Math.PI*2); ctx.stroke();
     for (let i=0;i<3;i++){
@@ -850,7 +1118,6 @@ function drawBallSymbol(ab, r, t){
     return;
   }
   if (ab==='byakugan'){
-    // Eye with veins
     ctx.beginPath(); ctx.arc(0,0,S*0.75,0,Math.PI*2); ctx.stroke();
     ctx.beginPath(); ctx.arc(0,0,S*0.22,0,Math.PI*2); ctx.fill();
     for (let i=0;i<8;i++){
@@ -863,18 +1130,15 @@ function drawBallSymbol(ab, r, t){
     return;
   }
   if (ab==='amaterasu'){
-    // Black flame
     ctx.beginPath();
     ctx.moveTo(0,S);
     ctx.bezierCurveTo(-S*0.75,S*0.4, -S*0.55,-S*0.3, 0,-S);
     ctx.bezierCurveTo(S*0.55,-S*0.3, S*0.75,S*0.4, 0,S);
     ctx.closePath(); ctx.fill();
-    ctx.beginPath();
-    ctx.arc(0, 0, S*0.35, 0, Math.PI*2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(0, 0, S*0.35, 0, Math.PI*2); ctx.stroke();
     return;
   }
   if (ab==='susanoo'){
-    // Armored diamond
     ctx.beginPath();
     ctx.moveTo(0,-S); ctx.lineTo(S*0.7,-S*0.4);
     ctx.lineTo(S*0.7,S*0.4); ctx.lineTo(0,S);
@@ -892,7 +1156,6 @@ function drawBallSymbol(ab, r, t){
     return;
   }
   if (ab==='eight_gates'){
-    // Chakra flame
     for (let i=0;i<3;i++){
       ctx.beginPath();
       ctx.moveTo(0,S*(1-i*0.3));
@@ -903,16 +1166,13 @@ function drawBallSymbol(ab, r, t){
     return;
   }
   if (ab==='sand_shield'){
-    // Sand swirl
     for (let i=1;i<=3;i++){
-      ctx.beginPath(); ctx.arc(0,0,S*i/3,0,Math.PI*1.7);
-      ctx.stroke();
+      ctx.beginPath(); ctx.arc(0,0,S*i/3,0,Math.PI*1.7); ctx.stroke();
     }
     ctx.beginPath(); ctx.arc(0,0,S*0.2,0,Math.PI*2); ctx.fill();
     return;
   }
   if (ab==='eight_tails'){
-    // Octopus
     ctx.beginPath(); ctx.arc(0,-S*0.2,S*0.4,0,Math.PI*2); ctx.stroke();
     for (let i=0;i<6;i++){
       const a = i/6*Math.PI*2;
@@ -924,8 +1184,6 @@ function drawBallSymbol(ab, r, t){
     return;
   }
   if (ab==='kamui'){
-    // Spiral vortex
-    ctx.beginPath();
     for (let a=0;a<Math.PI*4;a+=0.15){
       const rr = a/(Math.PI*4)*S;
       const x = Math.cos(a+t*2)*rr, y = Math.sin(a+t*2)*rr;
@@ -947,26 +1205,16 @@ function drawBallSymbol(ab, r, t){
     return;
   }
   if (ab==='paper_dance'){
-    // Paper sheet
     ctx.beginPath();
     ctx.moveTo(-S*0.7,-S*0.5); ctx.lineTo(S*0.5,-S*0.7);
     ctx.lineTo(S*0.7,S*0.5); ctx.lineTo(-S*0.5,S*0.7);
     ctx.closePath(); ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(-S*0.4,-S*0.2); ctx.lineTo(S*0.3,-S*0.35);
-    ctx.stroke();
     return;
   }
   if (ab==='sage_mode'){
-    // Sage marks
     ctx.beginPath(); ctx.arc(0,0,S*0.7,0,Math.PI*2); ctx.stroke();
     ctx.beginPath(); ctx.arc(-S*0.3,-S*0.1,S*0.15,0,Math.PI*2); ctx.fill();
     ctx.beginPath(); ctx.arc(S*0.3,-S*0.1,S*0.15,0,Math.PI*2); ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(0,-S*0.7); ctx.lineTo(0,-S*0.3);
-    ctx.moveTo(-S*0.4,-S*0.5); ctx.lineTo(-S*0.2,-S*0.3);
-    ctx.moveTo(S*0.4,-S*0.5); ctx.lineTo(S*0.2,-S*0.3);
-    ctx.stroke();
     return;
   }
   if (ab==='tsunade_heal'){
@@ -980,20 +1228,16 @@ function drawBallSymbol(ab, r, t){
     return;
   }
   if (ab==='flying_thunder'){
-    // Kunai
     ctx.beginPath();
     ctx.moveTo(0,-S); ctx.lineTo(S*0.3,0);
     ctx.lineTo(S*0.15,S*0.2); ctx.lineTo(0,S*0.1);
     ctx.lineTo(-S*0.15,S*0.2); ctx.lineTo(-S*0.3,0);
     ctx.closePath(); ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(0,S*0.1); ctx.lineTo(0,S*0.7);
-    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,S*0.1); ctx.lineTo(0,S*0.7); ctx.stroke();
     ctx.beginPath(); ctx.arc(0,S*0.75,S*0.12,0,Math.PI*2); ctx.fill();
     return;
   }
   if (ab==='wood_release'){
-    // Wood grain
     for (let i=-2;i<=2;i++){
       ctx.beginPath();
       ctx.moveTo(i*S*0.3, -S);
@@ -1003,7 +1247,6 @@ function drawBallSymbol(ab, r, t){
     return;
   }
   if (ab==='shadow_possess'){
-    // Shadow hand
     ctx.beginPath();
     ctx.moveTo(-S*0.6,S*0.6); ctx.lineTo(S*0.6,S*0.6);
     ctx.stroke();
@@ -1013,9 +1256,7 @@ function drawBallSymbol(ab, r, t){
     return;
   }
   if (ab==='expansion'){
-    for (let i=1;i<=3;i++){
-      ctx.beginPath(); ctx.arc(0,0,S*i/3,0,Math.PI*2); ctx.stroke();
-    }
+    for (let i=1;i<=3;i++){ ctx.beginPath(); ctx.arc(0,0,S*i/3,0,Math.PI*2); ctx.stroke(); }
     return;
   }
   if (ab==='rotation'){
@@ -1028,12 +1269,11 @@ function drawBallSymbol(ab, r, t){
     return;
   }
 
-  // === ORIGINAL SYMBOLS ===
+  // === ORIGINAL SYMBOLS (compact) ===
   if (['basic','sturdy','heavy','tank','golem','bear','adamant','fortress','ironhide','turtle','rhino','bulwark'].includes(ab)){
     ctx.beginPath();
     for(let i=0;i<6;i++){const a=i/6*Math.PI*2-Math.PI/2;const x=Math.cos(a)*S,y=Math.sin(a)*S; if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
     ctx.closePath(); ctx.stroke();
-    if(ab==='bear'||ab==='golem'){ctx.beginPath();ctx.arc(0,0,S*0.35,0,Math.PI*2);ctx.stroke();}
     return;
   }
   if (['speedy','swift','sprinter','turbo','cheetah','dashmaster'].includes(ab)){
@@ -1050,7 +1290,6 @@ function drawBallSymbol(ab, r, t){
     ctx.moveTo(-S,-S); ctx.lineTo(0,0); ctx.lineTo(S,-S);
     ctx.moveTo(-S,S); ctx.lineTo(0,0); ctx.lineTo(S,S);
     ctx.stroke();
-    if(ab==='shark'||ab==='reaper'){ctx.beginPath();ctx.arc(0,0,S*0.25,0,Math.PI*2);ctx.fill();}
     return;
   }
   if (['duelist','gladiator','warrior','ram','spiker','marauder','berserker','lion','wolf','tiger','fox','cobra','snake','spider','venom','toxic','plague'].includes(ab)){
@@ -1064,7 +1303,6 @@ function drawBallSymbol(ab, r, t){
     const bw=S*0.7,bh=S*0.38;
     ctx.strokeRect(-S,-S*0.75,bw,bh); ctx.strokeRect(-S+bw,-S*0.75,bw,bh);
     ctx.strokeRect(-S-bw/2,-S*0.38,bw,bh); ctx.strokeRect(-S+bw/2,-S*0.38,bw,bh);
-    ctx.strokeRect(-S,0,bw,bh); ctx.strokeRect(-S+bw,0,bw,bh);
     return;
   }
   if (['shield','paladin','aegis','aegis2','barrier','shell','resilient','warden'].includes(ab)){
@@ -1169,7 +1407,7 @@ function drawBallSymbol(ab, r, t){
     ctx.moveTo(S*0.7,-S*0.7); ctx.lineTo(-S*0.7,S*0.7); ctx.stroke();
     return;
   }
-  if (['repulsor','nova','implode','blaze','quake'].includes(ab)){
+  if (['repulsor','nova','blaze'].includes(ab)){
     ctx.beginPath(); ctx.arc(0,0,S*0.4,0,Math.PI*2); ctx.fill();
     for(let i=0;i<8;i++){
       const a=i/8*Math.PI*2;
@@ -1180,13 +1418,8 @@ function drawBallSymbol(ab, r, t){
   if (['blaster','sniper','cluster'].includes(ab)){
     ctx.beginPath(); ctx.arc(0,0,S*0.7,0,Math.PI*2); ctx.stroke();
     ctx.beginPath(); ctx.arc(0,0,S*0.2,0,Math.PI*2); ctx.fill();
-    for(let i=0;i<4;i++){
-      const a=i/4*Math.PI*2 + t;
-      ctx.beginPath(); ctx.moveTo(Math.cos(a)*S*0.3,Math.sin(a)*S*0.3); ctx.lineTo(Math.cos(a)*S*0.95,Math.sin(a)*S*0.95); ctx.stroke();
-    }
     return;
   }
-  // Default
   ctx.beginPath(); ctx.arc(0,0,S*0.4,0,Math.PI*2); ctx.fill();
 }
 
@@ -1217,11 +1450,17 @@ class Ball {
     this.stacks=0; this.hitCount=0; this.abilityDisabled=0;
     this.alive=true; this.outside=false; this.deathTime=0;
     this.lastBounceTime=0;
-    this.kamuiActive=0;    // Naruto: Obito
-    this.susanooActive=0;  // Naruto: Madara
-    this.eightGatesActive=0; // Naruto: Rock Lee
+    this.kamuiActive=0;
+    this.susanooActive=0;
+    this.eightGatesActive=0;
     this.flyingThunderCd=0;
-    // Passive stat mods
+    // Dragon Ball specifics
+    this.kamehamehaCharge=0;
+    this.finalFlashCharge=0;
+    this.whisBuffer=0;      // HP buffer for time rewind
+    this.whisBufferTimer=0;
+    this.hakaiReady=0;
+    this.kiAura=0;          // visual ki aura
     if (this.ability === 'sturdy') this.defenseStat *= 1.30;
     if (this.ability === 'swift')  this.speedMul *= 1.35;
     if (this.ability === 'sharp')  this.attackStat *= 1.30;
@@ -1230,8 +1469,9 @@ class Ball {
     if (this.ability === 'guardian') this.damageReduction = 0.20;
     if (this.ability === 'plated') this.critResist = 0.5;
     if (this.ability === 'aegis') this.shieldBonus = 1.5;
-    if (this.ability === 'adamant') this.noKnockback = true;
+    if (this.ability === 'adamant' || this.ability === 'jiren' || this.ability === 'ultimate_battle') this.noKnockback = true;
     if (this.ability === 'juggernaut') this.ccImmune = true;
+    if (this.ability === 'vegeta' || this.ability === 'final_flash') this.speedMul *= 1.05;
     const a = Math.random()*Math.PI*2;
     const sp = 340*SCALE*this.speedMul;
     this.vx = Math.cos(a)*sp; this.vy = Math.sin(a)*sp;
@@ -1242,6 +1482,7 @@ class Ball {
 
   update(dt, enemy){
     if (!this.alive){ if (this.trail.length>0) this.trail.shift(); return; }
+    // Timers
     if (this.dashCd>0){ this.dashCd -= dt; if (this.dashCd<=0){ this.dashCd=0; this.dashCharges = Math.min(this.maxDashCharges, this.dashCharges+1); if (this.dashCharges < this.maxDashCharges) this.dashCd = this.dashMax; } }
     if (this.dashTime>0) this.dashTime -= dt;
     if (this.invuln>0) this.invuln -= dt;
@@ -1257,15 +1498,15 @@ class Ball {
     if (this.kamuiActive>0) this.kamuiActive -= dt;
     if (this.susanooActive>0) this.susanooActive -= dt;
     if (this.eightGatesActive>0) this.eightGatesActive -= dt;
-    if (this.flyingThunderCd>0) this.flyingThunderCd -= dt;
+    if (this.kamehamehaCharge>0) this.kamehamehaCharge -= dt;
+    if (this.finalFlashCharge>0) this.finalFlashCharge -= dt;
+    if (this.whisBufferTimer>0){ this.whisBufferTimer -= dt; if (this.whisBufferTimer<=0) this.whisBuffer=0; }
+    if (this.kiAura>0) this.kiAura -= dt;
     if (this.poisonTimer>0){ this.poisonTimer -= dt; this.hp -= 25*dt/4; if (Math.random()<0.4) burst(this.x,this.y,1,'#9dff4d',60,2.5); if (this.hp<=0){ this.die(); return; } }
     if (this.burnTimer>0){ this.burnTimer -= dt; this.hp -= 16*dt; if (Math.random()<0.5) burst(this.x,this.y,1,'#ff4400',80,3); if (this.hp<=0){ this.die(); return; } }
     if (this.bleedTimer>0){ this.bleedTimer -= dt; this.hp -= 20*dt/3; if (Math.random()<0.4) burst(this.x,this.y,1,'#dc143c',70,2.5); if (this.hp<=0){ this.die(); return; } }
-    // Eight gates self damage
     if (this.eightGatesActive>0){ this.hp -= 3*dt; if (this.hp<=0){ this.die(); return; } }
-
     if (this.abilityDisabled <= 0) this.applyAbilityPassive(dt, enemy);
-
     const frozen = this.freeze>0 || this.sticky>0;
     if (!frozen){
       const sp = Math.hypot(this.vx,this.vy);
@@ -1277,15 +1518,12 @@ class Ball {
       } else { const a = Math.random()*Math.PI*2; this.vx = Math.cos(a)*targetSp; this.vy = Math.sin(a)*targetSp; }
       this.x += this.vx*dt; this.y += this.vy*dt;
     }
-
     let targetR = this.baseR;
     if (this.growth>0) targetR *= (1+this.growth*0.55);
     this.r += (targetR-this.r)*Math.min(1, dt*6);
     const ratio = this.r/this.baseR;
     this.mass = this.baseMass*ratio*ratio;
-
     this.handleWallBounce();
-
     const sp2 = Math.hypot(this.vx,this.vy);
     if (sp2>40*SCALE){ this.trail.push({x:this.x,y:this.y,r:this.r}); if (this.trail.length>12) this.trail.shift(); }
     else if (this.trail.length>0 && Math.random()<0.5) this.trail.shift();
@@ -1306,7 +1544,7 @@ class Ball {
         if (this.ability==='bouncer' || this.ability==='ram') rest = 1.05;
         this.vx -= (1+rest)*dot*nx; this.vy -= (1+rest)*dot*ny;
         const enemy = (this === G.player) ? G.enemy : G.player;
-        const smartChance = (this.ability==='ram' || this.ability==='chidori' || this.ability==='rasengan') ? 0.75 : 0.50;
+        const smartChance = (this.ability==='ram' || this.ability==='chidori' || this.ability==='rasengan' || this.ability==='goku' || this.ability==='vegeta') ? 0.75 : 0.50;
         if (enemy && enemy.alive && Math.random() < smartChance){
           const edx = enemy.x + enemy.vx*0.2 - this.x;
           const edy = enemy.y + enemy.vy*0.2 - this.y;
@@ -1330,58 +1568,295 @@ class Ball {
     const ab = this.ability;
     const enemies = enemy ? [enemy] : [];
 
-    // === NARUTO ABILITIES ===
-    // SHARINGAN: periodic dodge buff (handled in onTakeDamage)
-    // BYAKUGAN: pierce DEF (handled in dealDamageTo)
-    // RASENGAN: onHit
-    // CHIDORI: onHit
+    // === DRAGON BALL PASSIVES ===
+    // GOKU KAMEHAMEHA — charge 2s, then fire beam
+    if (ab==='kamehameha'){
+      if (this.kamehamehaCharge <= 0 && this.abilityCd <= 0){
+        this.kamehamehaCharge = 2.0;
+        this.kiAura = 2.0;
+        this.showFloatText('KA-ME-HA-ME...', '#44ccff');
+        Sound.ki();
+      }
+      if (this.kamehamehaCharge > 0 && this.kamehamehaCharge <= dt){
+        // Fire beam
+        if (enemy && enemy.alive && G.beams.length < MAX_BEAMS){
+          const dx = enemy.x - this.x, dy = enemy.y - this.y;
+          const l = Math.hypot(dx, dy) || 1;
+          const endX = this.x + (dx/l)*arena.r*1.5;
+          const endY = this.y + (dy/l)*arena.r*1.5;
+          G.beams.push(new Beam(this.x, this.y, endX, endY, this, 40, '#44ccff', 24*SCALE, 0.6));
+          this.dealDamageTo(enemy, 22, true);
+          this.showFloatText('KA-ME-HA-ME-HA!', '#44ccff');
+          G.shake = Math.min(38, G.shake + 26);
+          G.flash = 0.7; G.flashColor = '#44ccff';
+          Sound.beam();
+        }
+        this.triggerAbility(6);
+      }
+    }
 
-    // AMATERASU: leave eternal black flame trail
+    // VEGETA FINAL FLASH — 2s charge, then huge AoE blast
+    if (ab==='final_flash'){
+      if (this.finalFlashCharge <= 0 && this.abilityCd <= 0){
+        this.finalFlashCharge = 2.0;
+        this.kiAura = 2.0;
+        this.showFloatText('FINAL...', '#2050ff');
+        Sound.ki();
+      }
+      if (this.finalFlashCharge > 0 && this.finalFlashCharge <= dt){
+        if (enemy && enemy.alive){
+          const dx = enemy.x - this.x, dy = enemy.y - this.y;
+          const l = Math.hypot(dx, dy) || 1;
+          const endX = this.x + (dx/l)*arena.r*1.5;
+          const endY = this.y + (dy/l)*arena.r*1.5;
+          G.beams.push(new Beam(this.x, this.y, endX, endY, this, 55, '#2050ff', 30*SCALE, 0.7));
+          this.dealDamageTo(enemy, 28, true);
+          // Knockback
+          if (!enemy.noKnockback){
+            enemy.vx += (dx/l)*600*SCALE;
+            enemy.vy += (dy/l)*600*SCALE;
+          }
+          this.showFloatText('FINAL FLASH!', '#2050ff');
+          G.shake = Math.min(42, G.shake + 28);
+          G.flash = 0.8; G.flashColor = '#2050ff';
+          Sound.beam();
+        }
+        this.triggerAbility(7);
+      }
+    }
+
+    // GOHAN MASENKO — damage up when low HP
+    if (ab==='masenko'){ /* handled in dealDamageTo */ }
+
+    // PICCOLO SPECIAL BEAM — pierce + ignore DEF
+    if (ab==='special_beam' && this.abilityCd <= 0 && enemy && enemy.alive){
+      const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
+      if (d < 450*SCALE){
+        const dx = enemy.x - this.x, dy = enemy.y - this.y, l = Math.hypot(dx,dy)||1;
+        G.beams.push(new Beam(this.x, this.y, enemy.x, enemy.y, this, 20, '#44aa44', 14*SCALE, 0.4));
+        this.dealDamageTo(enemy, 18, true);
+        this.showFloatText('MAKANKOSAPPO!', '#44aa44');
+        Sound.jutsu();
+      }
+      this.triggerAbility(3.5);
+    }
+
+    // FRIEZA DEATH BEAM — fast homing shot, crit
+    if (ab==='death_beam' && this.abilityCd <= 0 && enemy && enemy.alive){
+      const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
+      if (d < 450*SCALE){
+        const dx = enemy.x-this.x, dy = enemy.y-this.y, l = Math.hypot(dx,dy)||1;
+        const v = 700*SCALE;
+        G.projectiles.push(new Projectile(this.x, this.y, (dx/l)*v, (dy/l)*v, this, 12, '#ddddff', true, 6));
+        this.showFloatText('DEATH BEAM!', '#ddddff');
+      }
+      this.triggerAbility(1.2);
+    }
+
+    // CELL ABSORB — steal HP on hit
+    if (ab==='absorb'){ /* handled in onHit */ }
+
+    // BUU CANDY BEAM — shrink + slow
+    if (ab==='candy_beam' && this.abilityCd <= 0 && enemy && enemy.alive){
+      const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
+      if (d < 300*SCALE){
+        enemy.slow = Math.max(enemy.slow, 2.5);
+        if (!enemy.candyStacks) enemy.candyStacks = 0;
+        enemy.candyStacks = Math.min(3, enemy.candyStacks + 1);
+        enemy.baseR = Math.max(enemy.def.r*SCALE*0.5, enemy.def.r*SCALE*(1-0.15*enemy.candyStacks));
+        this.dealDamageTo(enemy, 6, true);
+        this.showFloatText('CANDY BEAM!', '#ff88dd');
+        burst(enemy.x, enemy.y, 20, '#ff88dd', 240, 4);
+        Sound.jutsu();
+      }
+      this.triggerAbility(5);
+    }
+
+    // TRUNKS SWORD SLASH — bleed on hit
+    if (ab==='sword_slash'){ /* handled in onHit */ }
+
+    // KRILLIN DESTRUCTO DISK — homing blade with crit
+    if (ab==='destructo_disk' && this.abilityCd <= 0 && enemy && enemy.alive){
+      const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
+      if (d < 400*SCALE){
+        const dx = enemy.x-this.x, dy = enemy.y-this.y, l = Math.hypot(dx,dy)||1;
+        const v = 480*SCALE;
+        G.projectiles.push(new Projectile(this.x, this.y, (dx/l)*v, (dy/l)*v, this, 22, '#ffaa44', true, 9));
+        this.showFloatText('DESTRUCTO DISK!', '#ffaa44');
+        Sound.jutsu();
+      }
+      this.triggerAbility(4);
+    }
+
+    // VEGITO SPIRIT SWORD — AoE sweep
+    if (ab==='spirit_sword' && this.abilityCd <= 0 && enemy && enemy.alive){
+      const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
+      if (d < 250*SCALE){
+        this.dealDamageTo(enemy, 20, true);
+        this.showFloatText('SPIRIT SWORD!', '#3355ff');
+        burst(this.x, this.y, 30, '#3355ff', 400, 5);
+        G.shake = Math.min(30, G.shake + 18);
+        Sound.jutsu();
+      }
+      this.triggerAbility(4);
+    }
+
+    // GOGETA BIG BANG KAMEHAMEHA — huge blast
+    if (ab==='big_bang_kame' && this.abilityCd <= 0 && enemy && enemy.alive){
+      const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
+      if (d < 400*SCALE){
+        const dx = enemy.x - this.x, dy = enemy.y - this.y, l = Math.hypot(dx,dy)||1;
+        const endX = this.x + (dx/l)*arena.r*1.4;
+        const endY = this.y + (dy/l)*arena.r*1.4;
+        G.beams.push(new Beam(this.x, this.y, endX, endY, this, 45, '#ff4444', 26*SCALE, 0.6));
+        this.dealDamageTo(enemy, 24, true);
+        this.showFloatText('BIG BANG KAME!', '#ff4444');
+        G.shake = Math.min(40, G.shake + 26);
+        G.flash = 0.75; G.flashColor = '#ff4444';
+        Sound.beam();
+      }
+      this.triggerAbility(5);
+    }
+
+    // BEERUS HAKAI — massive damage, chance to insta-kill if low HP
+    if (ab==='hakai' && this.abilityCd <= 0 && enemy && enemy.alive){
+      const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
+      if (d < 200*SCALE){
+        let dmg = 25;
+        if (enemy.hp < enemy.maxHp*0.3) dmg = 999;
+        this.dealDamageTo(enemy, dmg, true);
+        this.showFloatText('HAKAI!', '#aa44dd');
+        burst(enemy.x, enemy.y, 40, '#aa44dd', 400, 6);
+        burst(enemy.x, enemy.y, 20, '#ffffff', 300, 5);
+        G.shake = Math.min(45, G.shake + 30);
+        G.flash = 0.85; G.flashColor = '#aa44dd';
+        Sound.beam();
+      }
+      this.triggerAbility(6);
+    }
+
+    // WHIS TIME REWIND — heal back damage
+    if (ab==='time_rewind'){
+      if (this.hp < this.maxHp && this.whisBufferTimer <= 0){
+        this.whisBuffer = this.hp;
+        this.whisBufferTimer = 3;
+      }
+      if (this.whisBufferTimer <= 0 && this.whisBuffer > this.hp && this.abilityCd <= 0){
+        // Heal back
+        this.hp = Math.min(this.maxHp, this.whisBuffer);
+        this.showFloatText('TIME REWIND!', '#88ddff');
+        burst(this.x, this.y, 30, '#88ddff', 300, 5);
+        Sound.ability();
+        this.triggerAbility(8);
+      }
+    }
+
+    // BROLY LEGENDARY SSJ — grow + rage
+    if (ab==='legendary_ssj'){
+      if (this.growth < 0.5) this.growth = Math.min(0.5, this.growth + dt/15);
+      if (this.hp < this.maxHp) this.hp = Math.min(this.maxHp, this.hp + 3*dt);
+    }
+
+    // GOKU BLACK BLACK KAME — beam + burn
+    if (ab==='black_kame' && this.abilityCd <= 0 && enemy && enemy.alive){
+      const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
+      if (d < 400*SCALE){
+        const dx = enemy.x - this.x, dy = enemy.y - this.y, l = Math.hypot(dx,dy)||1;
+        const endX = this.x + (dx/l)*arena.r*1.3;
+        const endY = this.y + (dy/l)*arena.r*1.3;
+        G.beams.push(new Beam(this.x, this.y, endX, endY, this, 32, '#cc44aa', 18*SCALE, 0.5));
+        enemy.burnTimer = Math.max(enemy.burnTimer, 3);
+        this.dealDamageTo(enemy, 18, true);
+        this.showFloatText('BLACK KAME!', '#cc44aa');
+        G.shake = Math.min(35, G.shake + 22);
+        G.flash = 0.65; G.flashColor = '#cc44aa';
+        Sound.beam();
+      }
+      this.triggerAbility(4);
+    }
+
+    // HIT TIME SKIP — freeze enemy
+    if (ab==='time_skip' && this.abilityCd <= 0 && enemy && enemy.alive){
+      const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
+      if (d < 250*SCALE){
+        enemy.freeze = Math.max(enemy.freeze, 2.0);
+        this.dealDamageTo(enemy, 12, true);
+        this.showFloatText('TIME SKIP!', '#8844dd');
+        burst(enemy.x, enemy.y, 25, '#8844dd', 280, 4);
+        Sound.jutsu();
+      }
+      this.triggerAbility(6);
+    }
+
+    // JIREN ULTIMATE BATTLE — DEF boost
+    if (ab==='ultimate_battle'){
+      this.defenseStat = this.def.def * 1.30;
+      if (this.hp < this.maxHp*0.5) this.defenseStat = this.def.def * 1.55;
+    }
+
+    // ANDROID 18 INFINITE ENERGY — constant shield regen
+    if (ab==='infinite_energy'){
+      if (this.shield < 8) this.shield = Math.min(8, this.shield + 1.5*dt);
+      if (this.abilityCd <= 0){
+        this.shield = Math.min(8, this.shield + 2);
+        this.triggerAbility(3);
+      }
+    }
+
+    // GOTENKS SUPER GHOST KAMIKAZE — multiple ghost projectiles
+    if (ab==='ghost_kamikaze' && this.abilityCd <= 0 && enemy && enemy.alive){
+      const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
+      if (d < 450*SCALE){
+        for (let i=0;i<5;i++){
+          const angle = Math.atan2(enemy.y-this.y, enemy.x-this.x) + (i-2)*0.18;
+          const v = 420*SCALE;
+          G.projectiles.push(new Projectile(this.x, this.y, Math.cos(angle)*v, Math.sin(angle)*v, this, 10, '#ffff44', true, 8));
+        }
+        this.showFloatText('SUPER GHOST KAMIKAZE!', '#ffff44');
+        Sound.jutsu();
+      }
+      this.triggerAbility(5);
+    }
+
+    // MASTER ROSHI KAME MASTER — counter + reflect
+    if (ab==='kame_master'){
+      if (this.shield <= 0 && this.abilityCd <= 0){
+        this.shield = 3;
+        this.triggerAbility(7);
+      }
+      // Reduce incoming damage when shield active (passive)
+    }
+
+    // === NARUTO PASSIVES (compact) ===
     if (ab==='amaterasu' && this.abilityCd<=0){
       G.hazards.push(new Hazard(this.x, this.y, this, 20, 5, '#0a0a0a', this.r*0.9));
       this.triggerAbility(0.3);
     }
-
-    // SUSANOO: periodic invulnerability + reflect
     if (ab==='susanoo' && this.abilityCd<=0){
       this.susanooActive = 2.5;
       this.triggerAbility(9);
       this.showFloatText('SUSANOO!', '#a020a0');
-      Sound.jutsu();
-      burst(this.x, this.y, 30, '#a020a0', 320, 5);
-      G.flash = Math.min(0.5, G.flash + 0.3);
-      G.flashColor = '#a020a0';
+      Sound.jutsu(); burst(this.x, this.y, 30, '#a020a0', 320, 5);
+      G.flash = Math.min(0.5, G.flash + 0.3); G.flashColor = '#a020a0';
     }
-
-    // EIGHT GATES: boost speed + atk, self-damage
     if (ab==='eight_gates' && this.abilityCd<=0 && this.hp > this.maxHp*0.3){
       this.eightGatesActive = 4;
-      const prevSpd = this.speedMul;
-      const prevAtk = this.attackStat;
-      this.speedMul *= 1.6;
-      this.attackStat *= 1.4;
+      const prevSpd = this.speedMul, prevAtk = this.attackStat;
+      this.speedMul *= 1.6; this.attackStat *= 1.4;
       this.triggerAbility(14);
       this.showFloatText('8 GATES!', '#00cc00');
-      Sound.jutsu();
-      burst(this.x, this.y, 40, '#00cc00', 400, 5);
-      G.flash = Math.min(0.5, G.flash + 0.3);
-      G.flashColor = '#00cc00';
+      Sound.jutsu(); burst(this.x, this.y, 40, '#00cc00', 400, 5);
+      G.flash = Math.min(0.5, G.flash + 0.3); G.flashColor = '#00cc00';
       const self = this;
       setTimeout(() => {
-        if (self.alive){ self.speedMul = self.speedMul / 1.6; self.attackStat = self.attackStat / 1.4; }
+        if (self.alive){ self.speedMul /= 1.6; self.attackStat /= 1.4; }
       }, 4000);
     }
-
-    // SAND SHIELD: auto regenerating shield
     if (ab==='sand_shield' && this.shield <= 0 && this.abilityCd <= 0){
-      this.shield = 4;
-      this.triggerAbility(6);
+      this.shield = 4; this.triggerAbility(6);
       this.showFloatText('SAND SHIELD!', '#cc8844');
-      Sound.jutsu();
-      burst(this.x, this.y, 20, '#cc8844', 240, 4);
+      Sound.jutsu(); burst(this.x, this.y, 20, '#cc8844', 240, 4);
     }
-
-    // EIGHT TAILS: multi-hit AoE
     if (ab==='eight_tails' && this.abilityCd<=0 && enemy && enemy.alive){
       const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
       if (d < 180*SCALE){
@@ -1392,34 +1867,25 @@ class Ball {
       }
       this.triggerAbility(1.6);
     }
-
-    // KAMUI: phase through attacks periodically
     if (ab==='kamui' && this.abilityCd<=0){
       this.kamuiActive = 2;
       this.triggerAbility(10);
       this.showFloatText('KAMUI!', '#6a3a9a');
-      Sound.jutsu();
-      burst(this.x, this.y, 24, '#6a3a9a', 280, 4);
+      Sound.jutsu(); burst(this.x, this.y, 24, '#6a3a9a', 280, 4);
     }
-
-    // SHINRA TENSEI: AoE push blast
     if (ab==='shinra_tensei' && this.abilityCd<=0 && enemy && enemy.alive){
       const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
       if (d < 200*SCALE){
         this.dealDamageTo(enemy, 18, true);
         const ddx = enemy.x-this.x, ddy = enemy.y-this.y, dl = Math.hypot(ddx,ddy)||1;
-        enemy.vx += (ddx/dl)*700*SCALE;
-        enemy.vy += (ddy/dl)*700*SCALE;
+        enemy.vx += (ddx/dl)*700*SCALE; enemy.vy += (ddy/dl)*700*SCALE;
         burst(this.x, this.y, 40, '#cc5500', 450, 6);
         this.showFloatText('SHINRA TENSEI!', '#cc5500');
-        G.shake = Math.min(35, G.shake + 22);
-        G.flash = 0.55; G.flashColor = '#cc5500';
+        G.shake = Math.min(35, G.shake + 22); G.flash = 0.55; G.flashColor = '#cc5500';
         Sound.jutsu();
       }
       this.triggerAbility(4);
     }
-
-    // PAPER DANCE: shield + heal
     if (ab==='paper_dance' && this.abilityCd<=0){
       this.shield = Math.max(this.shield, 3);
       this.hp = Math.min(this.maxHp, this.hp + 8);
@@ -1427,25 +1893,13 @@ class Ball {
       this.showFloatText('PAPER!', '#6a6aba');
       burst(this.x, this.y, 18, '#6a6aba', 220, 3.5);
     }
-
-    // SAGE MODE: regen + damage boost passive
-    if (ab==='sage_mode'){
-      if (this.hp < this.maxHp) this.hp = Math.min(this.maxHp, this.hp + 4*dt);
-      // Attack boost handled in dealDamageTo via ability check
-    }
-
-    // TSUNADE HEAL: massive regen
-    if (ab==='tsunade_heal'){
-      if (this.hp < this.maxHp) this.hp = Math.min(this.maxHp, this.hp + 7*dt);
-    }
-
-    // FLYING THUNDER: teleport to enemy + damage
+    if (ab==='sage_mode' && this.hp < this.maxHp) this.hp = Math.min(this.maxHp, this.hp + 4*dt);
+    if (ab==='tsunade_heal' && this.hp < this.maxHp) this.hp = Math.min(this.maxHp, this.hp + 7*dt);
     if (ab==='flying_thunder' && this.abilityCd<=0 && enemy && enemy.alive){
       const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
       if (d > 100*SCALE && d < 400*SCALE){
         burst(this.x, this.y, 20, '#ffdd33', 300, 4);
-        this.x = enemy.x - 30*SCALE;
-        this.y = enemy.y;
+        this.x = enemy.x - 30*SCALE; this.y = enemy.y;
         burst(this.x, this.y, 20, '#ffdd33', 300, 4);
         this.dealDamageTo(enemy, 15, true);
         this.showFloatText('FTG!', '#ffdd33');
@@ -1453,8 +1907,6 @@ class Ball {
       }
       this.triggerAbility(6);
     }
-
-    // WOOD RELEASE: trap in wood
     if (ab==='wood_release' && this.abilityCd<=0 && enemy && enemy.alive){
       const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
       if (d < 250*SCALE){
@@ -1466,8 +1918,6 @@ class Ball {
       }
       this.triggerAbility(5);
     }
-
-    // SHADOW POSSESSION: immobilize
     if (ab==='shadow_possess' && this.abilityCd<=0 && enemy && enemy.alive){
       const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
       if (d < 250*SCALE){
@@ -1478,13 +1928,7 @@ class Ball {
       }
       this.triggerAbility(5);
     }
-
-    // EXPANSION: grow + push (passive growth)
-    if (ab==='expansion' && this.growth<1){
-      this.growth = Math.min(1, this.growth + dt/8);
-    }
-
-    // ROTATION: reflect + AoE
+    if (ab==='expansion' && this.growth<1) this.growth = Math.min(1, this.growth + dt/8);
     if (ab==='rotation' && this.abilityCd<=0){
       for (const e of enemies){
         if (!e.alive) continue;
@@ -1492,11 +1936,9 @@ class Ball {
         if (d < this.r*2.5){
           this.dealDamageTo(e, 8, true);
           const ddx = e.x-this.x, ddy = e.y-this.y, dl = Math.hypot(ddx,ddy)||1;
-          e.vx += (ddx/dl)*300*SCALE;
-          e.vy += (ddy/dl)*300*SCALE;
+          e.vx += (ddx/dl)*300*SCALE; e.vy += (ddy/dl)*300*SCALE;
         }
       }
-      // Remove projectiles
       for (let i = G.projectiles.length-1; i >= 0; i--){
         const pr = G.projectiles[i];
         const d = Math.hypot(pr.x-this.x, pr.y-this.y);
@@ -1509,23 +1951,14 @@ class Ball {
       this.triggerAbility(1.2);
     }
 
-    // === ORIGINAL ABILITIES (unchanged essentials) ===
+    // Original abilities (compact essentials)
     if (ab==='healer' && this.hp<this.maxHp) this.hp = Math.min(this.maxHp, this.hp+6*dt);
     if (ab==='druid' && this.hp<this.maxHp) this.hp = Math.min(this.maxHp, this.hp+8*dt);
-    if (ab==='acolyte' && this.hp<this.maxHp) this.hp = Math.min(this.maxHp, this.hp+3*dt);
     if (ab==='eternal' && this.hp<this.maxHp) this.hp = Math.min(this.maxHp, this.hp+4*dt);
-    if (ab==='fortitude' && this.abilityCd<=0){ this.hp = Math.min(this.maxHp, this.hp+10); this.showFloatText('+10', '#66cdaa'); burst(this.x,this.y,8,'#66cdaa',120,3); this.triggerAbility(5); }
-    if (ab==='shield' && this.shield<=0 && this.abilityCd<=0){ this.shield = 4.5; this.triggerAbility(9); this.showFloatText('SHIELD!', '#4fc3ff'); Sound.ability(); burst(this.x,this.y,18,'#4fc3ff',220,4); }
-    if (ab==='paladin' && this.shield<=0 && this.abilityCd<=0){ this.shield = 5.5; this.triggerAbility(7); this.showFloatText('HOLY SHIELD!', '#e8e0c8'); Sound.ability(); burst(this.x,this.y,18,'#e8e0c8',220,4); }
-    if (ab==='barrier' && this.shield<=0 && this.abilityCd<=0){ this.shield = 3.5; this.triggerAbility(5); this.showFloatText('BARRIER!', '#4682b4'); Sound.ability(); burst(this.x,this.y,14,'#4682b4',200,3.5); }
-    if (ab==='aegis2' && this.shield<=0 && this.abilityCd<=0){ this.shield = 5; this.triggerAbility(6); this.showFloatText('REGEN!', '#00ced1'); burst(this.x,this.y,14,'#00ced1',200,3.5); }
-    if (ab==='resilient' && this.shield<3) this.shield = Math.min(3, this.shield + dt*1.2);
+    if (ab==='shield' && this.shield<=0 && this.abilityCd<=0){ this.shield = 4.5; this.triggerAbility(9); this.showFloatText('SHIELD!', '#4fc3ff'); burst(this.x,this.y,18,'#4fc3ff',220,4); }
+    if (ab==='paladin' && this.shield<=0 && this.abilityCd<=0){ this.shield = 5.5; this.triggerAbility(7); this.showFloatText('HOLY SHIELD!', '#e8e0c8'); burst(this.x,this.y,18,'#e8e0c8',220,4); }
     if (ab==='giant' && this.growth<1) this.growth = Math.min(1, this.growth+dt/10);
     if (ab==='magnet'){ for (const pu of G.powerups){ const ddx=this.x-pu.x, ddy=this.y-pu.y, d=Math.hypot(ddx,ddy)||1; if(d<240*SCALE){ pu.x += (ddx/d)*280*SCALE*dt; pu.y += (ddy/d)*280*SCALE*dt; } } }
-    if (ab==='vacuum'){
-      for (const pu of G.powerups){ const ddx=this.x-pu.x, ddy=this.y-pu.y, d=Math.hypot(ddx,ddy)||1; if(d<260*SCALE){ pu.x += (ddx/d)*300*SCALE*dt; pu.y += (ddy/d)*300*SCALE*dt; } }
-      if (enemy && enemy.alive){ const ddx=this.x-enemy.x, ddy=this.y-enemy.y, d=Math.hypot(ddx,ddy)||1; if(d<200*SCALE){ enemy.vx += (ddx/d)*200*SCALE*dt; enemy.vy += (ddy/d)*200*SCALE*dt; } }
-    }
     if ((ab==='teleport' || ab==='warp') && this.abilityCd<=0){
       const a = Math.random()*Math.PI*2, dist = Math.random()*arena.r*0.65;
       burst(this.x,this.y,20,'#7b68ee',260,4.5);
@@ -1534,205 +1967,105 @@ class Ball {
       this.vx = Math.cos(na)*sp; this.vy = Math.sin(na)*sp;
       burst(this.x,this.y,20,'#7b68ee',260,4.5);
       this.showFloatText(ab==='warp'?'WARP!':'BLINK!', '#7b68ee');
-      this.triggerAbility(ab==='warp'?3.5:5); Sound.ability();
-    }
-    if (ab==='blink' && this.abilityCd<=0){
-      const a = Math.random()*Math.PI*2, dist = 80*SCALE;
-      burst(this.x,this.y,12,'#6a5acd',180,3);
-      this.x += Math.cos(a)*dist; this.y += Math.sin(a)*dist;
-      burst(this.x,this.y,12,'#6a5acd',180,3);
-      this.showFloatText('BLINK!', '#6a5acd'); this.triggerAbility(2.5);
-    }
-    if (ab==='shadow' && this.invisible<=0 && this.abilityCd<=0){
-      this.invisible = 1.5; this.showFloatText('INVISIBLE!', '#2f2f2f');
-      burst(this.x,this.y,14,'#2f2f2f',200,4); this.triggerAbility(6);
-    }
-    if (ab==='tiger' && this.abilityCd<=0){
-      this.speedMul *= 1.5; this.showFloatText('SPEED!', '#ff8c00');
-      burst(this.x,this.y,14,'#ff8c00',240,4); this.triggerAbility(5);
-      const self = this;
-      setTimeout(()=>{ if (self.alive) self.speedMul /= 1.5; }, 1500);
+      this.triggerAbility(ab==='warp'?3.5:5);
     }
     if (ab==='spinner' && this.abilityCd<=0){
-      let hitAny = false;
-      for (const e of enemies){ if (!e.alive) continue; const d = Math.hypot(e.x-this.x, e.y-this.y); if (d < this.r*2.4){ this.dealDamageTo(e, 12, true); hitAny = true; } }
-      if (hitAny){ this.showFloatText('SPIN!', '#00ced1'); burst(this.x,this.y,10,'#00ced1',180,3); }
+      for (const e of enemies){ if (!e.alive) continue; const d = Math.hypot(e.x-this.x, e.y-this.y); if (d < this.r*2.4) this.dealDamageTo(e, 12, true); }
       this.triggerAbility(0.5);
-    }
-    if (ab==='cyclone' && this.abilityCd<=0){
-      for (const e of enemies){ if (!e.alive) continue; const d = Math.hypot(e.x-this.x, e.y-this.y); if (d < this.r*2.2) this.dealDamageTo(e, 7, true); }
-      this.triggerAbility(0.6);
     }
     if (ab==='aura' && this.abilityCd<=0){
       for (const e of enemies){ if (!e.alive) continue; const d = Math.hypot(e.x-this.x, e.y-this.y); if (d < this.r*2.0) this.dealDamageTo(e, 9, true); }
       this.triggerAbility(0.4);
     }
-    if (ab==='spiker' && this.abilityCd<=0){
-      for (const e of enemies){ if (!e.alive) continue; const d = Math.hypot(e.x-this.x, e.y-this.y); if (d < this.r+e.r) this.dealDamageTo(e, 5, true); }
-      this.triggerAbility(1);
-    }
-    if (ab==='glacier'){ for (const e of enemies){ if (!e.alive) continue; const d = Math.hypot(e.x-this.x, e.y-this.y); if (d < this.r*2.5 && Math.random() < 0.02) e.slow = Math.max(e.slow, 0.6); } }
-    if (ab==='blizzard'){ for (const e of enemies){ if (!e.alive) continue; const d = Math.hypot(e.x-this.x, e.y-this.y); if (d < this.r*3.5) e.slow = Math.max(e.slow, 0.3); } }
-    if (ab==='storm' && this.abilityCd<=0){
-      for (const e of enemies){
-        if (!e.alive) continue;
-        const d = Math.hypot(e.x-this.x, e.y-this.y);
-        if (d < this.r*3.5){ this.dealDamageTo(e, 8, true); burst(e.x, e.y, 6, '#9370db', 200, 3); this.triggerAbility(1.2); break; }
+    if (ab==='fire' || ab==='magma' || ab==='dragon' || ab==='inferno'){
+      if (this.abilityCd<=0){
+        const dmg = ab==='magma'?18:(ab==='dragon'?16:(ab==='inferno'?20:12));
+        G.hazards.push(new Hazard(this.x, this.y, this, dmg, 2.5, '#ff4400', this.r*0.85));
+        this.triggerAbility(0.22);
       }
-      if (this.abilityCd<=0) this.triggerAbility(0.5);
     }
-    if (ab==='shaman' && this.abilityCd<=0 && enemy && enemy.alive){
-      const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
-      if (d < 340*SCALE){ this.dealDamageTo(enemy, 10, true); burst(enemy.x,enemy.y,10,'#40e0d0',240,4); this.showFloatText('CHAIN!', '#40e0d0'); this.triggerAbility(1.5); }
-    }
-    if (ab==='mystic' && this.abilityCd<=0 && enemy && enemy.alive){
-      const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
-      if (d < 300*SCALE){ this.dealDamageTo(enemy, 8, true); this.hp = Math.min(this.maxHp, this.hp + 4); burst(enemy.x,enemy.y,10,'#40e0d0',200,3); this.triggerAbility(2); }
-    }
-    if (ab==='thunder' && this.abilityCd<=0 && enemy && enemy.alive){
-      const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
-      if (d < 320*SCALE){ for (let i=0;i<3;i++) this.dealDamageTo(enemy, 5, true); burst(enemy.x,enemy.y,14,'#ffd700',260,4); this.showFloatText('THUNDER!', '#ffd700'); this.triggerAbility(2.5); }
-    }
-    if ((ab==='fire' || ab==='magma' || ab==='dragon' || ab==='inferno' || ab==='plasma') && this.abilityCd<=0){
-      let dmg = 12, life = 2.5, col = '#ff4400';
-      if (ab==='magma'){ dmg = 18; life = 2.8; col = '#ff4500'; }
-      if (ab==='dragon'){ dmg = 16; life = 3.2; col = '#8b0000'; }
-      if (ab==='inferno'){ dmg = 20; life = 3.5; col = '#ff2400'; }
-      if (ab==='plasma'){ dmg = 14; life = 2.5; col = '#da70d6'; }
-      G.hazards.push(new Hazard(this.x, this.y, this, dmg, life, col, this.r*0.85));
-      this.triggerAbility(ab==='dragon'?0.18:0.22);
-    }
-    if (ab==='toxic' && this.abilityCd<=0){ G.hazards.push(new Hazard(this.x, this.y, this, 10, 3, '#32cd32', this.r*1.1)); this.triggerAbility(0.4); }
-    if (ab==='plague' && this.abilityCd<=0){ G.hazards.push(new Hazard(this.x, this.y, this, 12, 3.5, '#808000', this.r*1.2)); this.triggerAbility(0.5); }
     if (ab==='sniper' && this.abilityCd<=0 && enemy && enemy.alive){
       const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
-      if (d < 400*SCALE){ const dx=enemy.x-this.x, dy=enemy.y-this.y, l=Math.hypot(dx,dy)||1; const v = 520*SCALE; G.projectiles.push(new Projectile(this.x, this.y, (dx/l)*v, (dy/l)*v, this, 14, '#ffcc00', true)); this.showFloatText('SHOOT!', '#ffcc00'); Sound.ability(); }
+      if (d < 400*SCALE){ const dx=enemy.x-this.x, dy=enemy.y-this.y, l=Math.hypot(dx,dy)||1; const v = 520*SCALE; G.projectiles.push(new Projectile(this.x, this.y, (dx/l)*v, (dy/l)*v, this, 14, '#ffcc00', true)); this.showFloatText('SHOOT!', '#ffcc00'); }
       this.triggerAbility(2.0);
     }
-    if (ab==='blaster' && this.abilityCd<=0 && enemy && enemy.alive){
-      const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
-      if (d < 450*SCALE){ const dx=enemy.x-this.x, dy=enemy.y-this.y, l=Math.hypot(dx,dy)||1; const v = 480*SCALE; G.projectiles.push(new Projectile(this.x, this.y, (dx/l)*v, (dy/l)*v, this, 12, '#9400d3', true)); this.showFloatText('BLAST!', '#9400d3'); }
-      this.triggerAbility(1.6);
-    }
-    if (ab==='cluster' && this.abilityCd<=0 && enemy && enemy.alive){
-      const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
-      if (d < 400*SCALE){ for (let i=0;i<4;i++){ const angle = Math.atan2(enemy.y-this.y, enemy.x-this.x) + (i-1.5)*0.25; const v = 480*SCALE; G.projectiles.push(new Projectile(this.x, this.y, Math.cos(angle)*v, Math.sin(angle)*v, this, 8, '#daa520', false)); } this.showFloatText('CLUSTER!', '#daa520'); }
-      this.triggerAbility(2.5);
-    }
-    if (ab==='trapper' && this.abilityCd<=0){ G.hazards.push(new Hazard(this.x, this.y, this, 15, 4, '#2e8b57', this.r*0.9)); this.triggerAbility(1.8); }
-    if (ab==='spider' && this.abilityCd<=0){ G.hazards.push(new Hazard(this.x, this.y, this, 8, 3, '#2f4f4f', this.r*1.0)); this.triggerAbility(2.2); }
     if (ab==='quake' && this.abilityCd<=0){
       for (const e of enemies){ if (!e.alive) continue; const d = Math.hypot(e.x-this.x, e.y-this.y); if (d < this.r*4) this.dealDamageTo(e, 15, true); }
       burst(this.x, this.y, 20, '#8b4513', 300, 4); this.showFloatText('QUAKE!', '#8b4513'); this.triggerAbility(3);
-    }
-    if (ab==='vortex'){ for (const e of enemies){ if (!e.alive) continue; const ddx=this.x-e.x, ddy=this.y-e.y, d=Math.hypot(ddx,ddy)||1; if(d<250*SCALE){ e.vx += (ddx/d)*180*SCALE*dt; e.vy += (ddy/d)*180*SCALE*dt; } } }
-    if (ab==='singularity'){
-      for (const e of enemies){ if (!e.alive) continue; const ddx=this.x-e.x, ddy=this.y-e.y, d=Math.hypot(ddx,ddy)||1; if(d<280*SCALE){ e.vx += (ddx/d)*240*SCALE*dt; e.vy += (ddy/d)*240*SCALE*dt; if (this.abilityCd<=0) this.dealDamageTo(e, 4, true); } }
-      if (this.abilityCd<=0) this.triggerAbility(0.8);
-    }
-    if (ab==='repulsor' && this.abilityCd<=0){
-      for (const e of enemies){ if (!e.alive) continue; const ddx=e.x-this.x, ddy=e.y-this.y, d=Math.hypot(ddx,ddy)||1; if(d<200*SCALE){ e.vx += (ddx/d)*400*SCALE; e.vy += (ddy/d)*400*SCALE; } }
-      this.triggerAbility(1.2);
-    }
-    if (ab==='puller' && this.abilityCd<=0 && enemy && enemy.alive){
-      const ddx=this.x-enemy.x, ddy=this.y-enemy.y, d=Math.hypot(ddx,ddy)||1;
-      if (d<220*SCALE){ enemy.vx += (ddx/d)*280*SCALE; enemy.vy += (ddy/d)*280*SCALE; this.showFloatText('PULL!', '#20b2aa'); burst(enemy.x, enemy.y, 10, '#20b2aa', 200, 3); }
-      this.triggerAbility(2);
-    }
-    if (ab==='grabber' && this.abilityCd<=0 && enemy && enemy.alive){
-      const ddx=this.x-enemy.x, ddy=this.y-enemy.y, d=Math.hypot(ddx,ddy)||1;
-      if (d<250*SCALE){ enemy.vx += (ddx/d)*350*SCALE; enemy.vy += (ddy/d)*350*SCALE; this.showFloatText('GRAB!', '#b0e0e6'); }
-      this.triggerAbility(2.2);
-    }
-    if (ab==='jitter' && this.abilityCd<=0){
-      const a = Math.random()*Math.PI*2; const sp = this.speedMax;
-      this.vx = Math.cos(a)*sp; this.vy = Math.sin(a)*sp;
-      burst(this.x, this.y, 6, this.light, 100, 3);
-      this.triggerAbility(0.8);
-    }
-    if (ab==='trickster' && this.abilityCd<=0){
-      const r = Math.random();
-      if (r < 0.33){ this.hp = Math.min(this.maxHp, this.hp+15); this.showFloatText('HEAL!', '#4dff88'); }
-      else if (r < 0.66){ this.shield = 4; this.showFloatText('SHIELD!', '#4fc3ff'); }
-      else { this.hp = Math.min(this.maxHp, this.hp+10); this.showFloatText('LUCKY!', '#ffd700'); }
-      burst(this.x, this.y, 12, '#ff00ff', 200, 4); this.triggerAbility(5);
-    }
-    if (ab==='jammer' && this.abilityCd<=0 && enemy && enemy.alive){
-      const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
-      if (d < 200*SCALE){ enemy.abilityDisabled = Math.max(enemy.abilityDisabled, 3); this.showFloatText('JAMMED!', '#444444'); burst(enemy.x, enemy.y, 12, '#444444', 200, 3); this.triggerAbility(4); }
-    }
-    if (ab==='antimagic' && this.abilityCd<=0 && enemy && enemy.alive){
-      const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
-      if (d < 180*SCALE){ enemy.abilityDisabled = Math.max(enemy.abilityDisabled, 2); this.showFloatText('NULL!', '#2f4f4f'); this.triggerAbility(3); }
-    }
-    if (ab==='nullify' && this.abilityCd<=0 && enemy && enemy.alive){
-      const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
-      if (d < 180*SCALE){ enemy.abilityCd = 0; this.showFloatText('RESET!', '#808080'); this.triggerAbility(5); }
-    }
-    if (ab==='shell' && this.abilityCd<=0 && this.shield < 6){ this.shield = Math.min(6, this.shield + 1); this.triggerAbility(1.5); }
-    if (ab==='warden' && this.hp < this.maxHp*0.4 && this.shield<=0 && this.abilityCd<=0){
-      this.shield = 6; this.showFloatText('PANIC!', '#3cb371');
-      Sound.ability(); burst(this.x,this.y,18,'#3cb371',220,4);
-      this.triggerAbility(8);
-    }
-    if (ab==='ironhide'){
-      if (this.hp < this.maxHp*0.5) this.defenseStat = this.def.def*1.5;
-      else this.defenseStat = this.def.def*1.20;
-    }
-    if (ab==='lifebinder'){
-      if (this.hp<this.maxHp) this.hp = Math.min(this.maxHp, this.hp+3*dt);
-      if (this.shield<=0 && this.abilityCd<=0){ this.shield = 3; this.triggerAbility(6); }
     }
   }
 
   onHit(target, damage){
     const ab = this.ability;
+    // === DRAGON BALL ONHIT ===
+    if (ab==='masenko'){
+      const rageMul = 1 + (1 - this.hp/this.maxHp)*0.8;
+      this.dealDamageTo(target, damage*rageMul*0.4, true);
+      this.showFloatText('MASENKO!', '#8844ff');
+      burst(target.x, target.y, 16, '#8844ff', 260, 4);
+    }
+    if (ab==='absorb'){
+      const heal = damage * 0.50;
+      this.hp = Math.min(this.maxHp, this.hp + heal);
+      this.showFloatText('+'+Math.round(heal), '#22aa22');
+      burst(this.x, this.y, 10, '#22aa22', 180, 3.5);
+    }
+    if (ab==='sword_slash'){
+      target.bleedTimer = Math.max(target.bleedTimer, 3);
+      burst(target.x, target.y, 14, '#6677cc', 240, 4);
+      this.showFloatText('SLASH!', '#6677cc');
+    }
+    if (ab==='kamehameha' || ab==='big_bang_kame' || ab==='black_kame' || ab==='kame_master'){
+      burst(target.x, target.y, 14, '#44ccff', 260, 4);
+    }
+    if (ab==='final_flash'){
+      if (!target.noKnockback){
+        const dx = target.x-this.x, dy = target.y-this.y, l = Math.hypot(dx,dy)||1;
+        target.vx += (dx/l)*400*SCALE;
+        target.vy += (dy/l)*400*SCALE;
+      }
+      this.showFloatText('FLASH!', '#2050ff');
+    }
+    if (ab==='spirit_sword' || ab==='sword_slash'){
+      // Extra spirit damage
+    }
+    if (ab==='destructo_disk'){
+      this.dealDamageTo(target, 8, true);
+      this.showFloatText('SLICE!', '#ffaa44');
+    }
+    if (ab==='frieza' || ab==='death_beam'){
+      // Crit chance already handled
+    }
 
     // === NARUTO ONHIT ===
     if (ab==='rasengan'){
-      // Extra spiral AoE damage
       this.dealDamageTo(target, 12, true);
       burst(this.x, this.y, 30, '#ff9900', 400, 5);
       burst(target.x, target.y, 20, '#ffdd33', 350, 4);
       this.showFloatText('RASENGAN!', '#ff9900');
       G.shake = Math.min(30, G.shake + 15);
-      G.flash = Math.min(0.5, G.flash + 0.3);
-      G.flashColor = '#ff9900';
+      G.flash = Math.min(0.5, G.flash + 0.3); G.flashColor = '#ff9900';
       Sound.jutsu();
     }
-
     if (ab==='chidori'){
-      // Pierce shield + lightning burst
       target.shield = 0;
       this.dealDamageTo(target, 15, true);
       burst(target.x, target.y, 30, '#4a4aff', 420, 5);
-      burst(target.x, target.y, 15, '#ffffff', 300, 4);
       this.showFloatText('CHIDORI!', '#4a4aff');
       G.shake = Math.min(30, G.shake + 15);
-      G.flash = Math.min(0.5, G.flash + 0.3);
-      G.flashColor = '#4a4aff';
+      G.flash = Math.min(0.5, G.flash + 0.3); G.flashColor = '#4a4aff';
       Sound.jutsu();
     }
-
-    if (ab==='sharingan'){
-      // Small damage boost on hit
-      this.dealDamageTo(target, 5, true);
-      this.showFloatText('COPY!', '#c02020');
-    }
-
     if (ab==='byakugan'){
       this.showFloatText('GENTLE FIST!', '#d0d0ff');
       burst(target.x, target.y, 12, '#d0d0ff', 240, 4);
     }
-
     if (ab==='amaterasu'){
       target.burnTimer = Math.max(target.burnTimer, 8);
       burst(target.x, target.y, 20, '#0a0a0a', 280, 5);
       this.showFloatText('AMATERASU!', '#0a0a0a');
     }
-
     if (ab==='sakura_punch'){
-      // Massive knockback + extra damage
       if (!target.noKnockback){
         const dx = target.x-this.x, dy = target.y-this.y, l = Math.hypot(dx,dy)||1;
         target.vx += (dx/l)*600*SCALE;
@@ -1741,55 +2074,29 @@ class Ball {
       this.dealDamageTo(target, 10, true);
       burst(target.x, target.y, 20, '#ff88cc', 320, 5);
       this.showFloatText('SAKURA PUNCH!', '#ff88cc');
-      G.shake = Math.min(28, G.shake + 14);
       Sound.hit(0.9);
     }
-
     if (ab==='eight_tails'){
       this.dealDamageTo(target, 6, true);
       burst(target.x, target.y, 14, '#cc3333', 240, 4);
-      this.showFloatText('HACHIBI!', '#cc3333');
     }
-
     if (ab==='kamui'){
       this.dealDamageTo(target, 8, true);
       burst(target.x, target.y, 16, '#6a3a9a', 260, 4);
-      this.showFloatText('KAMUI!', '#6a3a9a');
     }
-
-    if (ab==='paper_dance'){
-      burst(target.x, target.y, 12, '#6a6aba', 220, 4);
-      this.showFloatText('PAPER CUT!', '#6a6aba');
-    }
-
     if (ab==='flying_thunder'){
       this.dealDamageTo(target, 12, true);
       burst(target.x, target.y, 20, '#ffdd33', 320, 4);
       this.showFloatText('HIRAISHIN!', '#ffdd33');
-      Sound.jutsu();
     }
-
     if (ab==='wood_release'){
       target.sticky = Math.max(target.sticky, 1);
       burst(target.x, target.y, 16, '#8a5a2a', 240, 4);
-      this.showFloatText('MOKUTON!', '#8a5a2a');
     }
-
     if (ab==='shadow_possess'){
       target.freeze = Math.max(target.freeze, 1.2);
       burst(target.x, target.y, 12, '#2a4a2a', 200, 4);
-      this.showFloatText('KAGEMANE!', '#2a4a2a');
     }
-
-    if (ab==='expansion'){
-      if (!target.noKnockback){
-        const dx = target.x-this.x, dy = target.y-this.y, l = Math.hypot(dx,dy)||1;
-        target.vx += (dx/l)*500*SCALE;
-        target.vy += (dy/l)*500*SCALE;
-      }
-      this.showFloatText('BAIKA!', '#aa6622');
-    }
-
     if (ab==='rotation'){
       this.dealDamageTo(target, 5, true);
       if (!target.noKnockback){
@@ -1798,10 +2105,9 @@ class Ball {
         target.vy += (dy/l)*350*SCALE;
       }
       burst(this.x, this.y, 16, '#ccaabb', 280, 4);
-      this.showFloatText('KAITEN!', '#ccaabb');
     }
 
-    // === ORIGINAL ONHIT (abbreviated) ===
+    // === ORIGINAL ONHIT ===
     if (ab==='vampire' || ab==='marauder' || ab==='leech' || ab==='absorber'){
       const rate = ab==='vampire'?0.45:(ab==='marauder'?0.30:0.25);
       const heal = damage * rate;
@@ -1814,85 +2120,56 @@ class Ball {
       const bx = (this.x+target.x)/2, by = (this.y+target.y)/2;
       this.dealDamageTo(target, 14, true);
       burst(bx,by,36,'#ff5b2e',400,6);
-      burst(bx,by,20,'#ffffff',300,5);
       this.showFloatText('BOOM!', '#ff5b2e');
       G.shake = Math.min(30, G.shake+14); G.flash = Math.min(0.45, G.flash+0.25); G.flashColor = '#ff5b2e';
-      Sound.hit(1);
     }
     if (ab==='nova'){
       for (const o of [G.player, G.enemy]){ if (!o || o===this || !o.alive) continue; const d = Math.hypot(o.x-this.x, o.y-this.y); if (d < 100*SCALE) this.dealDamageTo(o, 10, true); }
-      burst(this.x,this.y,30,'#ff1493',380,5); this.showFloatText('NOVA!', '#ff1493');
-    }
-    if (ab==='blaze'){
-      for (const o of [G.player, G.enemy]){ if (!o || o===this || !o.alive) continue; const d = Math.hypot(o.x-this.x, o.y-this.y); if (d < 120*SCALE) this.dealDamageTo(o, 12, true); }
-      burst(this.x,this.y,28,'#ff6347',380,5); this.showFloatText('BLAZE!', '#ff6347');
+      burst(this.x,this.y,30,'#ff1493',380,5);
     }
     if (ab==='freezer') target.slow = Math.max(target.slow, 2.5);
-    if (ab==='ice'){ target.freeze = Math.max(target.freeze, 1.5); burst(target.x,target.y,16,'#80ffff',220,4); this.showFloatText('FREEZE!', '#80ffff'); }
-    if (ab==='frost'){ target.freeze = Math.max(target.freeze, 1.0); burst(target.x,target.y,20,'#b0e0e6',260,4); this.showFloatText('FROST!', '#b0e0e6'); }
-    if (ab==='static'){ target.freeze = Math.max(target.freeze, 0.6); burst(target.x,target.y,12,'#fffacd',220,3.5); this.showFloatText('ZAP!', '#fffacd'); }
-    if (ab==='plasma'){ target.burnTimer = Math.max(target.burnTimer, 1.5); target.slow = Math.max(target.slow, 1.5); this.showFloatText('PLASMA!', '#da70d6'); }
-    if (ab==='poison'){ target.poisonTimer = Math.max(target.poisonTimer, 4); burst(target.x,target.y,10,'#9dff4d',150,3); this.showFloatText('POISON!', '#9dff4d'); }
-    if (ab==='venom'){ target.poisonTimer = Math.max(target.poisonTimer, 6); burst(target.x,target.y,14,'#6b8e23',180,4); this.showFloatText('VENOM!', '#6b8e23'); }
-    if (ab==='toxic'){ target.poisonTimer = Math.max(target.poisonTimer, 5); }
-    if (ab==='plague'){ target.poisonTimer = Math.max(target.poisonTimer, 7); this.showFloatText('PLAGUE!', '#808000'); }
-    if (ab==='snake'){ target.poisonTimer = Math.max(target.poisonTimer, 3); this.showFloatText('STRIKE!', '#228b22'); }
-    if (ab==='cobra'){ target.poisonTimer = Math.max(target.poisonTimer, 6); this.showFloatText('COBRA!', '#4b0082'); }
-    if (ab==='lightning'){ this.dealDamageTo(target, 6, true); burst(target.x,target.y,12,'#ffff44',260,4); this.showFloatText('ZAP!', '#ffff44'); }
-    if (ab==='thunder'){ this.dealDamageTo(target, 5, true); this.dealDamageTo(target, 5, true); burst(target.x,target.y,14,'#ffd700',280,4); }
-    if (ab==='shaman'){ this.dealDamageTo(target, 5, true); this.showFloatText('SHOCK!', '#40e0d0'); }
-    if (ab==='storm'){ this.dealDamageTo(target, 6, true); }
+    if (ab==='ice'){ target.freeze = Math.max(target.freeze, 1.5); burst(target.x,target.y,16,'#80ffff',220,4); }
+    if (ab==='poison'){ target.poisonTimer = Math.max(target.poisonTimer, 4); burst(target.x,target.y,10,'#9dff4d',150,3); }
+    if (ab==='venom'){ target.poisonTimer = Math.max(target.poisonTimer, 6); }
+    if (ab==='lightning'){ this.dealDamageTo(target, 6, true); burst(target.x,target.y,12,'#ffff44',260,4); }
+    if (ab==='thunder'){ this.dealDamageTo(target, 5, true); this.dealDamageTo(target, 5, true); }
     if (ab==='boxer' || ab==='brute' || ab==='puncher'){
       const power = ab==='brute'?500:(ab==='boxer'?320:220);
       if (!target.noKnockback){
         const dx = target.x-this.x, dy = target.y-this.y, l = Math.hypot(dx,dy)||1;
         target.vx += (dx/l)*power*SCALE; target.vy += (dy/l)*power*SCALE;
       }
-      burst(target.x,target.y,10,'#ff6347',220,3.5); this.showFloatText('PUNCH!', '#ff6347');
     }
-    if (ab==='sticky'){ target.sticky = Math.max(target.sticky, 1.0); this.showFloatText('STUCK!', '#88aa00'); burst(target.x,target.y,8,'#88aa00',140,3); }
-    if (ab==='spider'){ target.sticky = Math.max(target.sticky, 1.5); this.showFloatText('WEB!', '#2f4f4f'); }
+    if (ab==='sticky'){ target.sticky = Math.max(target.sticky, 1.0); }
     if (ab==='shrinker'){
       if (!target.shrinkStacks) target.shrinkStacks = 0;
       target.shrinkStacks = Math.min(3, target.shrinkStacks+1);
       target.baseR = Math.max(target.def.r*SCALE*0.5, target.def.r*SCALE*(1-0.2*target.shrinkStacks));
-      this.showFloatText('SHRINK!', '#32cd32'); burst(target.x,target.y,10,'#32cd32',200,3);
     }
-    if (ab==='slasher'){ target.bleedTimer = Math.max(target.bleedTimer, 3); this.showFloatText('BLEED!', '#dc143c'); }
-    if (ab==='drill'){ target.shield = 0; this.showFloatText('PIERCE!', '#808080'); }
-    if (ab==='shatter'){ target.shield = 0; this.showFloatText('SHATTER!', '#b0c4de'); burst(target.x,target.y,14,'#b0c4de',220,4); }
-    if (ab==='priest'){ this.hp = Math.min(this.maxHp, this.hp+8); this.showFloatText('+8', '#f0e68c'); }
-    if (ab==='cleric'){ this.hp = Math.min(this.maxHp, this.hp+5); this.showFloatText('+5', '#fffacd'); }
-    if (ab==='mender'){ this.hp = Math.min(this.maxHp, this.hp+6); this.showFloatText('+6', '#98fb98'); }
-    if (ab==='tsunade_heal'){ this.hp = Math.min(this.maxHp, this.hp+12); this.showFloatText('+12', '#ffbb88'); }
+    if (ab==='slasher'){ target.bleedTimer = Math.max(target.bleedTimer, 3); }
+    if (ab==='drill'){ target.shield = 0; }
+    if (ab==='shatter'){ target.shield = 0; burst(target.x,target.y,14,'#b0c4de',220,4); }
     if (ab==='fire' || ab==='magma' || ab==='dragon' || ab==='inferno' || ab==='blaze'){
       target.burnTimer = Math.max(target.burnTimer, ab==='dragon'?2.5:(ab==='inferno'?3:2));
-      this.showFloatText('BURN!', '#ff4400');
     }
     if (ab==='gladiator'){
       this.stacks = Math.min(10, this.stacks+1);
       this.attackStat = this.def.atk * (1 + this.stacks*0.08);
-      this.showFloatText('+' + (this.stacks*8) + '%', '#8b4513');
     }
     if (ab==='ram' && performance.now() - this.lastBounceTime < 400){
-      this.dealDamageTo(target, 8, true); this.showFloatText('RAM!', '#a0522d');
+      this.dealDamageTo(target, 8, true);
     }
-    if (ab==='eagle' || ab==='falcon'){ this.dealDamageTo(target, 4, true); }
-    if (ab==='shark' && target.hp < target.maxHp*0.35){ this.dealDamageTo(target, 15, true); this.showFloatText('CHOMP!', '#4682b4'); }
-    if (ab==='grace' && !target.alive){ this.hp = Math.min(this.maxHp, this.hp+30); this.showFloatText('+30', '#f0f8ff'); }
+    if (ab==='shark' && target.hp < target.maxHp*0.35){ this.dealDamageTo(target, 15, true); }
   }
 
   onTakeDamage(amount, source){
     const ab = this.ability;
     let dmg = amount;
-
-    // KAMUI — invincibility
     if (this.kamuiActive > 0){
       burst(this.x, this.y, 12, '#6a3a9a', 200, 3);
       this.showFloatText('PHASE!', '#6a3a9a');
       return { dodged: true, finalDamage: 0 };
     }
-    // SUSANOO — invulnerability + reflect
     if (this.susanooActive > 0){
       const reflect = amount * 0.8;
       if (source && source.alive) this.dealDamageTo(source, reflect, true);
@@ -1900,19 +2177,19 @@ class Ball {
       this.showFloatText('SUSANOO!', '#a020a0');
       return { dodged: true, finalDamage: 0 };
     }
-
-    if (ab==='ghost' && Math.random()<0.28){ burst(this.x,this.y,12,'#c0c0ff',200,3); this.showFloatText('DODGE!', '#c0c0ff'); return { dodged:true, finalDamage:0 }; }
-    if (ab==='oracle' && Math.random()<0.40){ burst(this.x,this.y,12,'#ffd700',200,3); this.showFloatText('FORESAW!', '#ffd700'); return { dodged:true, finalDamage:0 }; }
-    if (ab==='fox' && Math.random()<0.35){ burst(this.x,this.y,12,'#ff6347',200,3); this.showFloatText('DODGE!', '#ff6347'); return { dodged:true, finalDamage:0 }; }
-    if (ab==='sharingan' && Math.random()<0.25){ burst(this.x,this.y,12,'#c02020',200,3); this.showFloatText('SHARINGAN!', '#c02020'); return { dodged:true, finalDamage:0 }; }
+    if (ab==='ghost' && Math.random()<0.28){ burst(this.x,this.y,12,'#c0c0ff',200,3); return { dodged:true, finalDamage:0 }; }
+    if (ab==='oracle' && Math.random()<0.40){ burst(this.x,this.y,12,'#ffd700',200,3); return { dodged:true, finalDamage:0 }; }
+    if (ab==='fox' && Math.random()<0.35){ burst(this.x,this.y,12,'#ff6347',200,3); return { dodged:true, finalDamage:0 }; }
+    if (ab==='sharingan' && Math.random()<0.25){ burst(this.x,this.y,12,'#c02020',200,3); return { dodged:true, finalDamage:0 }; }
     if (ab==='guardian') dmg *= 0.80;
     if (ab==='bulwark' || ab==='bastion') dmg = Math.min(dmg, 12);
     if (ab==='ghostwalk' && this.hp < this.maxHp*0.4) dmg *= 0.70;
     if (ab==='susanoo') dmg *= 0.85;
+    if (ab==='kame_master' && this.shield > 0) dmg *= 0.7;
     if (ab==='reflector' && source && source.alive){
       const reflect = amount*0.55;
       this.dealDamageTo(source, reflect, true);
-      burst(this.x,this.y,10,'#ff77ff',240,4); this.showFloatText('REFLECT!', '#ff77ff');
+      burst(this.x,this.y,10,'#ff77ff',240,4);
     }
     return { dodged:false, finalDamage:dmg };
   }
@@ -1928,34 +2205,26 @@ class Ball {
     const res = target.onTakeDamage(dmg, this);
     if (res.dodged) return;
     dmg = res.finalDamage;
-
-    // BYAKUGAN — pierce DEF (damage unmitigated)
-    if (this.ability === 'byakugan' && !isAbility){
-      dmg = amount * 1.5;
-    }
-    // SAGE MODE — damage boost
+    if (this.ability === 'byakugan' && !isAbility) dmg = amount * 1.5;
     if (this.ability === 'sage_mode') dmg *= 1.25;
-
+    if (this.ability === 'jiren' || this.ability === 'ultimate_battle') dmg *= 1.15;
     if ((this.ability==='ninja'||this.ability==='assassin') && Math.random()<(this.ability==='assassin'?0.40:0.30)){
-      dmg *= 2; burst(target.x,target.y,14,'#a0a0b0',280,4.5); this.showFloatText('CRIT!', '#ff3d7f');
+      dmg *= 2; burst(target.x,target.y,14,'#a0a0b0',280,4.5);
     }
-    if (this.ability==='tiger' && Math.random()<0.25){ dmg *= 1.8; burst(target.x,target.y,12,'#ff8c00',260,4); this.showFloatText('CRIT!', '#ff8c00'); }
-    if (this.ability==='eagle' && Math.random()<0.30){ dmg *= 1.6; burst(target.x,target.y,10,'#8b0000',240,4); this.showFloatText('STRIKE!', '#8b0000'); }
-    if (this.ability==='venom') dmg *= 1.15;
-    if (this.ability==='berserker'){ const missing = 1-(this.hp/this.maxHp); dmg *= (1+missing); }
-    if (this.ability==='marauder'){ const missing = 1-(this.hp/this.maxHp); dmg *= (1+missing*0.7); }
-    if (this.ability==='reaper' && target.hp < target.maxHp*0.4){ dmg *= 1.8; burst(target.x,target.y,12,'#1a1a1a',220,4); this.showFloatText('EXECUTE!', '#ff3d3d'); }
-    if (this.ability==='shark' && target.hp < target.maxHp*0.35) dmg *= 1.6;
-    if (this.ability==='crusher' && target.hp > target.maxHp*0.7){ dmg *= 1.35; this.showFloatText('CRUSH!', '#c04040'); }
+    if (this.ability==='frieza' || this.ability==='death_beam'){
+      if (Math.random() < 0.45){ dmg *= 2; burst(target.x,target.y,14,'#ddddff',280,4.5); this.showFloatText('CRIT!','#ddddff'); }
+    }
+    if (this.ability==='reaper' && target.hp < target.maxHp*0.4){ dmg *= 1.8; }
+    if (this.ability==='crusher' && target.hp > target.maxHp*0.7){ dmg *= 1.35; }
     if (this.ability==='duelist'){
       const enemies = [G.player, G.enemy].filter(b => b && b.alive && b !== this);
       if (enemies.length === 1) dmg *= 1.20;
     }
     if (this.ability==='brawler' && this.dashTime > 0) dmg *= 2.20;
     if (this.ability==='ram' && performance.now() - this.lastBounceTime < 400) dmg *= 1.4;
-    if (this.ability==='lion' && target.hp < this.hp) dmg *= 1.15;
-    if (this.ability==='wolf' && target.hp < target.maxHp*0.5) dmg *= 1.25;
-    if (this.ability==='prophet' && Math.random()<0.20) dmg *= 1.5;
+    if (this.ability==='legendary_ssj'){
+      dmg *= (1 + (1 - this.hp/this.maxHp) * 0.8);
+    }
     if (target.critResist && dmg > amount*1.5) dmg = amount * (1 + (dmg/amount - 1) * (1 - target.critResist));
     target.hp -= dmg;
     target.hitFlash = 0.25;
@@ -1976,15 +2245,14 @@ class Ball {
     if (!this.alive) return;
     if ((this.ability==='zombie' || this.ability==='phoenix' || this.ability==='reviver') && !this.revived){
       this.revived = true;
-      this.hp = this.ability==='reviver' ? 25 : 30;
-      this.invuln = 1.5;
+      this.hp = 30; this.invuln = 1.5;
       const c = this.ability==='phoenix' ? '#ff5500' : '#32cd32';
       burst(this.x,this.y,32,c,340,6); burst(this.x,this.y,18,'#fff',240,5);
       this.showFloatText(this.ability==='phoenix'?'REBORN!':'REVIVE!', c);
       if (this.ability==='phoenix'){
         for (const o of [G.player, G.enemy]){ if (!o || o===this || !o.alive) continue; const d = Math.hypot(o.x-this.x, o.y-this.y); if (d < 130*SCALE) this.dealDamageTo(o, 20, true); }
       }
-      Sound.ability(); G.flash = Math.min(0.45, G.flash+0.35); G.flashColor = c;
+      G.flash = Math.min(0.45, G.flash+0.35); G.flashColor = c;
       return;
     }
     if (this.ability==='immortal' && !this.revived){
@@ -1999,7 +2267,7 @@ class Ball {
         const d = Math.hypot(other.x-this.x, other.y-this.y);
         if (d<130*SCALE) this.dealDamageTo(other, 30, true);
       }
-      burst(this.x,this.y,60,'#ffa500',560,7); burst(this.x,this.y,30,'#ffffff',420,6);
+      burst(this.x,this.y,60,'#ffa500',560,7);
       G.shake = Math.min(42, G.shake+28); G.flash = 0.75; G.flashColor = '#ffa500';
     } else {
       burst(this.x,this.y,45,this.color,520,7); burst(this.x,this.y,24,'#ffffff',340,5);
@@ -2011,9 +2279,7 @@ class Ball {
   }
 
   drawCooldownRing(){
-    if (!this.alive) return;
-    if (this.abilityCdMax <= 0) return;
-    if (this.abilityCd <= 0) return;
+    if (!this.alive || this.abilityCdMax <= 0 || this.abilityCd <= 0) return;
     const pct = 1 - this.abilityCd / this.abilityCdMax;
     const meta = ABILITY_META[this.ability] || { color: '#888' };
     ctx.save();
@@ -2041,7 +2307,26 @@ class Ball {
     const alpha = this.invisible>0 ? 0.35 : 1;
     const meta = ABILITY_META[this.ability] || {};
 
-    // Naruto active effects visuals
+    // KI AURA for Dragon Ball
+    if (this.kiAura > 0 || this.kamehamehaCharge > 0 || this.finalFlashCharge > 0){
+      const charge = Math.max(this.kiAura, this.kamehamehaCharge, this.finalFlashCharge);
+      const chargePct = clamp(charge/2, 0, 1);
+      const auraColor = this.kamehamehaCharge>0 ? '#44ccff' : (this.finalFlashCharge>0 ? '#2050ff' : '#ffff44');
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = (0.5 + Math.sin(performance.now()/60)*0.3) * (0.4 + chargePct*0.6);
+      // Outer aura
+      const ag = ctx.createRadialGradient(this.x, this.y, this.r, this.x, this.y, this.r + 40*SCALE*(0.5+chargePct));
+      ag.addColorStop(0, auraColor); ag.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = ag;
+      ctx.beginPath(); ctx.arc(this.x, this.y, this.r + 40*SCALE*(0.5+chargePct), 0, Math.PI*2); ctx.fill();
+      // Inner core
+      ctx.globalAlpha = 0.7;
+      ctx.fillStyle = '#fff';
+      ctx.beginPath(); ctx.arc(this.x, this.y, this.r * (0.3 + chargePct*0.4), 0, Math.PI*2); ctx.fill();
+      ctx.restore();
+    }
+
     if (this.kamuiActive > 0){
       ctx.save();
       ctx.globalAlpha = 0.5 + Math.sin(performance.now()/80)*0.3;
@@ -2061,7 +2346,6 @@ class Ball {
       ctx.strokeStyle = '#a020a0'; ctx.lineWidth = 4*SCALE;
       ctx.shadowBlur = 24; ctx.shadowColor = '#a020a0';
       ctx.beginPath(); ctx.arc(this.x, this.y, this.r + 14*SCALE, 0, Math.PI*2); ctx.stroke();
-      // Diamond shield
       ctx.beginPath();
       ctx.moveTo(this.x, this.y - this.r - 18*SCALE);
       ctx.lineTo(this.x + this.r + 18*SCALE, this.y);
@@ -2140,16 +2424,6 @@ class Ball {
     if (this.poisonTimer > 0){ ctx.globalAlpha = 0.35 * alpha; ctx.fillStyle = '#9dff4d'; ctx.beginPath(); ctx.arc(this.x, this.y, this.r * 0.92, 0, Math.PI*2); ctx.fill(); }
     if (this.burnTimer > 0){ ctx.globalAlpha = 0.35 * alpha; ctx.fillStyle = '#ff4400'; ctx.beginPath(); ctx.arc(this.x, this.y, this.r * 0.92, 0, Math.PI*2); ctx.fill(); }
     if (this.bleedTimer > 0){ ctx.globalAlpha = 0.35 * alpha; ctx.fillStyle = '#dc143c'; ctx.beginPath(); ctx.arc(this.x, this.y, this.r * 0.92, 0, Math.PI*2); ctx.fill(); }
-    if (this.sticky > 0){
-      ctx.save(); ctx.globalAlpha = 0.45 * alpha; ctx.strokeStyle = '#88aa00'; ctx.lineWidth = 3;
-      ctx.beginPath();
-      for (let i=0;i<8;i++){
-        const a = i/8*Math.PI*2 + performance.now()/400;
-        ctx.moveTo(this.x+Math.cos(a)*this.r, this.y+Math.sin(a)*this.r);
-        ctx.lineTo(this.x+Math.cos(a)*(this.r+10*SCALE), this.y+Math.sin(a)*(this.r+10*SCALE));
-      }
-      ctx.stroke(); ctx.restore();
-    }
     if (this.hitFlash > 0){
       ctx.globalAlpha = clamp(this.hitFlash*2.6, 0, 0.85) * alpha;
       ctx.fillStyle = '#fff';
@@ -2289,7 +2563,7 @@ function startGame(playerDef, enemyDef){
   G.enemy = makeBall(enemyDef, ex, ey, false);
   if (playerDef.ability === 'mirror') G.player.ability = enemyDef.ability;
   if (enemyDef.ability === 'mirror')  G.enemy.ability = playerDef.ability;
-  G.particles = []; G.projectiles = []; G.hazards = [];
+  G.particles = []; G.projectiles = []; G.hazards = []; G.beams = [];
   G.powerups = []; G.damageNums = []; G.floatTexts = [];
   G.elapsed = 0; G.score = 0; G.combo = 0; G.comboTimer = 0; G.maxCombo = 1;
   G.playerDmgDealt = 0; G.shake = 0; G.flash = 0; G.slowmo = 0; G.timeScale = 1;
@@ -2318,11 +2592,12 @@ function update(dt){
     if (ball.dashCd>0 || ball.dashCharges<=0) return;
     if (ball.freeze>0 || ball.sticky>0) return;
     const d = Math.hypot(enemy.x-ball.x, enemy.y-ball.y);
-    const chance = (ball.ability==='warrior'||ball.ability==='dasher' ? 1.6 : 1.0) * dt;
+    const chance = (ball.ability==='warrior'||ball.ability==='dasher'||ball.ability==='vegeta' ? 1.6 : 1.0) * dt;
     if (d < arena.r*0.55 && d > ball.r+enemy.r && Math.random()<chance) tryDash(ball);
   };
   decideDash(p, e); decideDash(e, p);
   if (p.alive && e.alive && !G.ending) handleCollision(p, e);
+  // Projectiles
   for (let i = G.projectiles.length-1; i>=0; i--){
     const pr = G.projectiles[i];
     const target = pr.owner === p ? e : p;
@@ -2330,9 +2605,32 @@ function update(dt){
     if (pr.life<=0){ G.projectiles.splice(i,1); continue; }
     if (target.alive){
       const d = Math.hypot(pr.x-target.x, pr.y-target.y);
-      if (d < target.r + pr.r){ pr.owner.dealDamageTo(target, pr.dmg, true); burst(pr.x,pr.y,10,pr.color,220,3); G.projectiles.splice(i,1); }
+      if (d < target.r + pr.r){ pr.owner.dealDamageTo(target, pr.dmg, true); burst(pr.x,pr.y,14,pr.color,240,4); G.projectiles.splice(i,1); }
     }
   }
+  // Beams — check line hit against enemy
+  for (let i = G.beams.length-1; i>=0; i--){
+    const bm = G.beams[i];
+    bm.update(dt);
+    if (bm.life <= 0){ G.beams.splice(i, 1); continue; }
+    const target = bm.owner === p ? e : p;
+    if (target.alive && !bm.hitSet.has(target.id)){
+      // Check if target intersects beam line
+      const dx = bm.x2 - bm.x1, dy = bm.y2 - bm.y1;
+      const len2 = dx*dx + dy*dy;
+      if (len2 > 0){
+        const t2 = clamp(((target.x - bm.x1)*dx + (target.y - bm.y1)*dy) / len2, 0, 1);
+        const cx = bm.x1 + dx*t2, cy = bm.y1 + dy*t2;
+        const dist = Math.hypot(target.x - cx, target.y - cy);
+        if (dist < target.r + bm.width){
+          bm.owner.dealDamageTo(target, bm.dmg, true);
+          bm.hitSet.add(target.id);
+          burst(target.x, target.y, 25, bm.color, 320, 5);
+        }
+      }
+    }
+  }
+  // Hazards
   for (let i = G.hazards.length-1; i>=0; i--){
     const h = G.hazards[i];
     h.update(dt);
@@ -2343,7 +2641,6 @@ function update(dt){
       if (d < h.r + ball.r*0.5){
         if (h.color==='#32cd32'||h.color==='#808000') ball.poisonTimer = Math.max(ball.poisonTimer, 0.5);
         if (h.color==='#ff4400'||h.color==='#ff4500'||h.color==='#8b0000'||h.color==='#ff2400'||h.color==='#da70d6'||h.color==='#0a0a0a') ball.burnTimer = Math.max(ball.burnTimer, 0.6);
-        if (h.color==='#2e8b57'||h.color==='#2f4f4f'||h.color==='#88aa00') ball.sticky = Math.max(ball.sticky, 0.4);
         h.owner.dealDamageTo(ball, h.dmg*dt, true);
       }
     }
@@ -2434,6 +2731,8 @@ function render(){
   if (G.enemy) G.enemy.draw();
   if (G.player) G.player.draw();
   for (const pr of G.projectiles) pr.draw();
+  // Beams on top with additive blend
+  for (const bm of G.beams) bm.draw();
   ctx.globalCompositeOperation = 'lighter';
   for (const p of G.particles) p.draw();
   ctx.globalCompositeOperation = 'source-over';
@@ -2441,7 +2740,7 @@ function render(){
   for (const dn of G.damageNums) dn.draw();
   for (const ft of G.floatTexts) ft.draw();
   ctx.restore();
-  if (G.flash>0.01){ ctx.globalAlpha = Math.min(0.75, G.flash); ctx.fillStyle = G.flashColor; ctx.fillRect(0,0,W,H); ctx.globalAlpha = 1; }
+  if (G.flash>0.01){ ctx.globalAlpha = Math.min(0.85, G.flash); ctx.fillStyle = G.flashColor; ctx.fillRect(0,0,W,H); ctx.globalAlpha = 1; }
 }
 
 /* ============================================================
@@ -2472,6 +2771,7 @@ function buildStatusHTML(ball){
   if (ball.kamuiActive > 0) parts.push('<div class="status-badge" style="color:#6a3a9a;border-color:#6a3a9a;box-shadow:0 0 12px #6a3a9a55">◎<div class="cd">'+ball.kamuiActive.toFixed(1)+'s</div></div>');
   if (ball.susanooActive > 0) parts.push('<div class="status-badge" style="color:#a020a0;border-color:#a020a0;box-shadow:0 0 12px #a020a055">⛨<div class="cd">'+ball.susanooActive.toFixed(1)+'s</div></div>');
   if (ball.eightGatesActive > 0) parts.push('<div class="status-badge" style="color:#00cc00;border-color:#00cc00;box-shadow:0 0 12px #00cc0055">⚡<div class="cd">'+ball.eightGatesActive.toFixed(1)+'s</div></div>');
+  if (ball.kiAura > 0) parts.push('<div class="status-badge" style="color:#ffff44;border-color:#ffff44;box-shadow:0 0 12px #ffff4455">✦<div class="cd">KI</div></div>');
   if (ball.maxDashCharges > 1){
     parts.push('<div class="status-badge" style="color:#ffd93d;border-color:#ffd93d;box-shadow:0 0 12px #ffd93d55">⚔<div class="cd">'+ball.dashCharges+'/'+ball.maxDashCharges+'</div></div>');
   }
@@ -2520,6 +2820,7 @@ const screens = {
   menu: document.getElementById('scr-menu'),
   howto: document.getElementById('scr-howto'),
   naruto: document.getElementById('scr-naruto'),
+  dragonball: document.getElementById('scr-dragonball'),
   balls: document.getElementById('scr-balls'),
   select: document.getElementById('scr-select'),
   'tourney-select': document.getElementById('scr-tourney-select'),
@@ -2545,7 +2846,7 @@ function restartGame(){
 function goToMenu(){
   T.active = false;
   G.mode = 'menu'; G.player = null; G.enemy = null;
-  G.particles=[]; G.projectiles=[]; G.hazards=[]; G.powerups=[]; G.damageNums=[]; G.floatTexts=[];
+  G.particles=[]; G.projectiles=[]; G.hazards=[]; G.powerups=[]; G.damageNums=[]; G.floatTexts=[]; G.beams=[];
   G.ending=false; G.endTimer=0; G.slowmo=0; G.timeScale=1; G.shake=0; G.flash=0;
   document.getElementById('hud').classList.add('hidden');
   showScreen('menu');
@@ -2738,8 +3039,10 @@ function makeBallCard(def){
   card.className = 'ball-card';
   const meta = ABILITY_META[def.ability] || { icon:'·', color:'#888' };
   const isNaruto = NARUTO_IDS.includes(def.id);
+  const isDB = DB_IDS.includes(def.id);
+  const badge = isNaruto ? '🍥' : (isDB ? '🐉' : '');
   card.innerHTML =
-    (isNaruto ? '<div style="position:absolute;top:2px;left:4px;font-size:10px">🍥</div>' : '') +
+    (badge ? '<div style="position:absolute;top:2px;left:4px;font-size:10px">'+badge+'</div>' : '') +
     '<div class="orb" style="background:radial-gradient(circle at 35% 30%,'+def.light+','+def.color+');box-shadow:0 0 12px '+def.color+'"></div>'+
     '<div class="nm">'+def.name+'</div>'+
     '<div class="ab" style="color:'+meta.color+'">'+meta.icon+' '+abilityLabel(def.ability)+'</div>'+
@@ -2765,7 +3068,16 @@ function renderNarutoGrid(){
   grid.innerHTML = '';
   BALLS.filter(b => NARUTO_IDS.includes(b.id)).forEach(def => {
     const card = makeBallCard(def);
-    card.title = def.desc + ' — HP '+def.hp+' · ATK '+def.atk.toFixed(2)+' · DEF '+def.def.toFixed(2);
+    card.title = def.desc;
+    grid.appendChild(card);
+  });
+}
+function renderDBGrid(){
+  const grid = document.getElementById('dragonBallGrid');
+  grid.innerHTML = '';
+  BALLS.filter(b => DB_IDS.includes(b.id)).forEach(def => {
+    const card = makeBallCard(def);
+    card.title = def.desc;
     grid.appendChild(card);
   });
 }
@@ -2853,6 +3165,7 @@ document.querySelectorAll('[data-act]').forEach(btn => {
     if (act === 'play'){ renderSelectGrid(); updatePicked(BALL_MAP[selectedBallId]); showScreen('select'); }
     if (act === 'howto') showScreen('howto');
     if (act === 'naruto'){ renderNarutoGrid(); showScreen('naruto'); }
+    if (act === 'dragonball'){ renderDBGrid(); showScreen('dragonball'); }
     if (act === 'balls'){ renderAllBallsGrid(); showScreen('balls'); }
     if (act === 'back') showScreen('menu');
     if (act === 'resume') resumeGame();
@@ -2885,6 +3198,14 @@ document.getElementById('tourneyNarutoBtn').addEventListener('click', () => {
   Sound.ui();
   const narutoBalls = BALLS.filter(b => NARUTO_IDS.includes(b.id)).sort(() => Math.random() - 0.5);
   T.participants = narutoBalls.slice(0, 8);
+  renderTourneySlots();
+  renderTournamentGrid(document.getElementById('tourneySearch').value);
+  updateTourneyStartBtn();
+});
+document.getElementById('tourneyDBBtn').addEventListener('click', () => {
+  Sound.ui();
+  const dbBalls = BALLS.filter(b => DB_IDS.includes(b.id)).sort(() => Math.random() - 0.5);
+  T.participants = dbBalls.slice(0, 8);
   renderTourneySlots();
   renderTournamentGrid(document.getElementById('tourneySearch').value);
   updateTourneyStartBtn();
