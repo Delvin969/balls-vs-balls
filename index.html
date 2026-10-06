@@ -3,168 +3,1406 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
-<title>Ball vs Ball — 190 Balls (Naruto + Dragon Ball + Black Clover)</title>
+<meta name="theme-color" content="#05060f"/>
+<title>Ball vs Ball — 190 Balls</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
-html,body{height:100%;overflow:hidden;background:#04020e;font-family:'Segoe UI',system-ui,sans-serif;color:#fff;-webkit-user-select:none;user-select:none;touch-action:none;}
-canvas{position:fixed;inset:0;display:block;image-rendering:-webkit-optimize-contrast;}
-#hud{position:fixed;inset:0;pointer-events:none;z-index:10;transition:opacity .3s;}
+/* ==========================================================================
+   1. RESET & BASE
+   ========================================================================== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+html,body{
+  height:100%;
+  overflow:hidden;
+  background:var(--bg-0);
+  color:var(--text-1);
+  font-family:var(--font-sans);
+  font-size:14px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  -webkit-user-select:none;
+  user-select:none;
+  touch-action:none;
+  -webkit-tap-highlight-color:transparent;
+}
+
+canvas{position:fixed;inset:0;display:block;}
+
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+input{font-family:inherit;}
+img,svg{display:block;max-width:100%;}
+
+/* ==========================================================================
+   2. DESIGN TOKENS
+   ========================================================================== */
+:root{
+  /* Colors — backgrounds */
+  --bg-0:#05060f;
+  --bg-1:#0a0c1c;
+  --bg-2:#12142a;
+
+  /* Colors — surfaces (glass) */
+  --surface-1:rgba(20,22,44,.78);
+  --surface-2:rgba(30,32,58,.6);
+  --surface-3:rgba(40,42,72,.45);
+  --surface-hi:rgba(60,62,100,.5);
+
+  /* Colors — borders */
+  --border-1:rgba(130,140,210,.12);
+  --border-2:rgba(150,160,230,.22);
+  --border-strong:rgba(170,180,255,.4);
+
+  /* Colors — text */
+  --text-1:#f0f2ff;
+  --text-2:#b8bce0;
+  --text-3:#7a80a8;
+
+  /* Colors — accents */
+  --primary:#7c5cff;
+  --primary-hi:#a25bff;
+  --primary-lo:#4a3cb8;
+  --primary-glow:rgba(124,92,255,.45);
+  --primary-soft:rgba(124,92,255,.12);
+
+  --secondary:#4dd4ff;
+  --secondary-glow:rgba(77,212,255,.4);
+  --secondary-soft:rgba(77,212,255,.12);
+
+  --accent:#ff5c9d;
+  --accent-glow:rgba(255,92,157,.4);
+  --accent-soft:rgba(255,92,157,.12);
+
+  --gold:#ffcc4d;
+  --gold-glow:rgba(255,204,77,.45);
+  --gold-soft:rgba(255,204,77,.14);
+
+  --success:#4dff9e;
+  --danger:#ff5f7e;
+
+  /* Radii */
+  --r-xs:4px;
+  --r-sm:8px;
+  --r-md:12px;
+  --r-lg:16px;
+  --r-xl:24px;
+  --r-full:999px;
+
+  /* Spacing (8px grid) */
+  --s-1:4px;
+  --s-2:8px;
+  --s-3:12px;
+  --s-4:16px;
+  --s-5:24px;
+  --s-6:32px;
+  --s-7:48px;
+
+  /* Timing */
+  --ease:cubic-bezier(.32,.72,0,1);
+  --ease-out:cubic-bezier(.2,.9,.3,1);
+  --dur-fast:150ms;
+  --dur-mid:250ms;
+  --dur-slow:400ms;
+
+  /* Shadows */
+  --shadow-sm:0 1px 2px rgba(0,0,0,.5);
+  --shadow-md:0 4px 14px rgba(0,0,0,.4);
+  --shadow-lg:0 12px 36px rgba(0,0,0,.55);
+  --shadow-glow:0 0 24px var(--primary-glow);
+
+  /* Font */
+  --font-sans:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;
+
+  /* Safe areas */
+  --safe-t:env(safe-area-inset-top,0px);
+  --safe-r:env(safe-area-inset-right,0px);
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --safe-l:env(safe-area-inset-left,0px);
+}
+
+/* ==========================================================================
+   3. HUD
+   ========================================================================== */
+#hud{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:10;
+  transition:opacity var(--dur-mid) var(--ease);
+}
 #hud.hidden{opacity:0;}
-.hp-row{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:12px 16px;gap:8px;}
-.hp-side{flex:1;max-width:40%;}
+
+.hp-row{
+  position:absolute;
+  top:0;left:0;right:0;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  padding:calc(var(--safe-t) + var(--s-3)) calc(var(--safe-r) + var(--s-4)) var(--s-3) calc(var(--safe-l) + var(--s-4));
+  gap:var(--s-3);
+}
+
+.hp-side{
+  flex:1;
+  max-width:38%;
+  min-width:0;
+}
 .hp-side.right{text-align:right;}
-.hp-name{font-size:11px;letter-spacing:2px;font-weight:800;margin-bottom:4px;text-shadow:0 0 10px currentColor;}
-.hp-name.you{color:#5fe6ff;}
-.hp-name.foe{color:#ff5f9e;}
-.hp-bar{height:14px;border-radius:8px;overflow:hidden;position:relative;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.2);}
-.hp-fill{height:100%;width:100%;border-radius:7px;transition:width .15s ease-out;}
-.hp-fill.you{background:linear-gradient(90deg,#0aa6d6,#5fe6ff);box-shadow:0 0 14px #5fe6ff;}
-.hp-fill.foe{background:linear-gradient(90deg,#ff5f9e,#c81e63);box-shadow:0 0 14px #ff5f9e;margin-left:auto;}
-.hp-ability{font-size:10px;letter-spacing:1.5px;margin-top:3px;font-weight:800;padding:2px 8px;border-radius:6px;display:inline-block;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);}
-.hp-side.right .hp-ability{background:rgba(255,95,158,0.12);border-color:rgba(255,95,158,0.3);}
-.hp-side.left .hp-ability{background:rgba(95,230,255,0.12);border-color:rgba(95,230,255,0.3);}
-.hp-stats{font-size:9px;letter-spacing:1.5px;margin-top:2px;opacity:.9;}
-.hp-stats b{color:#ffd93d;text-shadow:0 0 8px #ffd93d;}
-.hud-mid{flex:1;text-align:center;min-width:90px;}
-.timer{font-size:24px;font-weight:900;letter-spacing:2px;font-variant-numeric:tabular-nums;text-shadow:0 0 18px #a25bff;}
-.combo{position:absolute;left:0;right:0;bottom:60px;text-align:center;font-size:16px;font-weight:900;letter-spacing:2px;color:#ffd93d;text-shadow:0 0 14px #ff9d00;opacity:0;transform:scale(.7);transition:all .18s;}
+
+.hp-head{
+  display:flex;
+  align-items:center;
+  gap:var(--s-2);
+  margin-bottom:var(--s-2);
+}
+.hp-side.right .hp-head{justify-content:flex-end;}
+
+.hp-name{
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:100%;
+  text-shadow:0 0 12px currentColor;
+}
+.hp-name.you{color:var(--secondary);}
+.hp-name.foe{color:var(--accent);}
+
+.hp-bar{
+  height:18px;
+  border-radius:var(--r-sm);
+  overflow:hidden;
+  position:relative;
+  background:rgba(0,0,0,.45);
+  border:1px solid var(--border-2);
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.7);
+}
+.hp-fill{
+  height:100%;
+  width:100%;
+  border-radius:calc(var(--r-sm) - 1px);
+  transition:width var(--dur-fast) ease-out;
+  position:relative;
+}
+.hp-fill::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg,rgba(255,255,255,.32),transparent 45%,transparent 55%,rgba(0,0,0,.18));
+  pointer-events:none;
+}
+.hp-fill.you{
+  background:linear-gradient(90deg,#0891b2,#4dd4ff);
+  box-shadow:0 0 16px var(--secondary-glow);
+}
+.hp-fill.foe{
+  background:linear-gradient(90deg,#ff5c9d,#a3165b);
+  box-shadow:0 0 16px var(--accent-glow);
+  margin-left:auto;
+}
+
+.hp-ability{
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.06em;
+  padding:3px var(--s-2);
+  border-radius:var(--r-xs);
+  display:inline-block;
+  margin-top:var(--s-2);
+  background:var(--surface-2);
+  border:1px solid var(--border-2);
+  color:var(--text-2);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:100%;
+}
+
+.hp-stats{
+  font-size:10px;
+  letter-spacing:.06em;
+  margin-top:var(--s-1);
+  color:var(--text-3);
+  font-variant-numeric:tabular-nums;
+}
+.hp-stats b{color:var(--gold);font-weight:800;}
+
+.hud-mid{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:var(--s-1);
+  flex-shrink:0;
+  padding:var(--s-2) var(--s-3);
+  border-radius:var(--r-md);
+  background:var(--surface-1);
+  border:1px solid var(--border-2);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  box-shadow:var(--shadow-md);
+}
+.timer{
+  font-size:clamp(18px,2.6vw,24px);
+  font-weight:800;
+  letter-spacing:.04em;
+  font-variant-numeric:tabular-nums;
+  color:var(--text-1);
+}
+
+.combo{
+  position:absolute;
+  left:0;right:0;
+  bottom:calc(var(--safe-b) + var(--s-6));
+  text-align:center;
+  font-size:16px;
+  font-weight:900;
+  letter-spacing:.1em;
+  color:var(--gold);
+  text-shadow:0 0 16px var(--gold-glow);
+  opacity:0;
+  transform:scale(.7);
+  transition:opacity var(--dur-mid) var(--ease),transform var(--dur-mid) var(--ease);
+  pointer-events:none;
+}
 .combo.show{opacity:1;transform:scale(1);}
-.status-panel{position:absolute;top:88px;left:0;right:0;display:flex;justify-content:space-between;padding:0 20px;pointer-events:none;gap:12px;}
-.status-col{display:flex;gap:6px;flex-wrap:wrap;max-width:45%;}
+
+.status-panel{
+  position:absolute;
+  top:calc(var(--safe-t) + 82px);
+  left:0;right:0;
+  display:flex;
+  justify-content:space-between;
+  padding:0 calc(var(--safe-l) + var(--s-4)) 0 calc(var(--safe-r) + var(--s-4));
+  pointer-events:none;
+  gap:var(--s-3);
+}
+.status-col{
+  display:flex;
+  gap:var(--s-2);
+  flex-wrap:wrap;
+  max-width:46%;
+}
 .status-col.right{justify-content:flex-end;}
-.status-badge{position:relative;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.3);box-shadow:0 0 12px rgba(0,0,0,0.4);animation:badgePulse .8s infinite alternate;}
-@keyframes badgePulse{from{transform:scale(1);}to{transform:scale(1.08);}}
-.status-badge .cd{position:absolute;bottom:-9px;left:50%;transform:translateX(-50%);font-size:8px;font-weight:900;letter-spacing:.5px;color:#fff;background:rgba(0,0,0,.65);padding:1px 4px;border-radius:4px;font-variant-numeric:tabular-nums;white-space:nowrap;}
-#overlay{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 45%,rgba(30,10,70,.75),rgba(3,1,12,.94));backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);padding:14px;overflow-y:auto;}
+
+.status-badge{
+  position:relative;
+  width:36px;
+  height:36px;
+  border-radius:var(--r-sm);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:15px;
+  font-weight:900;
+  background:var(--surface-1);
+  border:1px solid var(--border-2);
+  box-shadow:var(--shadow-sm);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
+.status-badge .cd{
+  position:absolute;
+  bottom:-9px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.02em;
+  color:var(--text-1);
+  background:rgba(0,0,0,.75);
+  padding:1px 5px;
+  border-radius:var(--r-xs);
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+  border:1px solid var(--border-1);
+}
+
+/* ==========================================================================
+   4. OVERLAY / SCREENS
+   ========================================================================== */
+#overlay{
+  position:fixed;
+  inset:0;
+  z-index:20;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:
+    radial-gradient(ellipse at 50% 30%,rgba(124,92,255,.15),transparent 60%),
+    radial-gradient(ellipse at 80% 80%,rgba(255,92,157,.08),transparent 55%),
+    rgba(3,4,12,.88);
+  backdrop-filter:blur(14px) saturate(140%);
+  -webkit-backdrop-filter:blur(14px) saturate(140%);
+  padding:calc(var(--safe-t) + var(--s-4)) calc(var(--safe-r) + var(--s-4)) calc(var(--safe-b) + var(--s-4)) calc(var(--safe-l) + var(--s-4));
+  overflow-y:auto;
+  overscroll-behavior:contain;
+}
 #overlay.hidden{display:none;}
-.screen{display:none;flex-direction:column;align-items:center;width:100%;max-width:820px;padding:8px 0;}
-.screen.active{display:flex;animation:fadeUp .3s ease-out;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
-h1.logo{font-size:clamp(30px,8vw,52px);font-weight:900;letter-spacing:4px;line-height:1;text-align:center;margin-bottom:6px;background:linear-gradient(90deg,#5fe6ff,#a25bff,#ff5f9e,#ffd93d);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 22px rgba(162,91,255,.85));}
-h1.logo span{-webkit-text-fill-color:#fff;color:#fff;font-size:.55em;text-shadow:0 0 20px #ff5f9e;}
-.sub{font-size:11px;letter-spacing:4px;opacity:.6;margin-bottom:22px;text-transform:uppercase;}
-h2.title{font-size:clamp(22px,5.5vw,30px);font-weight:900;letter-spacing:3px;margin-bottom:14px;text-align:center;text-shadow:0 0 22px rgba(162,91,255,.9);}
-.btn{width:100%;padding:13px 20px;margin-bottom:10px;border-radius:13px;cursor:pointer;font-size:14px;font-weight:800;letter-spacing:2.5px;color:#dff6ff;background:rgba(255,255,255,.055);border:1.5px solid rgba(120,200,255,.35);transition:all .16s;font-family:inherit;text-transform:uppercase;}
-.btn:hover,.btn:active{background:rgba(95,230,255,.16);border-color:#5fe6ff;color:#fff;box-shadow:0 0 26px rgba(95,230,255,.55);transform:translateY(-2px);}
-.btn.primary{background:linear-gradient(100deg,rgba(162,91,255,.85),rgba(255,95,158,.85));border-color:rgba(255,255,255,.5);color:#fff;box-shadow:0 0 30px rgba(200,80,220,.6);font-size:16px;padding:16px;}
-.btn.primary:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none;}
-.btn.ghost{opacity:.75;font-size:12px;padding:10px;}
-.card{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:16px 18px;width:100%;margin-bottom:12px;font-size:13px;line-height:1.75;}
-.card b{color:#5fe6ff;text-shadow:0 0 10px rgba(95,230,255,.7);}
-.card ul{list-style:none;}
-.card li{margin-bottom:5px;}
-.ball-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:6px;width:100%;max-height:52vh;overflow-y:auto;padding:4px;margin-bottom:14px;}
+
+.screen{
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  width:100%;
+  max-width:820px;
+  padding:var(--s-2) 0;
+}
+.screen.active{
+  display:flex;
+  animation:screenIn var(--dur-slow) var(--ease-out);
+}
+@keyframes screenIn{
+  from{opacity:0;transform:translateY(16px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+/* ==========================================================================
+   5. TYPOGRAPHY
+   ========================================================================== */
+.logo{
+  font-size:clamp(36px,9vw,64px);
+  font-weight:900;
+  letter-spacing:-.02em;
+  line-height:.95;
+  text-align:center;
+  margin-bottom:var(--s-2);
+  background:linear-gradient(110deg,#f0f2ff 15%,var(--primary-hi) 50%,var(--secondary) 90%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  filter:drop-shadow(0 4px 24px rgba(124,92,255,.4));
+}
+.logo span{
+  -webkit-text-fill-color:var(--gold);
+  color:var(--gold);
+  font-size:.5em;
+  text-shadow:0 0 28px var(--gold-glow);
+  padding:0 .12em;
+  vertical-align:.08em;
+}
+.sub{
+  font-size:12px;
+  letter-spacing:.24em;
+  text-transform:uppercase;
+  color:var(--text-3);
+  font-weight:600;
+  text-align:center;
+  margin-bottom:var(--s-5);
+}
+h2.title{
+  font-size:clamp(22px,5vw,30px);
+  font-weight:900;
+  letter-spacing:-.01em;
+  text-align:center;
+  margin-bottom:var(--s-4);
+  color:var(--text-1);
+  text-shadow:0 0 32px var(--primary-glow);
+}
+
+/* ==========================================================================
+   6. MENU
+   ========================================================================== */
+.menu-wrap{
+  display:flex;
+  flex-direction:column;
+  gap:var(--s-5);
+  width:100%;
+  max-width:640px;
+}
+
+.menu-hero{
+  text-align:center;
+  padding:var(--s-4) 0 var(--s-2);
+}
+
+.menu-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:var(--s-2);
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.24em;
+  text-transform:uppercase;
+  color:var(--secondary);
+  padding:6px var(--s-3);
+  border-radius:var(--r-full);
+  background:var(--surface-2);
+  border:1px solid var(--border-2);
+  margin-bottom:var(--s-4);
+}
+.menu-badge::before{
+  content:'';
+  width:6px;height:6px;border-radius:50%;
+  background:var(--secondary);
+  box-shadow:0 0 10px var(--secondary);
+  animation:dotPulse 2s var(--ease) infinite;
+}
+@keyframes dotPulse{
+  0%,100%{opacity:1;transform:scale(1);}
+  50%{opacity:.5;transform:scale(.8);}
+}
+
+.menu-primary{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:var(--s-3);
+}
+
+.menu-section-label{
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.24em;
+  text-transform:uppercase;
+  color:var(--text-3);
+  padding:0 var(--s-1);
+  margin-top:var(--s-2);
+}
+
+.menu-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:var(--s-2);
+}
+
+.menu-card{
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:var(--s-3);
+  padding:var(--s-4);
+  border-radius:var(--r-lg);
+  background:var(--surface-1);
+  border:1px solid var(--border-2);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  color:var(--text-1);
+  text-align:left;
+  overflow:hidden;
+  transition:
+    transform var(--dur-mid) var(--ease),
+    border-color var(--dur-mid) var(--ease),
+    background var(--dur-mid) var(--ease),
+    box-shadow var(--dur-mid) var(--ease);
+  min-height:44px;
+}
+.menu-card::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  background:radial-gradient(circle at 15% 0%,rgba(255,255,255,.08),transparent 55%);
+  pointer-events:none;
+}
+.menu-card:hover{
+  transform:translateY(-2px);
+  border-color:var(--border-strong);
+  background:var(--surface-hi);
+}
+.menu-card:active{transform:translateY(0) scale(.99);}
+.menu-card:focus-visible{
+  outline:2px solid var(--primary-hi);
+  outline-offset:3px;
+}
+
+.menu-card--primary{
+  flex-direction:column;
+  align-items:flex-start;
+  padding:var(--s-5) var(--s-4);
+  background:linear-gradient(135deg,var(--primary-soft),var(--surface-1) 60%);
+  border-color:rgba(124,92,255,.35);
+  box-shadow:0 8px 28px rgba(124,92,255,.18),inset 0 1px 0 rgba(255,255,255,.06);
+}
+.menu-card--primary:hover{
+  border-color:var(--primary-hi);
+  box-shadow:0 12px 40px rgba(124,92,255,.32),inset 0 1px 0 rgba(255,255,255,.08);
+}
+.menu-card--gold{
+  background:linear-gradient(135deg,var(--gold-soft),var(--surface-1) 60%);
+  border-color:rgba(255,204,77,.35);
+  box-shadow:0 8px 28px rgba(255,204,77,.15),inset 0 1px 0 rgba(255,255,255,.06);
+}
+.menu-card--gold:hover{
+  border-color:var(--gold);
+  box-shadow:0 12px 40px rgba(255,204,77,.3),inset 0 1px 0 rgba(255,255,255,.08);
+}
+.menu-card__icon{
+  width:44px;height:44px;
+  border-radius:var(--r-md);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;
+  background:rgba(255,255,255,.06);
+  border:1px solid var(--border-2);
+  margin-bottom:var(--s-3);
+  flex-shrink:0;
+}
+.menu-card--gold .menu-card__icon{
+  background:rgba(255,204,77,.1);
+  border-color:rgba(255,204,77,.25);
+}
+.menu-card__body{flex:1;min-width:0;}
+.menu-card__title{
+  font-size:16px;
+  font-weight:800;
+  letter-spacing:-.01em;
+  margin-bottom:var(--s-1);
+}
+.menu-card__desc{
+  font-size:12px;
+  color:var(--text-2);
+  line-height:1.4;
+}
+.menu-card__cta{
+  font-size:18px;
+  color:var(--primary-hi);
+  align-self:flex-end;
+  opacity:.85;
+  transition:transform var(--dur-mid) var(--ease),opacity var(--dur-mid) var(--ease);
+}
+.menu-card--gold .menu-card__cta{color:var(--gold);}
+.menu-card--primary:hover .menu-card__cta{
+  transform:translateX(3px);
+  opacity:1;
+}
+
+.menu-card--sm{
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:var(--s-1);
+  padding:var(--s-3) var(--s-2);
+  text-align:center;
+  aspect-ratio:1 / 1;
+  background:var(--surface-2);
+}
+.menu-card__emoji{font-size:24px;line-height:1;}
+.menu-card__label{
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.04em;
+  color:var(--text-1);
+  white-space:nowrap;
+}
+.menu-card__count{
+  font-size:10px;
+  font-weight:800;
+  color:var(--text-3);
+  letter-spacing:.04em;
+}
+
+.menu-link{
+  display:inline-flex;
+  align-items:center;
+  gap:var(--s-2);
+  align-self:center;
+  padding:var(--s-2) var(--s-4);
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--text-2);
+  border-radius:var(--r-full);
+  border:1px solid var(--border-1);
+  background:transparent;
+  transition:all var(--dur-mid) var(--ease);
+  min-height:44px;
+}
+.menu-link:hover{
+  color:var(--text-1);
+  border-color:var(--border-2);
+  background:var(--surface-2);
+}
+.menu-link:focus-visible{
+  outline:2px solid var(--primary-hi);
+  outline-offset:3px;
+}
+
+.menu-best{
+  text-align:center;
+  font-size:11px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--text-3);
+  font-weight:700;
+  font-variant-numeric:tabular-nums;
+}
+.menu-best span,.menu-best b{color:var(--gold);}
+
+/* ==========================================================================
+   7. BUTTONS (legacy)
+   ========================================================================== */
+.btn{
+  width:100%;
+  padding:14px var(--s-5);
+  margin-bottom:var(--s-2);
+  border-radius:var(--r-md);
+  font-size:14px;
+  font-weight:800;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--text-1);
+  background:var(--surface-2);
+  border:1px solid var(--border-2);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  transition:
+    transform var(--dur-mid) var(--ease),
+    border-color var(--dur-mid) var(--ease),
+    background var(--dur-mid) var(--ease),
+    box-shadow var(--dur-mid) var(--ease);
+  min-height:44px;
+}
+.btn:hover{
+  border-color:var(--border-strong);
+  background:var(--surface-hi);
+  transform:translateY(-1px);
+}
+.btn:active{transform:translateY(0);}
+.btn:focus-visible{outline:2px solid var(--primary-hi);outline-offset:3px;}
+
+.btn.primary{
+  background:linear-gradient(100deg,var(--primary),var(--primary-hi));
+  border-color:rgba(255,255,255,.24);
+  box-shadow:0 6px 24px var(--primary-glow);
+  font-size:15px;
+  padding:16px var(--s-5);
+}
+.btn.primary:hover{
+  box-shadow:0 10px 36px var(--primary-glow);
+  border-color:rgba(255,255,255,.4);
+}
+.btn.primary:disabled{
+  opacity:.35;
+  cursor:not-allowed;
+  transform:none;
+  box-shadow:none;
+}
+.btn.ghost{
+  background:transparent;
+  border-color:var(--border-1);
+  color:var(--text-2);
+  font-size:12px;
+  padding:11px var(--s-4);
+}
+.btn.ghost:hover{
+  color:var(--text-1);
+  border-color:var(--border-2);
+}
+
+/* ==========================================================================
+   8. CARDS (How to play)
+   ========================================================================== */
+.card{
+  width:100%;
+  padding:var(--s-5);
+  border-radius:var(--r-lg);
+  background:var(--surface-1);
+  border:1px solid var(--border-2);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  font-size:13.5px;
+  line-height:1.7;
+  margin-bottom:var(--s-3);
+  color:var(--text-2);
+}
+.card b{color:var(--secondary);font-weight:700;}
+.card ul{list-style:none;display:flex;flex-direction:column;gap:var(--s-2);}
+.card li{padding-left:var(--s-5);position:relative;}
+.card li::before{
+  content:'›';
+  position:absolute;
+  left:var(--s-1);
+  top:0;
+  color:var(--primary-hi);
+  font-weight:900;
+  font-size:16px;
+  line-height:inherit;
+}
+.card .k{
+  display:inline-flex;
+  align-items:center;
+  padding:1px 7px;
+  border-radius:var(--r-xs);
+  background:rgba(255,255,255,.1);
+  border:1px solid var(--border-2);
+  font-weight:700;
+  font-size:11px;
+  margin:0 2px;
+  color:var(--text-1);
+}
+
+/* ==========================================================================
+   9. BALL GRID & CARD
+   ========================================================================== */
+.ball-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(96px,1fr));
+  gap:var(--s-2);
+  width:100%;
+  max-height:min(56vh,560px);
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  padding:var(--s-1);
+  margin-bottom:var(--s-4);
+  scrollbar-width:thin;
+  scrollbar-color:var(--border-strong) transparent;
+}
 .ball-grid::-webkit-scrollbar{width:6px;}
-.ball-grid::-webkit-scrollbar-thumb{background:rgba(162,91,255,.5);border-radius:3px;}
-.ball-card{border-radius:11px;padding:6px 4px 5px;cursor:pointer;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.13);transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative;}
-.ball-card:hover{transform:translateY(-2px);border-color:rgba(162,91,255,.7);}
-.ball-card.sel{border-color:#ffd93d;background:rgba(255,217,61,.12);box-shadow:0 0 22px rgba(255,217,61,.5);}
-.ball-card.picked-tourney{border-color:#4dff9e;background:rgba(77,255,158,0.15);box-shadow:0 0 16px rgba(77,255,158,.5);}
-.ball-card.picked-tourney::after{content:'✓';position:absolute;top:2px;right:6px;font-size:13px;color:#4dff9e;font-weight:900;text-shadow:0 0 6px #4dff9e;}
-.ball-card .orb{width:30px;height:30px;border-radius:50%;position:relative;}
-.ball-card .nm{font-size:8.5px;letter-spacing:.3px;font-weight:800;text-align:center;line-height:1.15;}
-.ball-card .ab{font-size:7.5px;letter-spacing:.5px;opacity:.8;font-weight:700;text-align:center;}
-.ball-card .st{display:flex;gap:3px;font-size:7.5px;letter-spacing:.3px;}
-.ball-card .st .a{color:#ff9d9d;font-weight:800;}
+.ball-grid::-webkit-scrollbar-track{background:transparent;}
+.ball-grid::-webkit-scrollbar-thumb{
+  background:var(--border-2);
+  border-radius:var(--r-full);
+}
+.ball-grid::-webkit-scrollbar-thumb:hover{background:var(--border-strong);}
+
+.ball-card{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:var(--s-1);
+  padding:var(--s-2) var(--s-1);
+  border-radius:var(--r-md);
+  background:var(--surface-2);
+  border:1.5px solid var(--border-1);
+  cursor:pointer;
+  transition:
+    transform var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease),
+    background var(--dur-fast) var(--ease);
+  min-height:44px;
+}
+.ball-card:hover{
+  transform:translateY(-2px);
+  border-color:var(--border-strong);
+  background:var(--surface-hi);
+}
+.ball-card:focus-visible{
+  outline:2px solid var(--primary-hi);
+  outline-offset:2px;
+}
+.ball-card.sel{
+  border-color:var(--gold);
+  background:var(--gold-soft);
+  box-shadow:0 0 0 1px var(--gold),0 4px 20px var(--gold-glow);
+}
+.ball-card.picked-tourney{
+  border-color:var(--success);
+  background:rgba(77,255,158,.1);
+  box-shadow:0 0 0 1px var(--success),0 4px 16px rgba(77,255,158,.35);
+}
+.ball-card.picked-tourney::after{
+  content:'✓';
+  position:absolute;
+  top:3px;
+  right:5px;
+  font-size:12px;
+  color:var(--success);
+  font-weight:900;
+  text-shadow:0 0 6px var(--success);
+}
+
+.ball-card .orb{
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  position:relative;
+  flex-shrink:0;
+}
+.ball-card .nm{
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.02em;
+  text-align:center;
+  line-height:1.2;
+  color:var(--text-1);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:100%;
+}
+.ball-card .ab{
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.01em;
+  text-align:center;
+  line-height:1.2;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:100%;
+  opacity:.9;
+}
+.ball-card .st{
+  display:flex;
+  gap:var(--s-2);
+  font-size:9px;
+  letter-spacing:.02em;
+  font-variant-numeric:tabular-nums;
+}
+.ball-card .st .a{color:#ffa8a8;font-weight:800;}
 .ball-card .st .d{color:#9dd6ff;font-weight:800;}
-.picked-info{width:100%;padding:12px 14px;border-radius:12px;margin-bottom:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;gap:12px;}
-.picked-orb{width:44px;height:44px;border-radius:50%;flex-shrink:0;}
-.picked-text h3{font-size:13px;letter-spacing:1.5px;margin-bottom:2px;}
-.picked-text p{font-size:11px;opacity:.7;line-height:1.4;}
-.picked-text .stats{font-size:10px;margin-top:3px;letter-spacing:1px;}
-.picked-text .stats b{color:#ffd93d;}
-.search-bar{width:100%;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:#fff;font-size:13px;font-family:inherit;margin-bottom:10px;outline:none;}
-.search-bar:focus{border-color:#5fe6ff;box-shadow:0 0 14px rgba(95,230,255,.4);}
-.vs-row{display:flex;align-items:center;gap:14px;margin-bottom:16px;width:100%;justify-content:center;}
-.vs-orb{width:60px;height:60px;border-radius:50%;position:relative;}
-.vs-orb.dead{opacity:.2;filter:grayscale(1);}
-.vs-orb .hp-mini{position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:50px;height:4px;border-radius:2px;background:rgba(255,255,255,.15);overflow:hidden;}
-.vs-orb .hp-mini i{display:block;height:100%;border-radius:2px;}
-.vs-label{font-size:20px;font-weight:900;letter-spacing:3px;color:#a25bff;text-shadow:0 0 20px #a25bff;}
-.result-sub{font-size:12px;letter-spacing:2px;opacity:.75;margin-bottom:14px;text-align:center;}
-.result-stats{display:flex;gap:8px;width:100%;margin-bottom:14px;}
-.stat{flex:1;text-align:center;padding:10px 4px;border-radius:11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);}
-.stat .v{font-size:18px;font-weight:900;color:#5fe6ff;text-shadow:0 0 12px rgba(95,230,255,.8);}
-.stat .l{font-size:9px;letter-spacing:1.5px;opacity:.6;margin-top:3px;}
-.win{color:#4dff9e !important;text-shadow:0 0 26px #4dff9e !important;}
-.lose{color:#ff5f7e !important;text-shadow:0 0 26px #ff5f7e !important;}
-.key-hint{font-size:10px;letter-spacing:1.5px;opacity:.55;margin-top:2px;margin-bottom:10px;text-align:center;}
-.key-hint b{display:inline-block;padding:2px 7px;border-radius:5px;margin:0 3px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);font-size:10px;color:#5fe6ff;}
-.tourney-slots{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%;margin-bottom:12px;padding:8px;background:rgba(255,255,255,0.04);border-radius:12px;border:1px dashed rgba(255,255,255,0.15);}
-.tourney-slot{aspect-ratio:1;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px;background:rgba(255,255,255,0.04);border:2px solid rgba(255,255,255,0.1);cursor:pointer;transition:all .15s;gap:3px;font-size:8px;text-align:center;position:relative;overflow:hidden;}
-.tourney-slot.empty::before{content:'+';font-size:22px;opacity:0.2;font-weight:900;}
+
+/* ==========================================================================
+   10. PICKED INFO
+   ========================================================================== */
+.picked-info{
+  width:100%;
+  padding:var(--s-3) var(--s-4);
+  border-radius:var(--r-lg);
+  background:var(--surface-1);
+  border:1px solid var(--border-2);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  display:flex;
+  align-items:center;
+  gap:var(--s-4);
+  margin-bottom:var(--s-3);
+}
+.picked-orb{
+  width:52px;
+  height:52px;
+  border-radius:50%;
+  flex-shrink:0;
+}
+.picked-text{min-width:0;flex:1;}
+.picked-text h3{
+  font-size:14px;
+  font-weight:800;
+  letter-spacing:-.01em;
+  margin-bottom:var(--s-1);
+  color:var(--text-1);
+}
+.picked-text p{
+  font-size:11.5px;
+  color:var(--text-2);
+  line-height:1.45;
+}
+.picked-text .stats{
+  font-size:10px;
+  margin-top:var(--s-1);
+  letter-spacing:.02em;
+  color:var(--text-3);
+  font-variant-numeric:tabular-nums;
+}
+.picked-text .stats b{color:var(--gold);font-weight:800;}
+
+/* ==========================================================================
+   11. SEARCH BAR
+   ========================================================================== */
+.search-bar{
+  width:100%;
+  padding:var(--s-3) var(--s-4);
+  border-radius:var(--r-md);
+  background:var(--surface-2);
+  border:1px solid var(--border-2);
+  color:var(--text-1);
+  font-size:13.5px;
+  font-family:inherit;
+  margin-bottom:var(--s-3);
+  outline:none;
+  transition:
+    border-color var(--dur-mid) var(--ease),
+    box-shadow var(--dur-mid) var(--ease),
+    background var(--dur-mid) var(--ease);
+  min-height:44px;
+}
+.search-bar::placeholder{color:var(--text-3);}
+.search-bar:hover{border-color:var(--border-strong);}
+.search-bar:focus{
+  border-color:var(--primary-hi);
+  background:var(--surface-hi);
+  box-shadow:0 0 0 3px var(--primary-soft);
+}
+
+/* ==========================================================================
+   12. TOURNAMENT — SLOTS
+   ========================================================================== */
+.tourney-slots{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:var(--s-2);
+  width:100%;
+  margin-bottom:var(--s-3);
+  padding:var(--s-3);
+  background:var(--surface-2);
+  border-radius:var(--r-md);
+  border:1px dashed var(--border-2);
+}
+.tourney-slot{
+  aspect-ratio:1 / 1;
+  border-radius:var(--r-md);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:var(--s-1);
+  padding:var(--s-1);
+  background:rgba(0,0,0,.25);
+  border:1.5px dashed var(--border-2);
+  font-size:9px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+  transition:
+    border-color var(--dur-fast) var(--ease),
+    background var(--dur-fast) var(--ease);
+}
 .tourney-slot.empty{cursor:default;}
-.tourney-slot.filled{border-color:rgba(77,255,158,0.6);background:rgba(77,255,158,0.08);}
-.tourney-slot.filled:hover{border-color:#ff5f7e;background:rgba(255,95,126,0.12);}
-.tourney-slot.filled:hover .ts-name::after{content:' ✕';color:#ff5f7e;}
-.tourney-slot .ts-orb{width:26px;height:26px;border-radius:50%;}
-.tourney-slot .ts-name{font-weight:800;letter-spacing:.5px;font-size:8px;}
-.bracket-wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;margin-bottom:14px;}
-.bracket-col{display:flex;flex-direction:column;gap:6px;}
-.bracket-label{text-align:center;font-size:10px;letter-spacing:2px;opacity:.6;font-weight:800;margin-bottom:4px;}
-.bracket-match{display:flex;flex-direction:column;gap:3px;padding:6px;border-radius:10px;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);transition:all .2s;}
-.bracket-match.current{border-color:#5fe6ff;box-shadow:0 0 16px rgba(95,230,255,.5);animation:bracketPulse 1s infinite alternate;}
-@keyframes bracketPulse{from{box-shadow:0 0 12px rgba(95,230,255,.4);}to{box-shadow:0 0 24px rgba(95,230,255,.9);}}
-.bracket-match.done{opacity:.6;}
-.bm-slot{display:flex;align-items:center;gap:6px;padding:3px 5px;border-radius:6px;font-size:10px;background:rgba(0,0,0,0.25);transition:all .2s;}
-.bm-slot .bm-orb{width:14px;height:14px;border-radius:50%;flex-shrink:0;}
-.bm-slot .bm-name{font-weight:800;letter-spacing:.5px;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;}
-.bm-slot.winner{background:rgba(77,255,158,0.22);box-shadow:0 0 10px rgba(77,255,158,.5);}
-.bm-slot.winner .bm-name{color:#4dff9e;}
-.bm-slot.loser{opacity:0.3;text-decoration:line-through;}
-.bm-slot.tbd{opacity:0.3;font-style:italic;}
-.next-match-info{text-align:center;margin:10px 0;padding:12px;border-radius:12px;background:rgba(95,230,255,0.08);border:1px solid rgba(95,230,255,0.3);}
-.next-match-label{font-size:10px;letter-spacing:3px;opacity:.7;font-weight:800;margin-bottom:6px;}
-.next-match-vs{font-size:16px;font-weight:900;}
-.champ-orb-big{width:120px;height:120px;border-radius:50%;margin:10px auto;animation:champSpin 3s linear infinite;}
-@keyframes champSpin{from{filter:hue-rotate(0deg);}to{filter:hue-rotate(360deg);}}
-.trophy-icon{font-size:60px;text-align:center;margin-bottom:6px;filter:drop-shadow(0 0 20px #ffd93d);animation:trophyBounce 1.2s ease-in-out infinite alternate;}
-@keyframes trophyBounce{from{transform:translateY(0);}to{transform:translateY(-10px);}}
+.tourney-slot.empty::before{
+  content:'+';
+  font-size:22px;
+  color:var(--text-3);
+  font-weight:300;
+}
+.tourney-slot.filled{
+  border-style:solid;
+  border-color:var(--border-strong);
+  background:var(--surface-3);
+  cursor:pointer;
+  min-height:44px;
+}
+.tourney-slot.filled:hover{
+  border-color:var(--danger);
+  background:rgba(255,95,126,.1);
+}
+.tourney-slot.filled:hover .ts-name::after{
+  content:' ✕';
+  color:var(--danger);
+}
+.tourney-slot .ts-orb{
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  flex-shrink:0;
+}
+.tourney-slot .ts-name{
+  font-weight:800;
+  letter-spacing:.02em;
+  font-size:9px;
+  color:var(--text-1);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:100%;
+}
+
+/* ==========================================================================
+   13. TOURNAMENT — BRACKET
+   ========================================================================== */
+.bracket-wrap{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:var(--s-4);
+  width:100%;
+  margin-bottom:var(--s-4);
+}
+.bracket-col{
+  display:flex;
+  flex-direction:column;
+  gap:var(--s-3);
+  position:relative;
+}
+.bracket-label{
+  text-align:center;
+  font-size:10px;
+  letter-spacing:.24em;
+  text-transform:uppercase;
+  font-weight:800;
+  color:var(--text-3);
+  margin-bottom:var(--s-1);
+}
+.bracket-match{
+  display:flex;
+  flex-direction:column;
+  gap:var(--s-1);
+  padding:var(--s-2);
+  border-radius:var(--r-md);
+  background:var(--surface-2);
+  border:1.5px solid var(--border-1);
+  transition:
+    border-color var(--dur-mid) var(--ease),
+    background var(--dur-mid) var(--ease),
+    box-shadow var(--dur-mid) var(--ease);
+}
+.bracket-match.current{
+  border-color:var(--secondary);
+  background:var(--secondary-soft);
+  box-shadow:0 0 0 1px var(--secondary-glow),0 4px 20px var(--secondary-glow);
+}
+.bracket-match.done{opacity:.55;}
+
+.bm-slot{
+  display:flex;
+  align-items:center;
+  gap:var(--s-2);
+  padding:var(--s-1) var(--s-2);
+  border-radius:var(--r-sm);
+  background:rgba(0,0,0,.25);
+  font-size:10px;
+  transition:
+    background var(--dur-mid) var(--ease),
+    color var(--dur-mid) var(--ease);
+  min-height:26px;
+}
+.bm-slot .bm-orb{
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  flex-shrink:0;
+}
+.bm-slot .bm-name{
+  font-weight:800;
+  letter-spacing:.02em;
+  font-size:10px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  flex:1;
+  color:var(--text-1);
+}
+.bm-slot.winner{
+  background:rgba(77,255,158,.18);
+  box-shadow:inset 0 0 0 1px rgba(77,255,158,.35);
+}
+.bm-slot.winner .bm-name{color:var(--success);}
+.bm-slot.loser{opacity:.35;text-decoration:line-through;}
+.bm-slot.tbd{opacity:.4;font-style:italic;color:var(--text-3);}
+
+.next-match-info{
+  text-align:center;
+  padding:var(--s-4);
+  border-radius:var(--r-lg);
+  background:var(--secondary-soft);
+  border:1px solid rgba(77,212,255,.3);
+  margin:var(--s-3) 0;
+  width:100%;
+}
+.next-match-label{
+  font-size:10px;
+  letter-spacing:.24em;
+  font-weight:800;
+  color:var(--secondary);
+  margin-bottom:var(--s-2);
+  text-transform:uppercase;
+}
+.next-match-vs{
+  font-size:16px;
+  font-weight:900;
+  letter-spacing:-.01em;
+}
+
+/* ==========================================================================
+   14. CHAMPION
+   ========================================================================== */
+.trophy-icon{
+  font-size:56px;
+  text-align:center;
+  margin-bottom:var(--s-2);
+  filter:drop-shadow(0 0 24px var(--gold-glow));
+  animation:trophyFloat 2.6s var(--ease) infinite alternate;
+}
+@keyframes trophyFloat{
+  from{transform:translateY(0);}
+  to{transform:translateY(-6px);}
+}
+.champ-orb-big{
+  width:120px;
+  height:120px;
+  border-radius:50%;
+  margin:var(--s-3) auto;
+  animation:champPulse 2.4s var(--ease) infinite alternate;
+}
+@keyframes champPulse{
+  from{transform:scale(1);}
+  to{transform:scale(1.06);}
+}
+
+.result-sub{
+  font-size:12px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  font-weight:600;
+  color:var(--text-2);
+  text-align:center;
+  margin-bottom:var(--s-4);
+}
+.result-stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:var(--s-2);
+  width:100%;
+  margin-bottom:var(--s-4);
+}
+.stat{
+  padding:var(--s-3) var(--s-2);
+  border-radius:var(--r-md);
+  background:var(--surface-2);
+  border:1px solid var(--border-1);
+  text-align:center;
+}
+.stat .v{
+  font-size:18px;
+  font-weight:900;
+  color:var(--secondary);
+  font-variant-numeric:tabular-nums;
+  letter-spacing:-.01em;
+}
+.stat .l{
+  font-size:9px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--text-3);
+  font-weight:700;
+  margin-top:var(--s-1);
+}
+
+.win{color:var(--success) !important;text-shadow:0 0 28px rgba(77,255,158,.5) !important;}
+.lose{color:var(--danger) !important;text-shadow:0 0 28px rgba(255,95,126,.5) !important;}
+
+/* VS row (game over) */
+.vs-row{
+  display:flex;
+  align-items:center;
+  gap:var(--s-4);
+  margin-bottom:var(--s-4);
+  width:100%;
+  justify-content:center;
+}
+.vs-orb{
+  width:64px;
+  height:64px;
+  border-radius:50%;
+  position:relative;
+  flex-shrink:0;
+}
+.vs-orb.dead{opacity:.2;filter:grayscale(1);}
+.vs-orb .hp-mini{
+  position:absolute;
+  bottom:-10px;
+  left:50%;
+  transform:translateX(-50%);
+  width:54px;
+  height:5px;
+  border-radius:var(--r-full);
+  background:rgba(0,0,0,.5);
+  overflow:hidden;
+  border:1px solid var(--border-1);
+}
+.vs-orb .hp-mini i{display:block;height:100%;border-radius:var(--r-full);transition:width var(--dur-fast) ease-out;}
+.vs-label{
+  font-size:14px;
+  font-weight:900;
+  letter-spacing:.24em;
+  color:var(--primary-hi);
+  text-shadow:0 0 18px var(--primary-glow);
+}
+
+.key-hint{
+  font-size:10px;
+  letter-spacing:.14em;
+  color:var(--text-3);
+  text-align:center;
+  margin:var(--s-2) 0 var(--s-3);
+  text-transform:uppercase;
+  font-weight:600;
+}
+.key-hint b{
+  display:inline-block;
+  padding:2px 8px;
+  border-radius:var(--r-xs);
+  margin:0 3px;
+  background:rgba(255,255,255,.1);
+  border:1px solid var(--border-2);
+  font-size:10px;
+  color:var(--secondary);
+  font-weight:800;
+}
+
+/* ==========================================================================
+   15. RESPONSIVE
+   ========================================================================== */
+@media (max-width:600px){
+  .hp-side{max-width:42%;}
+  .hp-stats{display:none;}
+  .hp-ability{font-size:9.5px;padding:2px 6px;}
+  .status-panel{top:calc(var(--safe-t) + 78px);}
+  .status-badge{width:32px;height:32px;font-size:13px;}
+
+  .menu-grid{grid-template-columns:repeat(2,1fr);}
+  .menu-primary{grid-template-columns:1fr;}
+  .menu-card--primary{padding:var(--s-4);}
+
+  .ball-grid{grid-template-columns:repeat(auto-fill,minmax(84px,1fr));}
+  .ball-card .orb{width:32px;height:32px;}
+  .ball-card .nm{font-size:9.5px;}
+  .ball-card .ab{font-size:8.5px;}
+
+  .result-stats{grid-template-columns:repeat(3,1fr);}
+  .stat .v{font-size:16px;}
+}
+
+@media (max-width:380px){
+  .menu-grid{grid-template-columns:repeat(2,1fr);}
+  .ball-grid{grid-template-columns:repeat(auto-fill,minmax(76px,1fr));}
+  .hud-mid{padding:var(--s-1) var(--s-2);}
+  .timer{font-size:16px;}
+}
+
+@media (min-width:820px){
+  .menu-wrap{max-width:680px;}
+}
+
+/* Landscape mobile */
+@media (max-height:500px) and (orientation:landscape){
+  .hp-row{padding-top:calc(var(--safe-t) + var(--s-2));}
+  .status-panel{top:calc(var(--safe-t) + 70px);}
+  .menu-hero{padding:var(--s-2) 0;}
+  .logo{font-size:clamp(28px,7vw,44px);}
+  .ball-grid{max-height:44vh;}
+}
+
+/* ==========================================================================
+   16. ACCESSIBILITY
+   ========================================================================== */
+:focus{outline:none;}
+:focus-visible{
+  outline:2px solid var(--primary-hi);
+  outline-offset:3px;
+  border-radius:var(--r-sm);
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;
+    scroll-behavior:auto !important;
+  }
+  .menu-badge::before{animation:none;opacity:1;}
+  .trophy-icon{animation:none;}
+  .champ-orb-big{animation:none;}
+}
+
+@media (prefers-contrast:more){
+  :root{
+    --text-2:#d5d8f0;
+    --text-3:#a0a5c8;
+    --border-2:rgba(200,210,255,.4);
+  }
+}
 </style>
 </head>
 <body>
 
 <canvas id="game"></canvas>
 
+<!-- ==========================================================================
+     HUD
+     ========================================================================== -->
 <div id="hud" class="hidden">
   <div class="hp-row">
     <div class="hp-side left">
-      <div class="hp-name you" id="youName">—</div>
+      <div class="hp-head">
+        <div class="hp-name you" id="youName">—</div>
+        <div class="hp-ability" id="youAbility">—</div>
+      </div>
       <div class="hp-bar"><div class="hp-fill you" id="youHp"></div></div>
-      <div class="hp-ability" id="youAbility">—</div>
       <div class="hp-stats" id="youStats">ATK <b>—</b> · DEF <b>—</b></div>
     </div>
-    <div class="hud-mid"><div class="timer" id="hudTimer">00:00</div></div>
+
+    <div class="hud-mid">
+      <div class="timer" id="hudTimer">00:00</div>
+    </div>
+
     <div class="hp-side right">
-      <div class="hp-name foe" id="foeName">—</div>
+      <div class="hp-head">
+        <div class="hp-ability" id="foeAbility">—</div>
+        <div class="hp-name foe" id="foeName">—</div>
+      </div>
       <div class="hp-bar"><div class="hp-fill foe" id="foeHp"></div></div>
-      <div class="hp-ability" id="foeAbility">—</div>
       <div class="hp-stats" id="foeStats">ATK <b>—</b> · DEF <b>—</b></div>
     </div>
   </div>
+
   <div class="status-panel">
     <div class="status-col" id="youStatus"></div>
     <div class="status-col right" id="foeStatus"></div>
   </div>
+
   <div class="combo" id="comboEl">COMBO x2</div>
 </div>
 
+<!-- ==========================================================================
+     OVERLAY
+     ========================================================================== -->
 <div id="overlay">
+
+  <!-- MENU -->
   <div class="screen active" id="scr-menu">
-    <h1 class="logo">BALL <span>VS</span> BALL</h1>
-    <p class="sub">190 Bola · 190 Kemampuan · Anime Ultimate</p>
-    <button class="btn primary" data-act="play">⚔ PERTARUNGAN 1v1</button>
-    <button class="btn primary" data-act="tournament" style="background:linear-gradient(100deg,rgba(255,180,0,.85),rgba(255,80,0,.85));box-shadow:0 0 30px rgba(255,180,0,.6);">🏆 TURNAMEN 8 BOLA</button>
-    <button class="btn" data-act="naruto" style="background:linear-gradient(100deg,rgba(255,140,0,.4),rgba(200,50,50,.4));border-color:rgba(255,140,0,.7);">🍥 NARUTO (20)</button>
-    <button class="btn" data-act="dragonball" style="background:linear-gradient(100deg,rgba(255,200,0,.35),rgba(255,100,0,.35));border-color:rgba(255,200,0,.8);">🐉 DRAGON BALL (20)</button>
-    <button class="btn" data-act="blackclover" style="background:linear-gradient(100deg,rgba(100,100,255,.4),rgba(50,50,150,.4));border-color:rgba(150,150,255,.8);">🍀 BLACK CLOVER (20)</button>
-    <button class="btn" data-act="howto">? CARA MAIN</button>
-    <button class="btn" data-act="balls">📖 DAFTAR BOLA (190)</button>
-    <div style="margin-top:10px;font-size:11px;letter-spacing:2px;opacity:.6" id="bestInfo">—</div>
+    <div class="menu-wrap">
+      <div class="menu-hero">
+        <div class="menu-badge">190 Balls · Anime Ultimate</div>
+        <h1 class="logo">BALL <span>VS</span> BALL</h1>
+        <p class="sub">Pertarungan Arena · 190 Kemampuan Unik</p>
+      </div>
+
+      <div class="menu-primary">
+        <button class="menu-card menu-card--primary" data-act="play">
+          <div class="menu-card__icon">⚔</div>
+          <div class="menu-card__body">
+            <div class="menu-card__title">Pertarungan 1v1</div>
+            <div class="menu-card__desc">Pilih bola, tonton duel otomatis</div>
+          </div>
+          <div class="menu-card__cta">▶</div>
+        </button>
+
+        <button class="menu-card menu-card--primary menu-card--gold" data-act="tournament">
+          <div class="menu-card__icon">🏆</div>
+          <div class="menu-card__body">
+            <div class="menu-card__title">Turnamen 8 Bola</div>
+            <div class="menu-card__desc">Bracket sampai juara</div>
+          </div>
+          <div class="menu-card__cta">▶</div>
+        </button>
+      </div>
+
+      <div class="menu-section-label">Kategori Anime &amp; Koleksi</div>
+
+      <div class="menu-grid">
+        <button class="menu-card menu-card--sm" data-act="naruto" aria-label="Lihat bola Naruto">
+          <span class="menu-card__emoji">🍥</span>
+          <span class="menu-card__label">Naruto</span>
+          <span class="menu-card__count">20</span>
+        </button>
+        <button class="menu-card menu-card--sm" data-act="dragonball" aria-label="Lihat bola Dragon Ball">
+          <span class="menu-card__emoji">🐉</span>
+          <span class="menu-card__label">Dragon Ball</span>
+          <span class="menu-card__count">20</span>
+        </button>
+        <button class="menu-card menu-card--sm" data-act="blackclover" aria-label="Lihat bola Black Clover">
+          <span class="menu-card__emoji">🍀</span>
+          <span class="menu-card__label">Black Clover</span>
+          <span class="menu-card__count">20</span>
+        </button>
+        <button class="menu-card menu-card--sm" data-act="balls" aria-label="Lihat semua bola">
+          <span class="menu-card__emoji">📖</span>
+          <span class="menu-card__label">Semua Bola</span>
+          <span class="menu-card__count">190</span>
+        </button>
+      </div>
+
+      <button class="menu-link" data-act="howto">? Cara Main</button>
+
+      <div class="menu-best" id="bestInfo">—</div>
+    </div>
   </div>
 
+  <!-- HOW TO PLAY -->
   <div class="screen" id="scr-howto">
-    <h2 class="title">CARA MAIN</h2>
+    <h2 class="title">Cara Main</h2>
     <div class="card">
       <ul>
         <li>Bola bergerak <b>lurus</b> dan <b>memantul</b> di dinding arena.</li>
@@ -173,39 +1411,45 @@ h2.title{font-size:clamp(22px,5.5vw,30px);font-weight:900;letter-spacing:3px;mar
         <li><b>Hanya yang menabrak yang memberi damage!</b></li>
         <li><b>CHARGE:</b> Bola seperti GOKU, VEGETA harus <b>DIAM</b> saat charging sebelum melepas beam.</li>
         <li><b>KAMEHAMEHA:</b> 50% chance kena target. Jika meleset, beam melenceng ke arah acak.</li>
-        <li><b>BLACK CLOVER:</b> 🍀 ASTA · YUNO · YAMI · NOELLE · JULIUS · MEREOLEONA · FUEgOLEON · CHARMY · LUCK · MAGNA · VANESSA · FINRAL · GAUCHE · ZORA · SECRE · NERO · LICHT · PATRY · RHYA · ZAGRED</li>
+        <li><b>BLACK CLOVER:</b> ASTA · YUNO · YAMI · NOELLE · JULIUS · MEREOLEONA · FUEGOLEON · CHARMY · LUCK · MAGNA · VANESSA · FINRAL · GAUCHE · ZORA · SECRE · NERO · LICHT · PATRY · RHYA · ZAGRED</li>
+        <li>Tekan <span class="k">ESC</span> untuk pause.</li>
       </ul>
     </div>
-    <button class="btn" data-act="back">← KEMBALI</button>
+    <button class="btn" data-act="back">← Kembali</button>
   </div>
 
+  <!-- NARUTO -->
   <div class="screen" id="scr-naruto">
-    <h2 class="title">🍥 BOLA NARUTO</h2>
+    <h2 class="title">🍥 Bola Naruto</h2>
     <div class="ball-grid" id="narutoGrid"></div>
-    <button class="btn" data-act="back">← KEMBALI</button>
+    <button class="btn" data-act="back">← Kembali</button>
   </div>
 
+  <!-- DRAGON BALL -->
   <div class="screen" id="scr-dragonball">
-    <h2 class="title">🐉 BOLA DRAGON BALL</h2>
+    <h2 class="title">🐉 Bola Dragon Ball</h2>
     <div class="ball-grid" id="dragonBallGrid"></div>
-    <button class="btn" data-act="back">← KEMBALI</button>
+    <button class="btn" data-act="back">← Kembali</button>
   </div>
 
+  <!-- BLACK CLOVER -->
   <div class="screen" id="scr-blackclover">
-    <h2 class="title">🍀 BOLA BLACK CLOVER</h2>
+    <h2 class="title">🍀 Bola Black Clover</h2>
     <div class="ball-grid" id="blackCloverGrid"></div>
-    <button class="btn" data-act="back">← KEMBALI</button>
+    <button class="btn" data-act="back">← Kembali</button>
   </div>
 
+  <!-- ALL BALLS -->
   <div class="screen" id="scr-balls">
-    <h2 class="title">DAFTAR BOLA (190)</h2>
+    <h2 class="title">Daftar Bola (190)</h2>
     <input type="text" class="search-bar" id="searchBalls" placeholder="🔍 Cari nama bola atau kemampuan..."/>
     <div class="ball-grid" id="allBallsGrid"></div>
-    <button class="btn" data-act="back">← KEMBALI</button>
+    <button class="btn" data-act="back">← Kembali</button>
   </div>
 
+  <!-- SELECT -->
   <div class="screen" id="scr-select">
-    <h2 class="title">PILIH BOLAMU</h2>
+    <h2 class="title">Pilih Bolamu</h2>
     <div class="picked-info" id="pickedInfo" style="display:none;">
       <div class="picked-orb" id="pickedOrb"></div>
       <div class="picked-text">
@@ -216,68 +1460,74 @@ h2.title{font-size:clamp(22px,5.5vw,30px);font-weight:900;letter-spacing:3px;mar
     </div>
     <input type="text" class="search-bar" id="searchSelect" placeholder="🔍 Cari bola..."/>
     <div class="ball-grid" id="selectGrid"></div>
-    <button class="btn primary" id="fightBtn">⚔ TONTON PERTARUNGAN</button>
-    <button class="btn ghost" data-act="back">← KEMBALI</button>
+    <button class="btn primary" id="fightBtn">⚔ Tonton Pertarungan</button>
+    <button class="btn ghost" data-act="back">← Kembali</button>
   </div>
 
+  <!-- TOURNEY SELECT -->
   <div class="screen" id="scr-tourney-select">
-    <h2 class="title">🏆 PILIH 8 PESERTA</h2>
+    <h2 class="title">🏆 Pilih 8 Peserta</h2>
     <p class="sub" style="margin-bottom:12px;" id="tourneyCount">0 / 8 terpilih</p>
     <div class="tourney-slots" id="tourneySlots"></div>
     <input type="text" class="search-bar" id="tourneySearch" placeholder="🔍 Cari bola untuk ditambahkan..."/>
     <div class="ball-grid" id="tourneyGrid"></div>
-    <button class="btn" id="tourneyRandomBtn">🎲 ACAK 8 BOLA</button>
-    <button class="btn" id="tourneyAnimeBtn" style="background:rgba(255,140,0,.2);border-color:rgba(255,140,0,.5)">🎌 8 ANIME RANDOM</button>
-    <button class="btn" id="tourneyBCBtn" style="background:rgba(150,150,255,.2);border-color:rgba(150,150,255,.5)">🍀 8 BLACK CLOVER RANDOM</button>
-    <button class="btn ghost" id="tourneyClearBtn">✖ KOSONGKAN</button>
-    <button class="btn primary" id="tourneyStartBtn" disabled>🏆 MULAI TURNAMEN</button>
-    <button class="btn ghost" data-act="back">← KEMBALI</button>
+    <button class="btn" id="tourneyRandomBtn">🎲 Acak 8 Bola</button>
+    <button class="btn" id="tourneyAnimeBtn">🎌 8 Anime Random</button>
+    <button class="btn" id="tourneyBCBtn">🍀 8 Black Clover Random</button>
+    <button class="btn ghost" id="tourneyClearBtn">✖ Kosongkan</button>
+    <button class="btn primary" id="tourneyStartBtn" disabled>🏆 Mulai Turnamen</button>
+    <button class="btn ghost" data-act="back">← Kembali</button>
   </div>
 
+  <!-- BRACKET -->
   <div class="screen" id="scr-bracket">
-    <h2 class="title">🏆 TURNAMEN</h2>
+    <h2 class="title">🏆 Turnamen</h2>
     <div class="bracket-wrap" id="bracketWrap"></div>
     <div class="next-match-info" id="nextMatchInfo"></div>
-    <button class="btn primary" id="nextMatchBtn">▶ MAIN PERTANDINGAN</button>
-    <button class="btn ghost" data-act="menu">⌂ MENU UTAMA</button>
+    <button class="btn primary" id="nextMatchBtn">▶ Main Pertandingan</button>
+    <button class="btn ghost" data-act="menu">⌂ Menu Utama</button>
   </div>
 
+  <!-- CHAMPION -->
   <div class="screen" id="scr-champion">
     <div class="trophy-icon">🏆</div>
-    <h2 class="title win">JUARA TURNAMEN</h2>
+    <h2 class="title win">Juara Turnamen</h2>
     <div class="champ-orb-big" id="championOrb"></div>
-    <h3 id="championName" style="text-align:center;font-size:26px;letter-spacing:3px;margin:10px 0;"></h3>
+    <h3 id="championName" style="text-align:center;font-size:24px;letter-spacing:.06em;margin:10px 0;"></h3>
     <p id="championDesc" class="result-sub"></p>
     <div class="result-stats" id="championStats" style="width:100%;max-width:360px;"></div>
-    <button class="btn primary" data-act="tournament">🏆 TURNAMEN BARU</button>
-    <button class="btn ghost" data-act="menu">⌂ MENU UTAMA</button>
+    <button class="btn primary" data-act="tournament">🏆 Turnamen Baru</button>
+    <button class="btn ghost" data-act="menu">⌂ Menu Utama</button>
   </div>
 
+  <!-- PAUSE -->
   <div class="screen" id="scr-pause">
-    <h2 class="title">PAUSED</h2>
-    <button class="btn primary" data-act="resume">▶ LANJUT</button>
-    <button class="btn" data-act="restart">↻ ULANGI</button>
-    <button class="btn ghost" data-act="menu">⌂ MENU UTAMA</button>
+    <h2 class="title">Paused</h2>
+    <button class="btn primary" data-act="resume">▶ Lanjut</button>
+    <button class="btn" data-act="restart">↻ Ulangi</button>
+    <button class="btn ghost" data-act="menu">⌂ Menu Utama</button>
   </div>
 
+  <!-- GAME OVER -->
   <div class="screen" id="scr-over">
-    <h2 class="title" id="overTitle">VICTORY</h2>
+    <h2 class="title" id="overTitle">Victory</h2>
     <div class="vs-row">
-      <div class="vs-orb" id="resultYou"><div class="hp-mini"><i id="resultYouHp" style="background:#5fe6ff;"></i></div></div>
+      <div class="vs-orb" id="resultYou"><div class="hp-mini"><i id="resultYouHp" style="background:#4dd4ff;"></i></div></div>
       <div class="vs-label">VS</div>
-      <div class="vs-orb" id="resultFoe"><div class="hp-mini"><i id="resultFoeHp" style="background:#ff5f9e;"></i></div></div>
+      <div class="vs-orb" id="resultFoe"><div class="hp-mini"><i id="resultFoeHp" style="background:#ff5c9d;"></i></div></div>
     </div>
     <p class="result-sub" id="overSub">—</p>
     <div class="result-stats">
-      <div class="stat"><div class="v" id="ovTime">0:00</div><div class="l">DURASI</div></div>
-      <div class="stat"><div class="v" id="ovDmg">0</div><div class="l">DMG DIBERIKAN</div></div>
-      <div class="stat"><div class="v" id="ovCombo">x1</div><div class="l">COMBO MAX</div></div>
+      <div class="stat"><div class="v" id="ovTime">0:00</div><div class="l">Durasi</div></div>
+      <div class="stat"><div class="v" id="ovDmg">0</div><div class="l">Dmg Diberikan</div></div>
+      <div class="stat"><div class="v" id="ovCombo">x1</div><div class="l">Combo Max</div></div>
     </div>
     <div class="key-hint"><b>R</b> main lagi · <b>M</b> menu · <b>ESC</b> menu</div>
-    <button class="btn primary" data-act="restart">↻ MAIN LAGI</button>
-    <button class="btn" data-act="play">🎯 GANTI BOLA</button>
-    <button class="btn ghost" data-act="menu">⌂ MENU UTAMA</button>
+    <button class="btn primary" data-act="restart">↻ Main Lagi</button>
+    <button class="btn" data-act="play">🎯 Ganti Bola</button>
+    <button class="btn ghost" data-act="menu">⌂ Menu Utama</button>
   </div>
+
 </div>
 
 <script>
@@ -363,7 +1613,6 @@ const MAX_BEAMS = 16;
    4. BALLS — 130 original + 20 Naruto + 20 DB + 20 BC = 190
    ============================================================ */
 const BALL_DEFS = [
-  // ===== ORIGINAL 130 =====
   ['basic','BASIC','#7ec8ff',100,22,1.00,1.00,1.00,5,'basic','Tanpa kemampuan khusus.'],
   ['sturdy','STURDY','#a8c0d8',115,23,0.95,0.95,1.30,5,'sturdy','DEF +30% permanen.'],
   ['swift','SWIFT','#ffe066',85,20,1.35,0.90,0.85,5,'swift','SPD +35% permanen.'],
@@ -504,8 +1753,6 @@ const BALL_DEFS = [
   ['cobra','COBRA','#4b0082',80,22,1.05,1.10,1.00,8,'cobra','Poison strike.'],
   ['falcon','FALCON','#cd853f',80,22,1.15,1.15,0.95,8,'falcon','Fast + vision.'],
   ['phoenix','PHOENIX','#ff5500',65,22,1.05,1.20,0.95,9,'phoenix','Reborn + fire.'],
-
-  // ===== 20 NARUTO =====
   ['naruto','NARUTO','#ff9900',95,22,1.05,1.20,1.00,9,'rasengan','Rasengan — bonus spiral AoE damage saat hit.'],
   ['sasuke','SASUKE','#1a1a4d',85,22,1.10,1.30,0.90,9,'chidori','Chidori — pierce shield + lightning burst.'],
   ['kakashi','KAKASHI','#3a3a5a',95,22,1.05,1.15,1.05,8,'sharingan','Sharingan — dodge + tiru kemampuan musuh.'],
@@ -526,8 +1773,6 @@ const BALL_DEFS = [
   ['shikamaru','SHIKAMARU','#2a4a2a',85,22,1.00,1.00,1.10,7,'shadow_possess','Shadow Possession — imobilisasi musuh.'],
   ['choji','CHOJI','#aa6622',130,26,0.80,1.10,1.25,7,'expansion','Expansion Jutsu — membesar + push besar.'],
   ['neji','NEJI','#ccaabb',90,22,1.05,1.15,1.05,8,'rotation','Rotation — reflect proyektil + AoE.'],
-
-  // ===== 20 DRAGON BALL =====
   ['goku','GOKU','#ff8800',100,23,1.10,1.25,1.00,9,'kamehameha','Kamehameha — CHARGE DIAM 2s, lalu beam 50% akurasi.'],
   ['vegeta','VEGETA','#2050ff',95,23,1.10,1.30,1.00,9,'final_flash','Final Flash — CHARGE DIAM 2s, blast besar.'],
   ['gohan','GOHAN','#8844ff',90,22,1.05,1.20,1.05,8,'masenko','Masenko — damage naik saat HP rendah.'],
@@ -548,8 +1793,6 @@ const BALL_DEFS = [
   ['android18','ANDROID 18','#ffdd66',90,22,1.05,1.15,1.25,8,'infinite_energy','Infinite Energy — shield regen terus.'],
   ['gotenks','GOTENKS','#ffff44',75,22,1.15,1.15,0.95,8,'ghost_kamikaze','Super Ghost Kamikaze — 5 ghost proyektil.'],
   ['roshi','MASTER ROSHI','#ffaa66',85,23,1.00,1.05,1.15,7,'kame_master','Kamehameha Master — counter + reflect.'],
-
-  // ===== 20 BLACK CLOVER =====
   ['asta','ASTA','#1a1a1a',95,23,1.10,1.25,1.00,9,'antimagic_sword','Anti-Magic Sword — nulifikasi shield & ability musuh.'],
   ['yuno','YUNO','#88dd88',90,22,1.15,1.15,1.05,8,'wind_spirit','Wind Spirit — sylph speed + dodge tinggi.'],
   ['yami','YAMI','#2a1a3a',100,24,1.00,1.35,1.10,9,'dark_slash','Dark Cloaked Slash — slash gelap besar + bleed.'],
@@ -735,7 +1978,6 @@ const ABILITY_META = {
   cobra:{label:'COBRA',icon:'☠',color:'#4b0082'},
   falcon:{label:'FALCON',icon:'⊕',color:'#cd853f'},
   phoenix:{label:'REBORN',icon:'✵',color:'#ff5500',active:true},
-  // Naruto
   rasengan:{label:'RASENGAN',icon:'🌀',color:'#ff9900'},
   chidori:{label:'CHIDORI',icon:'⚡',color:'#4a4aff'},
   sharingan:{label:'SHARINGAN',icon:'◉',color:'#c02020'},
@@ -756,7 +1998,6 @@ const ABILITY_META = {
   shadow_possess:{label:'SHADOW POSS',icon:'◐',color:'#2a4a2a',active:true},
   expansion:{label:'EXPANSION',icon:'◎',color:'#aa6622'},
   rotation:{label:'ROTATION',icon:'✺',color:'#ccaabb',active:true},
-  // Dragon Ball
   kamehameha:{label:'KAMEHAMEHA (CHARGE)',icon:'🌀',color:'#44ccff',active:true},
   final_flash:{label:'FINAL FLASH (CHARGE)',icon:'⚡',color:'#2050ff',active:true},
   masenko:{label:'MASENKO',icon:'✦',color:'#8844ff'},
@@ -777,7 +2018,6 @@ const ABILITY_META = {
   infinite_energy:{label:'INFINITE',icon:'∞',color:'#ffdd66',active:true},
   ghost_kamikaze:{label:'GHOST KAME',icon:'☁',color:'#ffff44',active:true},
   kame_master:{label:'KAME MASTER',icon:'✧',color:'#ffaa66',active:true},
-  // Black Clover
   antimagic_sword:{label:'ANTI-MAGIC SWORD',icon:'⚔',color:'#1a1a1a',active:true},
   wind_spirit:{label:'WIND SPIRIT',icon:'≫',color:'#88dd88',active:true},
   dark_slash:{label:'DARK SLASH',icon:'⚔',color:'#2a1a3a',active:true},
@@ -977,9 +2217,7 @@ function drawBallSymbol(ab, r, t){
   ctx.strokeStyle='rgba(255,255,255,0.92)';
   ctx.fillStyle='rgba(255,255,255,0.92)';
 
-  // === BLACK CLOVER ===
   if (ab==='antimagic_sword'){
-    // Sword with anti-magic
     ctx.beginPath();
     ctx.moveTo(-S*0.6,-S*0.8); ctx.lineTo(S*0.5,S*0.5);
     ctx.lineTo(S*0.15,S*0.75); ctx.lineTo(-S*0.8,-S*0.5);
@@ -1007,7 +2245,6 @@ function drawBallSymbol(ab, r, t){
     ctx.moveTo(-S*0.9,S*0.6); ctx.lineTo(S*0.7,-S*0.8);
     ctx.moveTo(-S*0.6,S*0.8); ctx.lineTo(S*0.9,-S*0.5);
     ctx.stroke();
-    // Dark aura
     ctx.beginPath();
     for (let i=0;i<8;i++){
       const a = i/8*Math.PI*2;
@@ -1018,7 +2255,6 @@ function drawBallSymbol(ab, r, t){
     return;
   }
   if (ab==='valkyrie_armor'){
-    // Armored valkyrie with water
     ctx.beginPath();
     ctx.moveTo(0,-S); ctx.lineTo(S*0.7,-S*0.4);
     ctx.lineTo(S*0.7,S*0.5); ctx.lineTo(0,S);
@@ -1046,7 +2282,6 @@ function drawBallSymbol(ab, r, t){
     ctx.bezierCurveTo(S*0.6,-S*0.4, S*0.85,S*0.3, 0,S);
     ctx.closePath(); ctx.stroke();
     if (ab==='fire_lion'){
-      // Lion mane
       for (let i=0;i<8;i++){
         const a = i/8*Math.PI*2;
         ctx.beginPath();
@@ -1076,7 +2311,6 @@ function drawBallSymbol(ab, r, t){
     return;
   }
   if (ab==='fire_chains'){
-    // Chain links
     for (let i=-1;i<=1;i++){
       ctx.beginPath();
       ctx.arc(i*S*0.5, 0, S*0.25, 0, Math.PI*1.5);
@@ -1085,7 +2319,6 @@ function drawBallSymbol(ab, r, t){
     return;
   }
   if (ab==='fate_magic'){
-    // Red thread
     ctx.beginPath();
     ctx.moveTo(-S*0.8,-S*0.8);
     ctx.bezierCurveTo(-S*0.3,-S*0.3, S*0.3,-S*0.5, S*0.8,-S*0.8);
@@ -1116,7 +2349,6 @@ function drawBallSymbol(ab, r, t){
     return;
   }
   if (ab==='trap_magic'){
-    // Rune circle
     ctx.beginPath(); ctx.arc(0,0,S*0.8,0,Math.PI*2); ctx.stroke();
     for (let i=0;i<6;i++){
       const a = i/6*Math.PI*2;
@@ -1135,7 +2367,6 @@ function drawBallSymbol(ab, r, t){
     return;
   }
   if (ab==='anti_bird'){
-    // Bird silhouette
     ctx.beginPath();
     ctx.moveTo(-S*0.7,-S*0.3);
     ctx.quadraticCurveTo(-S*0.3,-S*0.8, 0,-S*0.5);
@@ -1146,7 +2377,6 @@ function drawBallSymbol(ab, r, t){
     return;
   }
   if (ab==='light_magic'){
-    // Light rays
     ctx.beginPath(); ctx.arc(0,0,S*0.4,0,Math.PI*2); ctx.fill();
     for (let i=0;i<8;i++){
       const a = i/8*Math.PI*2;
@@ -1175,7 +2405,6 @@ function drawBallSymbol(ab, r, t){
     return;
   }
   if (ab==='demon_magic'){
-    // Demon horns
     ctx.beginPath();
     ctx.moveTo(-S*0.5,-S*0.3); ctx.lineTo(-S*0.7,-S*0.9);
     ctx.moveTo(S*0.5,-S*0.3); ctx.lineTo(S*0.7,-S*0.9);
@@ -1184,8 +2413,6 @@ function drawBallSymbol(ab, r, t){
     ctx.beginPath(); ctx.arc(0,0,S*0.2,0,Math.PI*2); ctx.fill();
     return;
   }
-
-  // === DRAGON BALL ===
   if (ab==='kamehameha' || ab==='big_bang_kame' || ab==='black_kame' || ab==='kame_master'){
     ctx.beginPath();
     ctx.arc(-S*0.4, 0, S*0.5, 0, Math.PI*2);
@@ -1313,8 +2540,6 @@ function drawBallSymbol(ab, r, t){
     ctx.closePath(); ctx.fill();
     return;
   }
-
-  // === NARUTO ===
   if (ab==='rasengan'){
     for (let a=0;a<Math.PI*6;a+=0.12){
       const rr = a/(Math.PI*6)*S*0.95;
@@ -1476,8 +2701,6 @@ function drawBallSymbol(ab, r, t){
     ctx.stroke();
     return;
   }
-
-  // Original fallback (compact) — many ability families
   if (['basic','sturdy','heavy','tank','golem','bear','adamant','fortress','ironhide','turtle','rhino','bulwark'].includes(ab)){
     ctx.beginPath();
     for(let i=0;i<6;i++){const a=i/6*Math.PI*2-Math.PI/2;const x=Math.cos(a)*S,y=Math.sin(a)*S; if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
@@ -1661,11 +2884,10 @@ class Ball {
     this.susanooActive=0;
     this.eightGatesActive=0;
     this.flyingThunderCd=0;
-    // Charge mechanics (STATIONARY)
-    this.isCharging = false;     // When true, ball is STATIONARY
-    this.chargeTimer = 0;         // Counts up to chargeTime
-    this.chargeTime = 0;          // Total charge duration
-    this.chargeType = null;       // 'kamehameha' | 'final_flash' | etc.
+    this.isCharging = false;
+    this.chargeTimer = 0;
+    this.chargeTime = 0;
+    this.chargeType = null;
     this.chargeColor = '#ffffff';
     this.whisBuffer=0;
     this.whisBufferTimer=0;
@@ -1673,7 +2895,6 @@ class Ball {
     this.kiAura=0;
     this.tempShield=0;
     this.tempDefBoost=0;
-    // Black Clover
     this.antiMagicActive=0;
     this.valkyrieActive=0;
     this.mirrorActive=0;
@@ -1687,7 +2908,6 @@ class Ball {
     if (this.ability === 'aegis') this.shieldBonus = 1.5;
     if (this.ability === 'adamant' || this.ability === 'jiren' || this.ability === 'ultimate_battle') this.noKnockback = true;
     if (this.ability === 'juggernaut') this.ccImmune = true;
-    // Yuno passive: extra dodge (handled in onTakeDamage)
     if (this.ability === 'wind_spirit'){ this.speedMul *= 1.15; }
     if (this.ability === 'lightning_speed'){ this.speedMul *= 1.20; }
     const a = Math.random()*Math.PI*2;
@@ -1705,14 +2925,12 @@ class Ball {
     this.chargeTime = duration;
     this.chargeType = type;
     this.chargeColor = color;
-    // FREEZE THE BALL
     this.vx = 0; this.vy = 0;
     return true;
   }
 
   update(dt, enemy){
     if (!this.alive){ if (this.trail.length>0) this.trail.shift(); return; }
-    // Timers
     if (this.dashCd>0){ this.dashCd -= dt; if (this.dashCd<=0){ this.dashCd=0; this.dashCharges = Math.min(this.maxDashCharges, this.dashCharges+1); if (this.dashCharges < this.maxDashCharges) this.dashCd = this.dashMax; } }
     if (this.dashTime>0) this.dashTime -= dt;
     if (this.invuln>0) this.invuln -= dt;
@@ -1741,11 +2959,9 @@ class Ball {
     if (this.eightGatesActive>0){ this.hp -= 3*dt; if (this.hp<=0){ this.die(); return; } }
     if (this.abilityDisabled <= 0) this.applyAbilityPassive(dt, enemy);
 
-    // === CHARGE STATIONARY ===
     if (this.isCharging){
       this.chargeTimer += dt;
-      this.vx = 0; this.vy = 0;  // stay still
-      // Emit charging particles
+      this.vx = 0; this.vy = 0;
       if (Math.random() < 0.6){
         const a = Math.random()*Math.PI*2;
         const r = this.r + Math.random()*20*SCALE;
@@ -1756,17 +2972,14 @@ class Ball {
         G.particles.push(new Particle(px, py, (dx/dl)*150*SCALE, (dy/dl)*150*SCALE, 0.4, 3*SCALE, this.chargeColor));
       }
       if (this.chargeTimer >= this.chargeTime){
-        // FIRE!
         this.fireChargedBeam(enemy);
         this.isCharging = false;
         this.chargeTimer = 0;
         this.chargeType = null;
       }
-      // Update trail/radius even while charging
       let targetR = this.baseR;
       if (this.growth>0) targetR *= (1+this.growth*0.55);
       this.r += (targetR-this.r)*Math.min(1, dt*6);
-      // Skip movement — ball is stationary
       return;
     }
 
@@ -1795,11 +3008,9 @@ class Ball {
 
   fireChargedBeam(enemy){
     const type = this.chargeType;
-    // 50% MISS CHANCE for kamehameha
     const missed = (type === 'kamehameha') && (Math.random() < 0.5);
     let dirX, dirY;
     if (missed){
-      // random direction
       const a = Math.random()*Math.PI*2;
       dirX = Math.cos(a); dirY = Math.sin(a);
       this.showFloatText('MISS!', '#888888');
@@ -1815,7 +3026,7 @@ class Ball {
     const endY = this.y + dirY*arena.r*1.6;
 
     if (type === 'kamehameha'){
-      const dmg = missed ? 0 : 30;   // nerfed from 40
+      const dmg = missed ? 0 : 30;
       G.beams.push(new Beam(this.x, this.y, endX, endY, this, dmg, '#44ccff', 26*SCALE, 0.7, missed));
       if (!missed && enemy && enemy.alive) this.dealDamageTo(enemy, 30, true);
       this.showFloatText(missed ? 'KAMEHAMEHA MISS!' : 'KA-ME-HA-ME-HA!', missed ? '#888888' : '#44ccff');
@@ -1843,7 +3054,7 @@ class Ball {
   }
 
   handleWallBounce(){
-    if (this.isCharging) return;   // stationary — no bounce
+    if (this.isCharging) return;
     const dx = this.x-arena.cx, dy = this.y-arena.cy;
     const d = Math.hypot(dx,dy)||0.001;
     const limit = arena.r-this.r;
@@ -1881,8 +3092,6 @@ class Ball {
     const ab = this.ability;
     const enemies = enemy ? [enemy] : [];
 
-    // ===== DRAGON BALL — CHARGED ABILITIES =====
-    // GOKU KAMEHAMEHA — 2s stationary charge, 50% hit
     if (ab==='kamehameha'){
       if (!this.isCharging && this.abilityCd <= 0){
         this.startCharge('kamehameha', 2.0, '#44ccff');
@@ -1891,7 +3100,6 @@ class Ball {
         Sound.ki();
       }
     }
-    // VEGETA FINAL FLASH — 2s stationary charge
     if (ab==='final_flash'){
       if (!this.isCharging && this.abilityCd <= 0){
         this.startCharge('final_flash', 2.0, '#2050ff');
@@ -1900,8 +3108,6 @@ class Ball {
         Sound.ki();
       }
     }
-    // GOHAN MASENKO — passive rage
-    // PICCOLO — special beam
     if (ab==='special_beam' && this.abilityCd <= 0 && enemy && enemy.alive){
       const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
       if (d < 450*SCALE){
@@ -2047,9 +3253,6 @@ class Ball {
     if (ab==='kame_master'){
       if (this.shield <= 0 && this.abilityCd <= 0){ this.shield = 3; this.triggerAbility(7); }
     }
-
-    // ===== BLACK CLOVER =====
-    // ASTA — Anti-Magic sword nullifies enemy abilities
     if (ab==='antimagic_sword' && this.abilityCd <= 0 && enemy && enemy.alive){
       const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
       if (d < 200*SCALE){
@@ -2064,7 +3267,6 @@ class Ball {
       }
       this.triggerAbility(4);
     }
-    // YUNO — Wind Spirit passive speed boost, sylph attacks
     if (ab==='wind_spirit' && this.abilityCd <= 0 && enemy && enemy.alive){
       const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
       if (d < 300*SCALE){
@@ -2074,7 +3276,6 @@ class Ball {
       }
       this.triggerAbility(2.5);
     }
-    // YAMI — Dark Cloaked Slash
     if (ab==='dark_slash' && this.abilityCd <= 0 && enemy && enemy.alive){
       const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
       if (d < 260*SCALE){
@@ -2088,14 +3289,12 @@ class Ball {
       }
       this.triggerAbility(4);
     }
-    // NOELLE — Valkyrie Armor (shield + blast)
     if (ab==='valkyrie_armor' && this.abilityCd <= 0){
       this.valkyrieActive = 4;
       this.shield = Math.max(this.shield, 6);
       this.showFloatText('VALKYRIE!', '#88bbff');
       burst(this.x, this.y, 25, '#88bbff', 300, 5);
       Sound.clover();
-      // Water blast
       if (enemy && enemy.alive){
         const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
         if (d < 300*SCALE){
@@ -2105,7 +3304,6 @@ class Ball {
       }
       this.triggerAbility(7);
     }
-    // JULIUS — Time Magic (freeze enemy in chrono stasis)
     if (ab==='time_magic' && this.abilityCd <= 0 && enemy && enemy.alive){
       const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
       if (d < 300*SCALE){
@@ -2118,7 +3316,6 @@ class Ball {
       }
       this.triggerAbility(8);
     }
-    // MEREOLEONA — Fire Lion
     if (ab==='fire_lion' && this.abilityCd <= 0 && enemy && enemy.alive){
       const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
       if (d < 300*SCALE){
@@ -2131,12 +3328,10 @@ class Ball {
       }
       this.triggerAbility(3.5);
     }
-    // FUEGOLEON — Fire Fury passive flame pillar
     if (ab==='fire_fury' && this.abilityCd <= 0){
       G.hazards.push(new Hazard(this.x, this.y, this, 16, 2.5, '#ff6600', this.r*1.0));
       this.triggerAbility(0.5);
     }
-    // CHARMY — Cotton Cooking (heal + shield)
     if (ab==='cotton_cooking' && this.abilityCd <= 0){
       if (this.hp < this.maxHp || this.shield < 5){
         this.hp = Math.min(this.maxHp, this.hp + 12);
@@ -2147,7 +3342,6 @@ class Ball {
       }
       this.triggerAbility(6);
     }
-    // LUCK — Lightning Speed (already has speed, add chain shock)
     if (ab==='lightning_speed' && this.abilityCd <= 0 && enemy && enemy.alive){
       const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
       if (d < 300*SCALE){
@@ -2156,7 +3350,6 @@ class Ball {
       }
       this.triggerAbility(2);
     }
-    // MAGNA — Fire Chains trap enemy
     if (ab==='fire_chains' && this.abilityCd <= 0 && enemy && enemy.alive){
       const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
       if (d < 250*SCALE){
@@ -2168,8 +3361,6 @@ class Ball {
       }
       this.triggerAbility(5);
     }
-    // VANESSA — Fate Magic dodge (handled in onTakeDamage)
-    // FINRAL — Spatial Magic teleport
     if (ab==='spatial_magic' && this.abilityCd <= 0){
       const a = Math.random()*Math.PI*2, dist = Math.random()*arena.r*0.5;
       burst(this.x,this.y,18,'#88ddff',240,4);
@@ -2181,7 +3372,6 @@ class Ball {
       this.showFloatText('SPATIAL!', '#88ddff');
       this.triggerAbility(3.5);
     }
-    // GAUCHE — Mirror Magic reflect
     if (ab==='mirror_magic'){
       if (this.mirrorActive <= 0 && this.abilityCd <= 0){
         this.mirrorActive = 3;
@@ -2191,18 +3381,15 @@ class Ball {
         this.triggerAbility(7);
       }
     }
-    // ZORA — Trap Magic
     if (ab==='trap_magic' && this.abilityCd <= 0){
       G.hazards.push(new Hazard(this.x, this.y, this, 18, 5, '#8844aa', this.r*1.0));
       this.triggerAbility(3);
     }
-    // SECRE — Poison Plant
     if (ab==='poison_plant' && this.abilityCd <= 0){
       G.hazards.push(new Hazard(this.x, this.y, this, 12, 3.5, '#cc88dd', this.r*1.0));
       if (this.hp < this.maxHp) this.hp = Math.min(this.maxHp, this.hp + 2*dt);
       this.triggerAbility(1.5);
     }
-    // NERO — Anti-Magic Bird (debuff)
     if (ab==='anti_bird' && this.abilityCd <= 0 && enemy && enemy.alive){
       const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
       if (d < 200*SCALE){
@@ -2213,7 +3400,6 @@ class Ball {
       }
       this.triggerAbility(4.5);
     }
-    // LICHT — Light Magic laser
     if (ab==='light_magic' && this.abilityCd <= 0 && enemy && enemy.alive){
       const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
       if (d < 400*SCALE){
@@ -2229,7 +3415,6 @@ class Ball {
       }
       this.triggerAbility(4);
     }
-    // PATRY — Wind Elf tornado
     if (ab==='wind_elf' && this.abilityCd <= 0 && enemy && enemy.alive){
       const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
       if (d < 300*SCALE){
@@ -2244,9 +3429,7 @@ class Ball {
       }
       this.triggerAbility(4.5);
     }
-    // RHYA — Copy Magic (copies enemy ability passively)
     if (ab==='copy_magic' && this.abilityCd <= 0 && enemy && enemy.alive){
-      // Copy a damage tick based on enemy ability
       const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
       if (d < 200*SCALE){
         this.dealDamageTo(enemy, 10, true);
@@ -2255,7 +3438,6 @@ class Ball {
       }
       this.triggerAbility(3);
     }
-    // ZAGRED — Demon Magic debuff + big damage
     if (ab==='demon_magic' && this.abilityCd <= 0 && enemy && enemy.alive){
       const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
       if (d < 250*SCALE){
@@ -2269,8 +3451,6 @@ class Ball {
       }
       this.triggerAbility(6);
     }
-
-    // ===== NARUTO (kept) =====
     if (ab==='amaterasu' && this.abilityCd<=0){
       G.hazards.push(new Hazard(this.x, this.y, this, 20, 5, '#0a0a0a', this.r*0.9));
       this.triggerAbility(0.3);
@@ -2381,8 +3561,6 @@ class Ball {
       }
       this.triggerAbility(1.2);
     }
-
-    // Original (compact)
     if (ab==='healer' && this.hp<this.maxHp) this.hp = Math.min(this.maxHp, this.hp+6*dt);
     if (ab==='druid' && this.hp<this.maxHp) this.hp = Math.min(this.maxHp, this.hp+8*dt);
     if (ab==='shield' && this.shield<=0 && this.abilityCd<=0){ this.shield = 4.5; this.triggerAbility(9); burst(this.x,this.y,18,'#4fc3ff',220,4); }
@@ -2427,7 +3605,6 @@ class Ball {
 
   onHit(target, damage){
     const ab = this.ability;
-    // DRAGON BALL
     if (ab==='masenko'){
       const rageMul = 1 + (1 - this.hp/this.maxHp)*0.8;
       this.dealDamageTo(target, damage*rageMul*0.4, true);
@@ -2449,7 +3626,6 @@ class Ball {
         target.vy += (dy/l)*400*SCALE;
       }
     }
-    // BLACK CLOVER onHit
     if (ab==='antimagic_sword'){
       target.shield = 0;
       target.abilityDisabled = Math.max(target.abilityDisabled, 1);
@@ -2461,13 +3637,11 @@ class Ball {
       target.burnTimer = Math.max(target.burnTimer, 3);
     }
     if (ab==='mirror_magic'){
-      // Reflect
       burst(this.x, this.y, 12, '#aaaaff', 240, 4);
     }
     if (ab==='light_magic'){
       burst(target.x, target.y, 14, '#ffffdd', 280, 4);
     }
-    // NARUTO onHit
     if (ab==='rasengan'){
       this.dealDamageTo(target, 12, true);
       burst(target.x, target.y, 20, '#ffdd33', 350, 4);
@@ -2509,7 +3683,6 @@ class Ball {
         target.vy += (dy/l)*350*SCALE;
       }
     }
-    // Original onHit
     if (ab==='vampire' || ab==='marauder' || ab==='leech' || ab==='absorber'){
       const rate = ab==='vampire'?0.45:(ab==='marauder'?0.30:0.25);
       const heal = damage * rate;
@@ -2553,13 +3726,8 @@ class Ball {
   onTakeDamage(amount, source){
     const ab = this.ability;
     let dmg = amount;
-    if (this.isCharging){
-      // Charging balls are invulnerable? No — they can still be hit but can't move. Actually let's make them take extra damage.
-      dmg *= 1.25; // Charge is risky!
-    }
-    if (this.kamuiActive > 0){
-      return { dodged: true, finalDamage: 0 };
-    }
+    if (this.isCharging){ dmg *= 1.25; }
+    if (this.kamuiActive > 0){ return { dodged: true, finalDamage: 0 }; }
     if (this.susanooActive > 0){
       const reflect = amount * 0.8;
       if (source && source.alive) this.dealDamageTo(source, reflect, true);
@@ -2569,7 +3737,6 @@ class Ball {
     if (ab==='oracle' && Math.random()<0.40) return { dodged:true, finalDamage:0 };
     if (ab==='fox' && Math.random()<0.35) return { dodged:true, finalDamage:0 };
     if (ab==='sharingan' && Math.random()<0.25) return { dodged:true, finalDamage:0 };
-    // Black Clover dodge
     if (ab==='fate_magic' && Math.random()<0.50){
       burst(this.x,this.y,15,'#dd88cc',240,4);
       return { dodged:true, finalDamage:0 };
@@ -2724,12 +3891,10 @@ class Ball {
     const pulse = this.dashTime>0 ? 1.07 : 1;
     const alpha = this.invisible>0 ? 0.35 : 1;
     const meta = ABILITY_META[this.ability] || {};
-
-    // KI AURA (during charge)
     if (this.kiAura > 0 || this.isCharging){
       const charge = this.isCharging ? (this.chargeTimer/this.chargeTime) : (this.kiAura/2.5);
       const chargePct = clamp(charge, 0, 1);
-      const auraColor = this.isCharging ? this.chargeColor : (this.kamehamehaCharge>0 ? '#44ccff' : '#ffff44');
+      const auraColor = this.isCharging ? this.chargeColor : '#ffff44';
       ctx.save();
       ctx.globalCompositeOperation = 'lighter';
       ctx.globalAlpha = (0.5 + Math.sin(performance.now()/60)*0.3) * (0.4 + chargePct*0.6);
@@ -2742,7 +3907,6 @@ class Ball {
       ctx.beginPath(); ctx.arc(this.x, this.y, this.r * (0.3 + chargePct*0.4), 0, Math.PI*2); ctx.fill();
       ctx.restore();
     }
-    // Charge particles
     if (this.isCharging){
       const chargePct = this.chargeTimer/this.chargeTime;
       for (let i=0;i<3;i++){
@@ -2750,15 +3914,12 @@ class Ball {
         const r = this.r + 30*SCALE*(1-chargePct);
         const px = this.x + Math.cos(a)*r;
         const py = this.y + Math.sin(a)*r;
-        const dx = this.x - px, dy = this.y - py;
-        const dl = Math.hypot(dx,dy)||1;
         ctx.globalAlpha = 0.6 * (0.3 + chargePct*0.7);
         ctx.fillStyle = this.chargeColor;
         ctx.beginPath(); ctx.arc(px, py, 3*SCALE*(0.5+chargePct), 0, Math.PI*2); ctx.fill();
       }
       ctx.globalAlpha = 1;
     }
-
     if (this.kamuiActive > 0){
       ctx.save();
       ctx.globalAlpha = 0.5 + Math.sin(performance.now()/80)*0.3;
@@ -2790,7 +3951,6 @@ class Ball {
       }
       ctx.restore();
     }
-    // Anti-magic aura
     if (this.antiMagicActive > 0 || this.ability === 'asta'){
       ctx.save();
       ctx.globalAlpha = 0.4 + Math.sin(performance.now()/100)*0.2;
@@ -2799,7 +3959,6 @@ class Ball {
       ctx.beginPath(); ctx.arc(this.x, this.y, this.r + 8*SCALE, 0, Math.PI*2); ctx.stroke();
       ctx.restore();
     }
-
     if (meta.active && this.abilityCd <= 0 && this.abilityDisabled <= 0 && !this.isCharging){
       ctx.save();
       ctx.globalAlpha = (0.35 + Math.sin(performance.now()/180)*0.15) * alpha;
@@ -2876,7 +4035,7 @@ class Ball {
 function tryDash(ball){
   if (!ball || !ball.alive || G.ending) return;
   if (ball.freeze>0 || ball.sticky>0) return;
-  if (ball.isCharging) return;  // cannot dash while charging
+  if (ball.isCharging) return;
   if (ball.dashCd>0 || ball.dashCharges<=0) return;
   const enemy = (ball===G.player) ? G.enemy : G.player;
   let dx=0, dy=0;
@@ -2894,7 +4053,6 @@ function tryDash(ball){
 }
 
 function handleCollision(a, b){
-  // Charging balls don't collide (they're stationary and busy)
   if (a.isCharging || b.isCharging) return;
   const dx = b.x - a.x, dy = b.y - a.y;
   let d = Math.hypot(dx,dy);
@@ -3051,7 +4209,6 @@ function update(dt){
     const bm = G.beams[i];
     bm.update(dt);
     if (bm.life <= 0){ G.beams.splice(i, 1); continue; }
-    // missed beams don't hit
     if (bm.missed) continue;
     const target = bm.owner === p ? e : p;
     if (target.alive && !bm.hitSet.has(target.id)){
@@ -3202,13 +4359,14 @@ function buildStatusHTML(ball){
     const v = ball[s.key];
     if (v > 0){
       const t = v < 10 ? v.toFixed(1) : Math.floor(v);
-      parts.push('<div class="status-badge" style="color:'+s.color+';border-color:'+s.color+';box-shadow:0 0 12px '+s.color+'55">'+s.icon+'<div class="cd">'+t+'s</div></div>');
+      const urgent = v < 3 ? ' status-badge--urgent' : '';
+      parts.push('<div class="status-badge'+urgent+'" style="color:'+s.color+';border-color:'+s.color+';box-shadow:0 0 12px '+s.color+'55">'+s.icon+'<div class="cd">'+t+'s</div></div>');
     }
   }
   if (ball.kamuiActive > 0) parts.push('<div class="status-badge" style="color:#6a3a9a;border-color:#6a3a9a">◎<div class="cd">'+ball.kamuiActive.toFixed(1)+'s</div></div>');
   if (ball.susanooActive > 0) parts.push('<div class="status-badge" style="color:#a020a0;border-color:#a020a0">⛨<div class="cd">'+ball.susanooActive.toFixed(1)+'s</div></div>');
   if (ball.eightGatesActive > 0) parts.push('<div class="status-badge" style="color:#00cc00;border-color:#00cc00">⚡<div class="cd">'+ball.eightGatesActive.toFixed(1)+'s</div></div>');
-  if (ball.isCharging) parts.push('<div class="status-badge" style="color:'+ball.chargeColor+';border-color:'+ball.chargeColor+'">⬤<div class="cd">CHARGING</div></div>');
+  if (ball.isCharging) parts.push('<div class="status-badge" style="color:'+ball.chargeColor+';border-color:'+ball.chargeColor+'">⬤<div class="cd">CHG</div></div>');
   if (ball.kiAura > 0) parts.push('<div class="status-badge" style="color:#ffff44;border-color:#ffff44">✦<div class="cd">KI</div></div>');
   if (ball.maxDashCharges > 1){
     parts.push('<div class="status-badge" style="color:#ffd93d;border-color:#ffd93d">⚔<div class="cd">'+ball.dashCharges+'/'+ball.maxDashCharges+'</div></div>');
@@ -3398,7 +4556,7 @@ function showBracket(){
   const cur = T.rounds[T.currentRound] && T.rounds[T.currentRound][T.currentMatch];
   if (cur && cur[0] && cur[1]){
     info.innerHTML =
-      '<div class="next-match-label">PERTANDINGAN BERIKUTNYA</div>' +
+      '<div class="next-match-label">Pertandingan Berikutnya</div>' +
       '<div class="next-match-vs">' +
       '<span style="color:'+cur[0].color+';text-shadow:0 0 10px '+cur[0].color+'">'+cur[0].name+'</span>' +
       ' <span style="opacity:.5;font-size:14px">VS</span> ' +
@@ -3409,7 +4567,7 @@ function showBracket(){
       ' · MATCH ' + (T.currentMatch+1) + ' / ' + T.rounds[T.currentRound].length +
       '</div>';
   } else {
-    info.innerHTML = '<div class="next-match-label">SEMUA PERTANDINGAN SELESAI</div>';
+    info.innerHTML = '<div class="next-match-label">Semua Pertandingan Selesai</div>';
   }
   document.getElementById('nextMatchBtn').style.display = 'block';
 }
@@ -3456,7 +4614,7 @@ function showChampion(){
     '<div class="stat"><div class="v">'+c.hp+'</div><div class="l">HP</div></div>' +
     '<div class="stat"><div class="v">'+c.atk.toFixed(2)+'</div><div class="l">ATK</div></div>' +
     '<div class="stat"><div class="v">'+c.def.toFixed(2)+'</div><div class="l">DEF</div></div>' +
-    '<div class="stat"><div class="v" style="font-size:12px;color:'+meta.color+'">'+meta.label+'</div><div class="l">ABILITY</div></div>';
+    '<div class="stat" style="grid-column:span 3"><div class="v" style="font-size:12px;color:'+meta.color+'">'+meta.label+'</div><div class="l">Ability</div></div>';
   Sound.win();
   showScreen('champion');
 }
@@ -3473,7 +4631,7 @@ function makeBallCard(def){
   const isBC = BC_IDS.includes(def.id);
   const badge = isNaruto ? '🍥' : (isDB ? '🐉' : (isBC ? '🍀' : ''));
   card.innerHTML =
-    (badge ? '<div style="position:absolute;top:2px;left:4px;font-size:10px">'+badge+'</div>' : '') +
+    (badge ? '<div style="position:absolute;top:3px;left:5px;font-size:11px;opacity:.9">'+badge+'</div>' : '') +
     '<div class="orb" style="background:radial-gradient(circle at 35% 30%,'+def.light+','+def.color+');box-shadow:0 0 12px '+def.color+'"></div>'+
     '<div class="nm">'+def.name+'</div>'+
     '<div class="ab" style="color:'+meta.color+'">'+meta.icon+' '+abilityLabel(def.ability)+'</div>'+
