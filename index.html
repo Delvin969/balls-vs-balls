@@ -444,13 +444,13 @@ const lerp = (a,b,t)=> a + (b-a)*t;
 const fmtTime = s => { const m=Math.floor(s/60),ss=Math.floor(s%60); return m+':'+(ss<10?'0':'')+ss; };
 const TAU = Math.PI*2;
 
-const MAX_PARTICLES = 400;
-const MAX_DAMAGE_NUMS = 60;
-const MAX_FLOATING_TEXTS = 40;
-const MAX_BEAMS = 12;
-const MAX_SHOCKWAVES = 36;
-const MAX_SLASHES = 24;
-const MAX_RUNES = 16;
+const MAX_PARTICLES = 180;
+const MAX_DAMAGE_NUMS = 30;
+const MAX_FLOATING_TEXTS = 20;
+const MAX_BEAMS = 8;
+const MAX_SHOCKWAVES = 12;
+const MAX_SLASHES = 10;
+const MAX_RUNES = 6;
 
 /* ==========================================================================
    5. HIT-STOP SYSTEM
