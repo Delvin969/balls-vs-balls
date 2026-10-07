@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
 <meta name="theme-color" content="#05060f"/>
-<title>Ball vs Ball — 190 Balls (HD VFX + Fix)</title>
+<title>Ball vs Ball — 190 Balls (HD VFX + All Fixes)</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;overflow:hidden;background:var(--bg-0);color:var(--text-1);font-family:var(--font-sans);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;-webkit-user-select:none;user-select:none;touch-action:none;-webkit-tap-highlight-color:transparent;}
@@ -1570,6 +1570,8 @@ class Ball {
     this.x=x; this.y=y; this.vx=0; this.vy=0;
     this.baseR = def.r*SCALE; this.r = this.baseR;
     this.maxHp = def.hp; this.hp = def.hp;
+    // ===== FIX: HP init validation =====
+    if (!isFinite(this.hp) || this.hp <= 0) this.hp = this.maxHp;
     this.baseMass = this.r*this.r*0.012; this.mass = this.baseMass;
     this.speedMul = def.spd;
     this.attackStat = def.atk; this.defenseStat = def.def;
@@ -1590,13 +1592,11 @@ class Ball {
     this.whisBuffer=0; this.whisBufferTimer=0;
     this.kiAura=0;
     this.antiMagicActive=0; this.valkyrieActive=0; this.mirrorActive=0;
-    // Animation
     this.squash = 1;
     this.squashTarget = 1;
     this.breathPhase = Math.random()*TAU;
-    // ===== FIX: steerTimer untuk homing ke musuh =====
+    // FIX: steering timer
     this.steerTimer = 0.4 + Math.random() * 0.8;
-    // Passive stat mods
     if (this.ability === 'sturdy') this.defenseStat *= 1.30;
     if (this.ability === 'swift')  this.speedMul *= 1.35;
     if (this.ability === 'sharp')  this.attackStat *= 1.30;
@@ -1609,7 +1609,6 @@ class Ball {
     if (this.ability === 'juggernaut') this.ccImmune = true;
     if (this.ability === 'wind_spirit') this.speedMul *= 1.15;
     if (this.ability === 'lightning_speed') this.speedMul *= 1.20;
-    // Aura init
     this.auras = [];
     this.sig = getVisualSignature(this);
     if (this.sig.aura) this.auras.push(new Aura(this, this.sig.aura));
@@ -1630,12 +1629,25 @@ class Ball {
   }
   update(dt, enemy){
     if (!this.alive){ if (this.trail.length>0) this.trail.shift(); return; }
-    // Squash & stretch easing
+
+    // ===== FIX: Kill if HP depleted (limbo state) =====
+    if (this.hp <= 0){ this.die(); return; }
+
+    // ===== FIX: NaN sanitization =====
+    if (!isFinite(this.x) || !isFinite(this.y) || !isFinite(this.vx) || !isFinite(this.vy)){
+      this.x = arena.cx + (Math.random()-0.5)*arena.r*0.4;
+      this.y = arena.cy + (Math.random()-0.5)*arena.r*0.4;
+      const _a = Math.random()*TAU;
+      const _sp = this.speedMax;
+      this.vx = Math.cos(_a)*_sp; this.vy = Math.sin(_a)*_sp;
+    }
+    if (!isFinite(this.hp)) this.hp = 0;
+
     this.squash += (this.squashTarget - this.squash) * Math.min(1, dt * 8);
     this.squashTarget += (1 - this.squashTarget) * Math.min(1, dt * 4);
     this.breathPhase += dt * 2.5;
 
-    // ===== FIX: STEERING — periodik bidik musuh agar match selesai =====
+    // ===== STEERING — bidik musuh periodik =====
     this.steerTimer -= dt;
     const frozenNow = this.freeze > 0 || this.sticky > 0;
     if (!frozenNow && !this.isCharging && this.alive && this.steerTimer <= 0){
@@ -2270,6 +2282,8 @@ class Ball {
     if (amount<=0 || !target.alive) return;
     if (target.invuln>0 && !isAbility) return;
     let dmg = amount;
+    // ===== FIX: sanitize NaN damage =====
+    if (!isFinite(dmg)) return;
     if (target.shield>0){
       const shieldMult = target.shieldBonus ? (1 - 0.4/target.shieldBonus) : 0.4;
       dmg *= shieldMult;
@@ -2277,6 +2291,7 @@ class Ball {
     const res = target.onTakeDamage(dmg, this);
     if (res.dodged) return;
     dmg = res.finalDamage;
+    if (!isFinite(dmg)) return;
     if (this.ability === 'byakugan' && !isAbility) dmg = amount * 1.5;
     if (this.ability === 'sage_mode') dmg *= 1.25;
     if (this.ability === 'jiren' || this.ability === 'ultimate_battle') dmg *= 1.15;
@@ -2296,6 +2311,8 @@ class Ball {
     if (this.ability==='mereoleona') dmg *= 1.15;
     if (target.critResist && dmg > amount*1.5) dmg = amount * (1 + (dmg/amount - 1) * (1 - target.critResist));
     target.hp -= dmg;
+    // ===== FIX: sanitize NaN HP =====
+    if (!isFinite(target.hp)) target.hp = 0;
     target.hitFlash = 0.28;
     if (!isAbility) target.invuln = 0.06;
     if (this.isPlayer) G.playerDmgDealt += dmg;
@@ -2723,6 +2740,11 @@ function update(dt){
   if (!p || !e) return;
   G.elapsed += dt;
   p.update(dt, e); e.update(dt, p);
+
+  // ===== FIX: Force-kill if HP depleted =====
+  if (p.alive && p.hp <= 0) p.die();
+  if (e.alive && e.hp <= 0) e.die();
+
   const decideDash = (ball, enemy) => {
     if (!ball.alive || !enemy || !enemy.alive || G.ending) return;
     if (ball.isCharging) return;
