@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
 <meta name="theme-color" content="#05060f"/>
-<title>Ball vs Ball — 190 Balls (HD VFX)</title>
+<title>Ball vs Ball — 190 Balls (HD VFX + Fix)</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;overflow:hidden;background:var(--bg-0);color:var(--text-1);font-family:var(--font-sans);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;-webkit-user-select:none;user-select:none;touch-action:none;-webkit-tap-highlight-color:transparent;}
@@ -352,7 +352,7 @@ h2.title{font-size:clamp(22px,5vw,30px);font-weight:900;text-align:center;margin
 'use strict';
 
 /* ==========================================================================
-   1. EASING LIBRARY — 12 Animation Principles foundation
+   1. EASING LIBRARY
    ========================================================================== */
 const ease = {
   linear: t => t,
@@ -370,22 +370,17 @@ const ease = {
   outBounce: t => { const n=7.5625,d=2.75; if(t<1/d)return n*t*t; if(t<2/d){t-=1.5/d;return n*t*t+0.75;} if(t<2.5/d){t-=2.25/d;return n*t*t+0.9375;} t-=2.625/d; return n*t*t+0.984375; },
   smoothstep: t => t*t*(3-2*t),
   smootherstep: t => t*t*t*(t*(t*6-15)+10),
-  // Custom: charge-up curve (slow build, quick release)
-  chargeCurve: t => Math.pow(t, 2.2),
-  // Custom: decay curve for particle life
   decayCurve: t => 1 - Math.pow(t, 1.6),
-  // Custom: pulse (for aura breathing)
   pulse: (t, freq) => 0.5 + 0.5 * Math.sin(t * (freq||2) * Math.PI * 2),
 };
 
 /* ==========================================================================
-   2. CANVAS SETUP — with DPR boost for extra crispness
+   2. CANVAS SETUP
    ========================================================================== */
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true });
 let W=0,H=0,DPR=1,SCALE=1,bgGrad=null;
 const arena = { cx:0, cy:0, r:260 };
-// Performance tier: 1 = normal, 1.5 = boost for HD
 const DPR_BOOST = window.devicePixelRatio < 1.5 ? 1.35 : 1.2;
 
 function resize(){
@@ -408,7 +403,7 @@ window.addEventListener('resize', resize);
 window.addEventListener('orientationchange', ()=>setTimeout(resize,120));
 
 /* ==========================================================================
-   3. SOUND (Web Audio API — procedural, no assets)
+   3. SOUND
    ========================================================================== */
 const Sound = {
   ctx:null, master:null, noiseBuf:null, ok:false,
@@ -446,7 +441,6 @@ const Sound = {
 const rand = (a,b)=>a+Math.random()*(b-a);
 const clamp = (v,a,b)=> v<a?a:(v>b?b:v);
 const lerp = (a,b,t)=> a + (b-a)*t;
-const dist = (ax,ay,bx,by)=> Math.hypot(bx-ax, by-ay);
 const fmtTime = s => { const m=Math.floor(s/60),ss=Math.floor(s%60); return m+':'+(ss<10?'0':'')+ss; };
 const TAU = Math.PI*2;
 
@@ -459,7 +453,7 @@ const MAX_SLASHES = 24;
 const MAX_RUNES = 16;
 
 /* ==========================================================================
-   5. HIT-STOP SYSTEM — freeze frame on heavy impacts
+   5. HIT-STOP SYSTEM
    ========================================================================== */
 const HitStop = {
   remaining: 0,
@@ -471,11 +465,10 @@ const HitStop = {
 };
 
 /* ==========================================================================
-   6. MULTI-PASS GLOW HELPER — 3-layer bloom
+   6. GLOW HELPERS
    ========================================================================== */
 function drawGlowCircle(x, y, r, color, alpha, blur){
   if (alpha <= 0.01) return;
-  // Outer glow
   ctx.save();
   ctx.globalCompositeOperation = 'lighter';
   ctx.globalAlpha = alpha * 0.35;
@@ -484,14 +477,12 @@ function drawGlowCircle(x, y, r, color, alpha, blur){
   ctx.fillStyle = color;
   ctx.beginPath(); ctx.arc(x, y, r*1.35, 0, TAU); ctx.fill();
   ctx.restore();
-  // Mid layer
   ctx.save();
   ctx.globalCompositeOperation = 'lighter';
   ctx.globalAlpha = alpha * 0.7;
   ctx.fillStyle = color;
   ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fill();
   ctx.restore();
-  // Core highlight
   ctx.save();
   ctx.globalCompositeOperation = 'lighter';
   ctx.globalAlpha = alpha * 0.9;
@@ -499,25 +490,9 @@ function drawGlowCircle(x, y, r, color, alpha, blur){
   ctx.beginPath(); ctx.arc(x, y, r*0.45, 0, TAU); ctx.fill();
   ctx.restore();
 }
-function drawGlowLine(x1,y1,x2,y2,color,width,alpha){
-  ctx.save();
-  ctx.globalCompositeOperation = 'lighter';
-  ctx.globalAlpha = alpha * 0.4;
-  ctx.shadowBlur = 24; ctx.shadowColor = color;
-  ctx.strokeStyle = color; ctx.lineWidth = width * 1.8; ctx.lineCap='round';
-  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
-  ctx.globalAlpha = alpha * 0.85;
-  ctx.lineWidth = width;
-  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
-  ctx.strokeStyle = '#ffffff';
-  ctx.globalAlpha = alpha;
-  ctx.lineWidth = width * 0.35;
-  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
-  ctx.restore();
-}
 
 /* ==========================================================================
-   7. PARTICLE — physics-based, with drag/gravity/curve
+   7. PARTICLE
    ========================================================================== */
 class Particle {
   constructor(x,y,vx,vy,life,size,color,opts){
@@ -525,11 +500,10 @@ class Particle {
     this.x=x; this.y=y; this.vx=vx; this.vy=vy;
     this.life=life; this.maxLife=life;
     this.size=size; this.color=color;
-    // Physics
-    this.drag = opts.drag !== undefined ? opts.drag : 0.14;  // per-second decay base
+    this.drag = opts.drag !== undefined ? opts.drag : 0.14;
     this.gravity = opts.gravity || 0;
-    this.curve = opts.curve || 0;  // sideways acceleration
-    this.wobble = opts.wobble || 0; // sinusoidal wobble amplitude
+    this.curve = opts.curve || 0;
+    this.wobble = opts.wobble || 0;
     this.wobbleFreq = opts.wobbleFreq || 4;
     this.trail = opts.trail ? [{x,y}] : null;
     this.trailLen = opts.trailLen || 5;
@@ -538,9 +512,7 @@ class Particle {
     this.glow = opts.glow !== false;
   }
   update(dt){
-    // Apply forces
     this.vy += this.gravity * dt;
-    // Curve (perpendicular acceleration)
     if (this.curve !== 0){
       const sp = Math.hypot(this.vx, this.vy) || 1;
       const px = -this.vy / sp;
@@ -548,20 +520,16 @@ class Particle {
       this.vx += px * this.curve * dt;
       this.vy += py * this.curve * dt;
     }
-    // Wobble
     if (this.wobble > 0){
       const t = (1 - this.life/this.maxLife) * this.wobbleFreq * TAU;
       this.x += Math.cos(t) * this.wobble * dt;
       this.y += Math.sin(t) * this.wobble * dt;
     }
-    // Physics integration
     this.x += this.vx * dt;
     this.y += this.vy * dt;
-    // Drag
     const d = Math.pow(this.drag, dt);
     this.vx *= d; this.vy *= d;
     this.rotation += this.rotationSpeed * dt;
-    // Trail
     if (this.trail){
       this.trail.push({x:this.x, y:this.y});
       if (this.trail.length > this.trailLen) this.trail.shift();
@@ -569,12 +537,10 @@ class Particle {
     this.life -= dt;
   }
   draw(){
-    const t = 1 - this.life/this.maxLife; // 0 → 1
-    const a = ease.decayCurve(1 - t) * (this.life/this.maxLife > 0 ? 1 : 0);
+    const t = 1 - this.life/this.maxLife;
     const aSmooth = ease.outQuad(clamp(this.life/this.maxLife, 0, 1));
     if (aSmooth <= 0.01) return;
     ctx.globalAlpha = aSmooth;
-    // Trail (motion blur)
     if (this.trail){
       for (let i = 0; i < this.trail.length; i++){
         const p = this.trail[i];
@@ -585,14 +551,11 @@ class Particle {
       }
       ctx.globalAlpha = aSmooth;
     }
-    // Main particle with glow
     const sz = Math.max(0.4, this.size * aSmooth);
     if (this.glow && sz > 2){
-      // 3-layer
       ctx.shadowBlur = 12; ctx.shadowColor = this.color;
       ctx.fillStyle = this.color;
       ctx.beginPath(); ctx.arc(this.x, this.y, sz, 0, TAU); ctx.fill();
-      // White core
       ctx.globalAlpha = aSmooth * 0.65;
       ctx.fillStyle = '#ffffff';
       ctx.beginPath(); ctx.arc(this.x, this.y, sz * 0.42, 0, TAU); ctx.fill();
@@ -605,7 +568,7 @@ class Particle {
 }
 
 /* ==========================================================================
-   8. SHOCKWAVE — 3-ring layered with easing
+   8. SHOCKWAVE
    ========================================================================== */
 class Shockwave {
   constructor(x,y,color,maxR,life,width){
@@ -621,17 +584,14 @@ class Shockwave {
     const r = this.maxR * (0.15 + eased*0.85);
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
-    // Outer ring
     ctx.globalAlpha = a * 0.75;
     ctx.shadowBlur = 32; ctx.shadowColor = this.color;
     ctx.strokeStyle = this.color;
     ctx.lineWidth = this.width * (1 - t*0.7);
     ctx.beginPath(); ctx.arc(this.x, this.y, r, 0, TAU); ctx.stroke();
-    // Mid ring
     ctx.globalAlpha = a * 0.5;
     ctx.lineWidth = this.width * 0.6;
     ctx.beginPath(); ctx.arc(this.x, this.y, r*0.75, 0, TAU); ctx.stroke();
-    // Inner white
     ctx.globalAlpha = a * 0.85;
     ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = this.width * 0.3;
@@ -641,7 +601,7 @@ class Shockwave {
 }
 
 /* ==========================================================================
-   9. SLASH — arc melee with easing & glow
+   9. SLASH
    ========================================================================== */
 class Slash {
   constructor(x,y,angle,color,length,life){
@@ -659,7 +619,6 @@ class Slash {
     ctx.globalCompositeOperation = 'lighter';
     ctx.translate(this.x, this.y);
     ctx.rotate(this.angle);
-    // Outer glow
     ctx.globalAlpha = a * 0.55;
     ctx.shadowBlur = 28; ctx.shadowColor = this.color;
     ctx.strokeStyle = this.color;
@@ -667,7 +626,6 @@ class Slash {
     ctx.beginPath();
     ctx.arc(0, 0, this.length * (0.3 + eased*0.7), -sweep + eased*0.4, sweep + eased*0.4);
     ctx.stroke();
-    // Inner white
     ctx.globalAlpha = a;
     ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 3 * SCALE * (1 - t);
@@ -679,7 +637,7 @@ class Slash {
 }
 
 /* ==========================================================================
-   10. RUNE — magic circle with rotation & counter-rotation
+   10. RUNE
    ========================================================================== */
 class Rune {
   constructor(x,y,color,r,life){
@@ -698,9 +656,7 @@ class Rune {
     ctx.shadowBlur = 24; ctx.shadowColor = this.color;
     ctx.strokeStyle = this.color;
     ctx.lineWidth = 2.5 * SCALE;
-    // Outer ring
     ctx.beginPath(); ctx.arc(this.x, this.y, this.r * scale, 0, TAU); ctx.stroke();
-    // Rotating inner hexagon
     ctx.save();
     ctx.translate(this.x, this.y);
     ctx.rotate(this.tick * 0.9);
@@ -713,7 +669,6 @@ class Rune {
       if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
     }
     ctx.closePath(); ctx.stroke();
-    // Counter-rotating triangle
     ctx.rotate(-this.tick * 1.7);
     ctx.beginPath();
     for (let i=0; i<3; i++){
@@ -729,7 +684,7 @@ class Rune {
 }
 
 /* ==========================================================================
-   11. BEAM — with layered core & animated shimmer
+   11. BEAM
    ========================================================================== */
 class Beam {
   constructor(x1,y1,x2,y2,owner,dmg,color,width,life,missed){
@@ -749,23 +704,19 @@ class Beam {
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
     ctx.lineCap = 'round';
-    // Outer glow
     ctx.globalAlpha = a * 0.35 * flicker;
     ctx.shadowBlur = 48; ctx.shadowColor = this.color;
     ctx.strokeStyle = this.color;
     ctx.lineWidth = this.width * 2.2 * wMul;
     ctx.beginPath(); ctx.moveTo(this.x1,this.y1); ctx.lineTo(this.x2,this.y2); ctx.stroke();
-    // Mid
     ctx.globalAlpha = a * 0.85 * wMul;
     ctx.lineWidth = this.width * wMul;
     ctx.beginPath(); ctx.moveTo(this.x1,this.y1); ctx.lineTo(this.x2,this.y2); ctx.stroke();
-    // Core white
     if (!this.missed){
       ctx.globalAlpha = a;
       ctx.strokeStyle = '#ffffff';
       ctx.lineWidth = this.width * 0.35;
       ctx.beginPath(); ctx.moveTo(this.x1,this.y1); ctx.lineTo(this.x2,this.y2); ctx.stroke();
-      // Hot center line
       ctx.globalAlpha = a * 0.9;
       ctx.strokeStyle = '#ffffcc';
       ctx.lineWidth = this.width * 0.12;
@@ -776,7 +727,7 @@ class Beam {
 }
 
 /* ==========================================================================
-   12. HAZARD — ground effect with animated core
+   12. HAZARD
    ========================================================================== */
 class Hazard {
   constructor(x,y,owner,dmg,life,color,r){
@@ -791,7 +742,6 @@ class Hazard {
     const R = this.r * (0.55 + (1-a)*0.45) * pulse;
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
-    // Outer fill
     ctx.globalAlpha = a * 0.4;
     ctx.shadowBlur = 24; ctx.shadowColor = this.color;
     const g = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, R);
@@ -800,7 +750,6 @@ class Hazard {
     g.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = g;
     ctx.beginPath(); ctx.arc(this.x, this.y, R, 0, TAU); ctx.fill();
-    // Animated core
     ctx.globalAlpha = a * 0.7;
     ctx.fillStyle = '#ffffff';
     ctx.beginPath(); ctx.arc(this.x, this.y, R * 0.25 * (0.8 + Math.sin(this.tick*12)*0.2), 0, TAU); ctx.fill();
@@ -809,7 +758,7 @@ class Hazard {
 }
 
 /* ==========================================================================
-   13. PROJECTILE — with trail motion blur
+   13. PROJECTILE
    ========================================================================== */
 class Projectile {
   constructor(x,y,vx,vy,owner,dmg,color,homing,size){
@@ -833,7 +782,6 @@ class Projectile {
     this.tick += dt;
   }
   draw(){
-    // Trail motion blur (older = more transparent)
     ctx.globalCompositeOperation = 'lighter';
     for (let i=0;i<this.trail.length;i++){
       const p = this.trail[i];
@@ -844,7 +792,6 @@ class Projectile {
     }
     ctx.globalAlpha = 1;
     ctx.globalCompositeOperation = 'source-over';
-    // Core with 3-layer glow
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
     ctx.shadowBlur = 28; ctx.shadowColor = this.color;
@@ -854,7 +801,6 @@ class Projectile {
     g.addColorStop(1, this.color);
     ctx.fillStyle = g;
     ctx.beginPath(); ctx.arc(this.x,this.y,this.r,0,TAU); ctx.fill();
-    // Hot core highlight
     ctx.globalAlpha = 0.85;
     ctx.fillStyle = '#ffffff';
     ctx.beginPath(); ctx.arc(this.x, this.y, this.r*0.35, 0, TAU); ctx.fill();
@@ -875,7 +821,7 @@ class DamageNum {
   update(dt){
     this.x += this.vx*dt;
     this.y += this.vy*dt;
-    this.vy += 55*dt; // gravity
+    this.vy += 55*dt;
     this.vx *= Math.pow(0.5, dt);
     this.life -= dt;
     this.scale = 1 + (1 - this.life/this.maxLife) * 0.4;
@@ -916,7 +862,7 @@ class FloatText {
 }
 
 /* ==========================================================================
-   15. BURST / IMPACT HELPERS — physical particle bursts
+   15. BURST / IMPACT HELPERS
    ========================================================================== */
 function burst(x, y, n, color, speed, size, opts){
   opts = opts || {};
@@ -950,7 +896,6 @@ function hitImpact(x, y, color, strength){
   if (strength > 1.5 && G.shockwaves.length < MAX_SHOCKWAVES){
     G.shockwaves.push(new Shockwave(x, y, '#ffffff', 28*SCALE*strength, 0.35, 2));
   }
-  // Directional sparks (arcs)
   const sparkCount = Math.floor(10 + strength*8);
   for (let i=0;i<sparkCount;i++){
     if (G.particles.length >= MAX_PARTICLES) break;
@@ -960,7 +905,6 @@ function hitImpact(x, y, color, strength){
       0.4 + Math.random()*0.4, 3 + strength*0.6, color,
       { drag: 0.06, gravity: 220, trail: true, trailLen: 4 }));
   }
-  // Slow organic cloud particles
   burst(x, y, Math.floor(4 + strength*3), '#ffffff', 80, 4 + strength, { drag: 0.3, gravity: -30 });
 }
 function screenFlash(color, alpha){ G.flash = Math.max(G.flash, alpha); G.flashColor = color; }
@@ -1189,7 +1133,7 @@ const DB_IDS = ['goku','vegeta','gohan','piccolo','frieza','cell','buu','trunks'
 const BC_IDS = ['asta','yuno','yami','noelle','julius','mereoleona','fuegoleon','charmy','luck','magna','vanessa','finral','gauche','zora','secre','nero','licht','patry','rhya','zagred'];
 
 /* ==========================================================================
-   17. VISUAL SIGNATURES — per ability config
+   17. VISUAL SIGNATURES
    ========================================================================== */
 const VISUAL_SIGNATURES = {
   shield:{aura:{color:'#4fc3ff',type:'hexagon',radius:1.5,intensity:.7},impact:{shockwave:'#4fc3ff',strength:1.1}},
@@ -1467,7 +1411,7 @@ function setupInput(){
 }
 
 /* ==========================================================================
-   21. AURA — follows ball with layered animation
+   21. AURA
    ========================================================================== */
 class Aura {
   constructor(ball, cfg){
@@ -1519,7 +1463,6 @@ class Aura {
     const pulse = 1 + Math.sin(this.tick * 3) * 0.08;
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
-    // Base ring
     ctx.globalAlpha = this.intensity * (0.45 + Math.sin(this.tick*2)*0.15);
     ctx.shadowBlur = 24; ctx.shadowColor = this.color;
     ctx.strokeStyle = this.color;
@@ -1605,7 +1548,6 @@ class Aura {
       }
       ctx.stroke();
     }
-    // Particles
     for (const p of this.particles){
       const a = ease.outQuad(p.life/p.maxLife);
       ctx.globalAlpha = a * 0.85;
@@ -1617,7 +1559,7 @@ class Aura {
 }
 
 /* ==========================================================================
-   22. BALL CLASS — with anticipation, squash-stretch, animation
+   22. BALL CLASS
    ========================================================================== */
 let ballIdSeq = 0;
 class Ball {
@@ -1648,10 +1590,12 @@ class Ball {
     this.whisBuffer=0; this.whisBufferTimer=0;
     this.kiAura=0;
     this.antiMagicActive=0; this.valkyrieActive=0; this.mirrorActive=0;
-    // Animation: squash & stretch
-    this.squash = 1;  // 1 = normal, <1 = squash (charge), >1 = stretch (cast)
+    // Animation
+    this.squash = 1;
     this.squashTarget = 1;
     this.breathPhase = Math.random()*TAU;
+    // ===== FIX: steerTimer untuk homing ke musuh =====
+    this.steerTimer = 0.4 + Math.random() * 0.8;
     // Passive stat mods
     if (this.ability === 'sturdy') this.defenseStat *= 1.30;
     if (this.ability === 'swift')  this.speedMul *= 1.35;
@@ -1690,6 +1634,26 @@ class Ball {
     this.squash += (this.squashTarget - this.squash) * Math.min(1, dt * 8);
     this.squashTarget += (1 - this.squashTarget) * Math.min(1, dt * 4);
     this.breathPhase += dt * 2.5;
+
+    // ===== FIX: STEERING — periodik bidik musuh agar match selesai =====
+    this.steerTimer -= dt;
+    const frozenNow = this.freeze > 0 || this.sticky > 0;
+    if (!frozenNow && !this.isCharging && this.alive && this.steerTimer <= 0){
+      let angle;
+      if (enemy && enemy.alive && Math.random() < 0.78){
+        const edx = enemy.x + enemy.vx * 0.15 - this.x;
+        const edy = enemy.y + enemy.vy * 0.15 - this.y;
+        angle = Math.atan2(edy, edx) + (Math.random() - 0.5) * 0.35;
+      } else {
+        angle = Math.random() * TAU;
+      }
+      const sp = this.speedMax;
+      this.vx = Math.cos(angle) * sp;
+      this.vy = Math.sin(angle) * sp;
+      this.steerTimer = 1.0 + Math.random() * 1.8;
+      burst(this.x, this.y, 3, this.light, 70, 2, { drag: 0.2 });
+    }
+
     for (const a of this.auras) a.update(dt);
     if (this.dashCd>0){ this.dashCd -= dt; if (this.dashCd<=0){ this.dashCd=0; this.dashCharges = Math.min(this.maxDashCharges, this.dashCharges+1); if (this.dashCharges < this.maxDashCharges) this.dashCd = this.dashMax; } }
     if (this.dashTime>0) this.dashTime -= dt;
@@ -1719,7 +1683,6 @@ class Ball {
     if (this.isCharging){
       this.chargeTimer += dt;
       this.vx = 0; this.vy = 0;
-      // Suction particle effect during charge (arcs curving inward)
       if (Math.random() < 0.7){
         const a = Math.random()*TAU;
         const r = this.r + 40*SCALE;
@@ -1831,13 +1794,11 @@ class Ball {
       }
     }
   }
-  // Passive ability handler — abbreviated; core charge/active abilities preserved
   applyAbilityPassive(dt, enemy){
     const ab = this.ability;
     const enemies = enemy ? [enemy] : [];
     const spawnRune = (color, r, life) => { if (G.runes.length < MAX_RUNES) G.runes.push(new Rune(this.x, this.y, color, r, life)); };
     const spawnSlash = (angle, color, len) => { if (G.slashes.length < MAX_SLASHES) G.slashes.push(new Slash(this.x, this.y, angle, color, len, 0.32)); };
-    // CHARGE ABILITIES
     if (ab==='kamehameha' && !this.isCharging && this.abilityCd <= 0){
       this.startCharge('kamehameha', 2.0, '#44ccff'); this.kiAura = 2.5;
       this.showFloatText('KA-ME-HA-ME...', '#44ccff');
@@ -1846,7 +1807,6 @@ class Ball {
       this.startCharge('final_flash', 2.0, '#2050ff'); this.kiAura = 2.5;
       this.showFloatText('FINAL...', '#2050ff');
     }
-    // Handle additional abilities only for the most visual ones
     if (ab==='special_beam' && this.abilityCd <= 0 && enemy && enemy.alive){
       const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
       if (d < 450*SCALE){
@@ -1966,7 +1926,6 @@ class Ball {
       this.triggerAbility(5);
     }
     if (ab==='kame_master' && this.shield <= 0 && this.abilityCd <= 0){ this.shield = 3; this.triggerAbility(7); }
-    // BLACK CLOVER
     if (ab==='antimagic_sword' && this.abilityCd <= 0 && enemy && enemy.alive){
       const d = Math.hypot(enemy.x-this.x, enemy.y-this.y);
       if (d < 200*SCALE){
@@ -2110,7 +2069,6 @@ class Ball {
       }
       this.triggerAbility(6);
     }
-    // NARUTO
     if (ab==='amaterasu' && this.abilityCd<=0){
       G.hazards.push(new Hazard(this.x, this.y, this, 20, 5, '#0a0a0a', this.r*0.9));
       this.triggerAbility(0.3);
@@ -2181,7 +2139,6 @@ class Ball {
       }
       this.triggerAbility(1.2);
     }
-    // BASIC
     if (ab==='healer' && this.hp<this.maxHp) this.hp = Math.min(this.maxHp, this.hp+6*dt);
     if (ab==='druid' && this.hp<this.maxHp) this.hp = Math.min(this.maxHp, this.hp+8*dt);
     if (ab==='shield' && this.shield<=0 && this.abilityCd<=0){ this.shield = 4.5; this.triggerAbility(9); }
@@ -2349,7 +2306,6 @@ class Ball {
       G.score += dmg*(1+(G.combo-1)*0.3);
     }
     addDamageNum(target.x, target.y - target.r*0.5, dmg, this.isPlayer ? '#5fe6ff' : '#ff8080');
-    // VISUAL IMPACT
     const sig = this.sig || {};
     if (sig.impact){
       hitImpact(target.x, target.y, sig.impact.shockwave || this.color, sig.impact.strength || 1);
@@ -2421,7 +2377,6 @@ class Ball {
     ctx.save();
     ctx.fillStyle = 'rgba(0,0,0,0.75)';
     ctx.fillRect(bx-2, by-2, barW+4, barH+4);
-    // Gradient fill
     const g = ctx.createLinearGradient(bx, 0, bx + barW, 0);
     g.addColorStop(0, this.chargeColor);
     g.addColorStop(1, '#ffffff');
@@ -2431,9 +2386,7 @@ class Ball {
     ctx.restore();
   }
   draw(){
-    // Auras behind
     for (const a of this.auras) a.draw();
-    // Trail (motion blur)
     ctx.globalCompositeOperation = 'lighter';
     for (let i=0;i<this.trail.length;i++){
       const p = this.trail[i]; const f = i/this.trail.length;
@@ -2448,7 +2401,6 @@ class Ball {
     const pulse = (this.dashTime>0 ? 1.07 : 1) * breath * this.squash;
     const alpha = this.invisible>0 ? 0.35 : 1;
     const meta = ABILITY_META[this.ability] || {};
-    // Ki aura during charge
     if (this.kiAura > 0 || this.isCharging){
       const charge = this.isCharging ? (this.chargeTimer/this.chargeTime) : (this.kiAura/2.5);
       const chargePct = clamp(charge, 0, 1);
@@ -2463,13 +2415,11 @@ class Ball {
       ag.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = ag;
       ctx.beginPath(); ctx.arc(this.x, this.y, R, 0, TAU); ctx.fill();
-      // Bright core
       ctx.globalAlpha = 0.85;
       ctx.fillStyle = '#ffffff';
       ctx.beginPath(); ctx.arc(this.x, this.y, this.r * (0.25 + chargePct*0.5), 0, TAU); ctx.fill();
       ctx.restore();
     }
-    // Kamui vortex
     if (this.kamuiActive > 0){
       ctx.save();
       ctx.globalAlpha = 0.5 + Math.sin(performance.now()/80)*0.3;
@@ -2509,7 +2459,6 @@ class Ball {
       ctx.beginPath(); ctx.arc(this.x, this.y, this.r + 8*SCALE, 0, TAU); ctx.stroke();
       ctx.setLineDash([]); ctx.restore();
     }
-    // Ball body — multi-layer glow
     ctx.save();
     ctx.globalAlpha = alpha;
     ctx.shadowBlur = 32; ctx.shadowColor = this.color;
@@ -2523,23 +2472,19 @@ class Ball {
     ctx.fillStyle = g;
     ctx.beginPath(); ctx.arc(this.x, this.y, this.r*pulse, 0, TAU); ctx.fill();
     ctx.restore();
-    // Rim highlight
     ctx.globalAlpha = alpha;
     ctx.strokeStyle = 'rgba(255,255,255,0.8)'; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.arc(this.x, this.y, this.r*pulse-1, 0, TAU); ctx.stroke();
-    // Specular
     ctx.globalAlpha = alpha*0.32;
     ctx.fillStyle = '#fff';
     ctx.beginPath();
     ctx.ellipse(this.x-this.r*0.3, this.y-this.r*0.4, this.r*0.28, this.r*0.18, -0.6, 0, TAU);
     ctx.fill();
     ctx.globalAlpha = alpha;
-    // Symbol
     ctx.save();
     ctx.translate(this.x, this.y);
     drawBallSymbol(this.ability, this.r, performance.now()/1000);
     ctx.restore();
-    // Eyes
     const sp = Math.hypot(this.vx,this.vy);
     let ex=0, ey=0; if (sp>12){ ex=this.vx/sp; ey=this.vy/sp; }
     const px=-ey, py=ex; const eOff = this.r*0.4; const eyeR = this.r*0.15; const pupR = this.r*0.075;
@@ -2591,7 +2536,7 @@ class Ball {
 }
 
 /* ==========================================================================
-   23. SYMBOL DRAWING (simple fallback — most visuals via Aura)
+   23. SYMBOL DRAWING
    ========================================================================== */
 function drawBallSymbol(ab, r, t){
   const S = r*0.62;
@@ -2691,14 +2636,12 @@ class PowerUp {
     const R = this.r*pulse;
     ctx.save(); ctx.translate(this.x, this.y);
     ctx.globalCompositeOperation = 'lighter';
-    // Outer glow
     ctx.globalAlpha = 0.5 + Math.sin(this.bob*2)*0.2;
     ctx.shadowBlur = 22; ctx.shadowColor = this.color;
     ctx.fillStyle = this.color;
     ctx.beginPath(); ctx.arc(0, 0, R*1.4, 0, TAU); ctx.fill();
     ctx.globalCompositeOperation = 'source-over';
     ctx.globalAlpha = 1;
-    // Body
     ctx.rotate(this.spin);
     ctx.fillStyle = 'rgba(10,5,25,0.9)';
     ctx.strokeStyle = this.color;
@@ -3015,7 +2958,6 @@ function loop(now){
   let rdt = (now-lastTime)/1000;
   lastTime = now;
   if (rdt>0.05) rdt = 0.05;
-  // Hit-stop
   const stopping = HitStop.update(rdt);
   const effectiveScale = stopping ? 0.05 : 1;
   const targetTS = G.slowmo>0 ? 0.2 : 1;
